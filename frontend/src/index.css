@@ -1,0 +1,355 @@
+/* 폰트 Import */
+@import url('https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@300;400;500;700&display=swap');
+@font-face {
+  font-family: 'Pretendard';
+  src: url('https://ext.same-assets.com/947818454/2043141024.woff2') format('woff2');
+  font-weight: 400;
+  font-style: normal;
+}
+@font-face {
+  font-family: 'Pretendard';
+  src: url('https://ext.same-assets.com/947818454/3135879896.woff2') format('woff2');
+  font-weight: 500;
+  font-style: normal;
+}
+@font-face {
+  font-family: 'Pretendard';
+  src: url('https://ext.same-assets.com/947818454/3145371850.woff2') format('woff2');
+  font-weight: 700;
+  font-style: normal;
+}
+
+/* ======================
+   전역 CSS 변수 (디자인 시스템)
+   ====================== */
+:root {
+  /* Primary Colors */
+  --primary-color: #7F39FB;
+  --primary-hover: #6c2fd4;
+  --hover-color: #6c2fc3; /* Legacy - 점진적으로 --primary-hover로 대체 */
+
+  /* Base Colors */
+  --color-white: #fff;
+  --color-black: #000;
+  --color-dark: #111;
+  --color-darker: #222;
+
+  /* Text Colors */
+  --text-primary: #040404;
+  --text-secondary: #5f5a53;
+  --text-tertiary: #999;
+  --text-medium: #444;
+  --text-light: #666;
+
+  /* Background Colors */
+  --bg-primary: #ffffff;
+  --bg-secondary: #f8f9fa;
+  --bg-tertiary: #f1f0ef;
+  --bg-light: #fafafa;
+
+  /* Border Colors */
+  --border-color: #e9e9e9;
+  --border-light: #e9ecef;
+  --border-medium: #ddd;
+
+  /* Status Colors - Error/Danger */
+  --color-danger: #ef4444;
+  --color-danger-hover: #dc2626;
+  --color-danger-bg: #fdeeee;
+  --color-danger-border: #f6c7c7;
+
+  /* Status Colors - Warning */
+  --color-warning: #ffce45;
+  --color-warning-hover: #ffc52a;
+  --color-warning-border: #f5c233;
+
+  /* Status Colors - Success */
+  --color-success: #0a7a28;
+  --color-success-bg: #e9f7ee;
+  --color-success-border: #c8ecd5;
+
+  /* Legacy - for backward compatibility */
+  --black: #000000;
+
+  /* 그림자 */
+  --shadow-sm: 0 2px 4px rgba(0, 0, 0, 0.05);
+  --shadow-md: 0 2px 8px rgba(0, 0, 0, 0.08);
+  --shadow-lg: 0 4px 16px rgba(0, 0, 0, 0.1);
+  --shadow: 0 2px 8px rgba(0, 0, 0, 0.08); /* Legacy - --shadow-md와 동일 */
+
+  /* 폰트 패밀리 */
+  --font-primary: 'Pretendard', 'Noto Sans KR', -apple-system, BlinkMacSystemFont, system-ui, sans-serif;
+
+  /* 폰트 크기 (Font Sizes) */
+  --font-xs: 12px;      /* Small labels, captions */
+  --font-sm: 14px;      /* Body small, secondary text */
+  --font-base: 16px;    /* Base body text */
+  --font-md: 18px;      /* Large body, small headings */
+  --font-lg: 20px;      /* Section titles */
+  --font-xl: 24px;      /* Page headings */
+  --font-2xl: 28px;     /* Large headings */
+  --font-3xl: 32px;     /* Page titles */
+  --font-4xl: 36px;     /* Hero text */
+  --font-5xl: 48px;     /* Display/Hero large */
+
+  /* 폰트 굵기 (Font Weights) */
+  --font-weight-normal: 400;
+  --font-weight-medium: 500;
+  --font-weight-semibold: 600;
+  --font-weight-bold: 700;
+
+  /* 행간 (Line Heights) */
+  --leading-none: 1;        /* Icons, badges */
+  --leading-tight: 1.25;    /* Headings */
+  --leading-snug: 1.375;    /* Tight paragraphs */
+  --leading-normal: 1.5;    /* Default body */
+  --leading-relaxed: 1.625; /* Comfortable reading */
+  --leading-loose: 1.8;     /* Long-form content */
+
+  /* 간격 */
+  --spacing-xs: 4px;
+  --spacing-sm: 8px;
+  --spacing-md: 16px;
+  --spacing-lg: 24px;
+  --spacing-xl: 32px;
+  --spacing-2xl: 48px;
+  --spacing-3xl: 64px;
+
+  /* border-radius */
+  --radius-sm: 4px;
+  --radius-md: 8px;
+  --radius-lg: 12px;
+  --radius-xl: 16px;
+  --radius-2xl: 20px;
+  --radius-3xl: 24px;
+  --radius-full: 9999px;  /* 완전한 원형 */
+
+  /* 레이아웃 */
+  --container-max-width: 1400px;
+  --container-padding: 20px;
+
+  /*
+   * 반응형 Breakpoints (참고용 주석)
+   * 모든 페이지에서 일관되게 사용할 표준 breakpoint
+   *
+   * @media (max-width: 480px)  - 작은 모바일
+   * @media (max-width: 768px)  - 모바일/태블릿
+   * @media (max-width: 1024px) - 태블릿/작은 데스크톱
+   * @media (max-width: 1200px) - 중간 데스크톱
+   */
+}
+
+/* ======================
+   전역 리셋
+   ====================== */
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+body {
+  font-family: var(--font-primary);
+  background-color: var(--bg-primary);
+  color: var(--text-primary);
+  line-height: 1.6;
+  font-size: 15px;
+}
+
+a {
+  text-decoration: none;
+  color: inherit;
+  transition: color 0.2s ease;
+}
+
+a:hover {
+  color: var(--primary-color);
+}
+
+ul, ol {
+  list-style: none;
+}
+
+button {
+  font-family: inherit;
+  cursor: pointer;
+  border: none;
+  background: none;
+}
+
+img {
+  max-width: 100%;
+  height: auto;
+  display: block;
+}
+
+/* ======================
+   공통 유틸리티 클래스
+   ====================== */
+
+/* Container */
+.container {
+  max-width: var(--container-max-width);
+  margin: 0 auto;
+  padding: 0 var(--container-padding);
+}
+
+/* 텍스트 정렬 */
+.text-center {
+  text-align: center;
+}
+
+.text-left {
+  text-align: left;
+}
+
+.text-right {
+  text-align: right;
+}
+
+/* 마진/패딩 유틸리티 */
+.mt-sm { margin-top: var(--spacing-sm); }
+.mt-md { margin-top: var(--spacing-md); }
+.mt-lg { margin-top: var(--spacing-lg); }
+.mt-xl { margin-top: var(--spacing-xl); }
+
+.mb-sm { margin-bottom: var(--spacing-sm); }
+.mb-md { margin-bottom: var(--spacing-md); }
+.mb-lg { margin-bottom: var(--spacing-lg); }
+.mb-xl { margin-bottom: var(--spacing-xl); }
+
+.p-sm { padding: var(--spacing-sm); }
+.p-md { padding: var(--spacing-md); }
+.p-lg { padding: var(--spacing-lg); }
+.p-xl { padding: var(--spacing-xl); }
+
+/* ======================
+   공통 버튼 스타일
+   ====================== */
+.btn {
+  display: inline-block;
+  padding: 12px 24px;
+  border-radius: var(--radius-md);
+  font-size: 15px;
+  font-weight: 600;
+  text-align: center;
+  transition: all 0.2s ease;
+  cursor: pointer;
+}
+
+.btn-primary {
+  background: var(--primary-color);
+  color: white;
+  border: none;
+}
+
+.btn-primary:hover {
+  background: var(--primary-hover);
+  color: white;
+  transform: translateY(-2px);
+  box-shadow: var(--shadow-md);
+}
+
+.btn-secondary {
+  background: white;
+  color: var(--primary-color);
+  border: 1px solid var(--primary-color);
+}
+
+.btn-secondary:hover {
+  background: var(--primary-color);
+  color: white;
+}
+
+.btn-outline {
+  background: transparent;
+  color: var(--text-primary);
+  border: 1px solid var(--border-color);
+}
+
+.btn-outline:hover {
+  border-color: var(--primary-color);
+  color: var(--primary-color);
+}
+
+/* ======================
+   공통 카드 스타일
+   ====================== */
+.card {
+  background: white;
+  border-radius: var(--radius-lg);
+  padding: var(--spacing-lg);
+  box-shadow: var(--shadow-sm);
+  transition: all 0.2s ease;
+}
+
+.card:hover {
+  box-shadow: var(--shadow-md);
+  transform: translateY(-2px);
+}
+
+/* ======================
+   공통 입력 필드 스타일
+   ====================== */
+.input {
+  width: 100%;
+  padding: 12px 16px;
+  border: 1px solid var(--border-color);
+  border-radius: var(--radius-md);
+  font-size: 15px;
+  font-family: inherit;
+  transition: all 0.2s ease;
+}
+
+.input:focus {
+  outline: none;
+  border-color: var(--primary-color);
+  box-shadow: 0 0 0 3px rgba(127, 57, 251, 0.1);
+}
+
+/* ======================
+   공통 그리드 레이아웃
+   ====================== */
+.grid {
+  display: grid;
+  gap: var(--spacing-lg);
+}
+
+.grid-2 {
+  grid-template-columns: repeat(2, 1fr);
+}
+
+.grid-3 {
+  grid-template-columns: repeat(3, 1fr);
+}
+
+.grid-4 {
+  grid-template-columns: repeat(4, 1fr);
+}
+
+/* 반응형 그리드 */
+@media (max-width: 1200px) {
+  .grid-4 {
+    grid-template-columns: repeat(3, 1fr);
+  }
+}
+
+@media (max-width: 768px) {
+  .grid-3, .grid-4 {
+    grid-template-columns: repeat(2, 1fr);
+  }
+
+  .grid-2 {
+    grid-template-columns: 1fr;
+  }
+
+  :root {
+    --container-padding: 16px;
+  }
+}
+
+@media (max-width: 480px) {
+  .grid-3, .grid-4 {
+    grid-template-columns: 1fr;
+  }
+}

@@ -1,0 +1,193 @@
+/* =========================================================
+   KUHO 브랜드 페이지 스타일 (사이즈 선택 포함 통일 버전)
+   - 8SECONDS/BEANPOLE/BEAKER와 동일한 동작
+   ========================================================= */
+
+/* ====== Common Layout ====== */
+.brandkh {
+  color: #111;
+  font-family: 'Noto Sans KR', sans-serif;
+  --brand-accent: #222; /* KUHO 포인트 컬러 */
+}
+.brandkh a { text-decoration: none; }
+
+/* ====== HERO ====== */
+.brandkh-hero {
+  width: 100%;
+  background: url("https://images.unsplash.com/photo-1512436991641-6745cdb1723f?w=2000&q=80&auto=format&fit=crop") center/cover no-repeat;
+  color: #fff;
+}
+.brandkh-hero-inner {
+  width: min(1240px, 94%);
+  margin: 0 auto;
+  padding: 80px 0 120px;
+}
+.brandkh-badge {
+  display: inline-block;
+  padding: 6px 10px;
+  font-size: 12px;
+  font-weight: 800;
+  border-radius: 10px;
+  background: var(--brand-accent);
+}
+.brandkh-title {
+  margin: 14px 0 8px;
+  font-size: 40px;
+  font-weight: 900;
+  line-height: 1.15;
+}
+.brandkh-sub { opacity: 0.95; }
+
+.brandkh-cta { margin-top: 18px; display: flex; gap: 8px; }
+.brandkh-btn {
+  padding: 10px 16px;
+  border-radius: 10px;
+  font-weight: 800;
+  border: 1px solid rgba(255, 255, 255, .6);
+  color: #fff;
+}
+.brandkh-btn:hover { border-color: #fff; }
+.brandkh-btn-primary { background: var(--brand-accent); border-color: var(--brand-accent); }
+.brandkh-btn-ghost { background: transparent; }
+
+/* ====== STATS ====== */
+.brandkh-stats { display: flex; gap: 24px; margin-top: 20px; }
+.brandkh-stats li strong { display: block; font-size: 22px; }
+
+/* ====== Section ====== */
+.brandkh-section { width: min(1240px, 94%); margin: 40px auto 60px; }
+.brandkh-section-head { display:flex; align-items:center; justify-content:space-between; margin-bottom: 12px; }
+.brandkh-more { font-weight: 800; color: var(--brand-accent); }
+
+/* ====== Grid ====== */
+.brandkh-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+  gap: 18px;
+}
+
+/* ====== Card ====== */
+.brandkh-card {
+  display: flex; flex-direction: column;
+  border: 1px solid #efefef; border-radius: 16px;
+  overflow: hidden; background: #fff;
+}
+.brandkh-card-thumb { position: relative; aspect-ratio: 4/3; background: #f7f7f7; }
+.brandkh-card-thumb img {
+  position: absolute; inset: 0; width: 100%; height: 100%;
+  object-fit: cover; display: block; transition: transform .25s ease;
+}
+.brandkh-card:hover .brandkh-card-thumb img { transform: scale(1.03); }
+
+.brandkh-tag {
+  position: absolute; left: 10px; top: 10px; z-index: 2;
+  background: var(--brand-accent); color: #fff;
+  font-weight: 800; padding: 4px 8px; border-radius: 10px; font-size: 12px;
+}
+.brandkh-card-body { padding: 12px; display: flex; flex-direction: column; gap: 10px; }
+.brandkh-name { font-weight: 800; line-height: 1.3; min-height: 40px; }
+.brandkh-price { font-weight: 900; }
+.brandkh-actions { margin-top: auto; display: flex; gap: 8px; }
+
+/* 카드 내 작은 버튼 */
+.brandkh-small-btn{
+  border:1px solid #e5e5e5;
+  padding:7px 10px;
+  border-radius:8px;
+  font-size:13px;
+  color:#333;
+  background:#fff;
+  font-weight:700;
+  cursor:pointer;
+}
+.brandkh-small-primary{ border-color:#222; background:#222; color:#fff; }
+
+/* --- size picker (공통) --- */
+.brandkh-sizebox {
+  margin-top: 10px;
+  border: 1px solid #eee;
+  border-radius: 12px;
+  padding: 10px;
+  background: #fff;
+}
+.sizebox-title { font-weight: 800; font-size: 14px; margin-bottom: 8px; }
+.sizebox-chips { display:flex; gap:8px; flex-wrap:wrap; }
+.sizebox-chip{
+  padding: 6px 12px;
+  border-radius: 10px;
+  border: 1px solid #ddd;
+  background: #fff;
+  font-weight: 700;
+  cursor: pointer;
+  transition: all .15s ease;
+}
+.sizebox-chip:hover { border-color: #bbb; }
+.sizebox-chip.active { border: 2px solid #111; }
+
+.sizebox-actions{
+  display:flex; gap:8px;
+  justify-content:flex-end;
+  margin-top:10px;
+}
+.sizebox-warn{ margin-top:6px; color:#c33; font-size:12px; }
+
+.brandkh-small-btn.disabled,
+.brandkh-small-btn[disabled]{
+  opacity:.45; cursor:not-allowed; pointer-events:none;
+}
+
+/* ====== 혜택 영역 ====== */
+.brandkh-benefits {
+  width: min(1240px, 94%);
+  margin: 40px auto 60px;
+  display: flex; flex-direction: column; gap: 14px;
+}
+.brandkh-benefit-card{
+  display:flex; justify-content:space-between; align-items:center;
+  border:1px solid #ddd; background:#f8f8f8;
+  border-radius:12px; padding:20px 24px;
+}
+.benefit-left{ display:flex; flex-direction:column; gap:6px; }
+.benefit-eyebrow{ font-size:12px; font-weight:900; color: var(--brand-accent); }
+.brandkh-benefit-card h3{ font-size:20px; font-weight:900; margin: 2px 0; color:#111; }
+.brandkh-benefit-card p{ color:#555; margin:0; }
+.benefit-right{ display:flex; gap:8px; }
+
+/* 하단 3분할 */
+.brandkh-benefit-sub{
+  display:grid; grid-template-columns: repeat(3, 1fr);
+  gap:12px;
+}
+.brandkh-benefit-sub > div{
+  border:1px dashed #ddd; background:#fff;
+  border-radius:10px; padding:14px 16px;
+}
+.brandkh-benefit-sub strong{ font-weight:900; color:#111; }
+.brandkh-benefit-sub span{ color:#666; }
+
+/* ====== Lookbook ====== */
+.brandkh-lookbook{
+  width:min(1240px, 94%);
+  margin: 40px auto 0;
+  display:grid;
+  grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+  gap:12px;
+}
+.kh-look{ position:relative; border-radius:16px; overflow:hidden; }
+.kh-look img{ width:100%; height:100%; object-fit:cover; display:block; transition: transform .25s ease; }
+.kh-look img:hover{ transform:scale(1.03); }
+
+/* ====== 오프라인 섹션 ====== */
+.brandkh-store{
+  display:grid; grid-template-columns: 1fr 1.2fr;
+  gap:20px; align-items:center;
+}
+.brandkh-store img{ width:100%; border-radius:16px; object-fit:cover; }
+.store-text .brandkh-btn{ margin-top: 12px; align-self:flex-start; }
+
+/* ====== Responsive ====== */
+@media (max-width: 960px){
+  .brandkh-benefit-sub{ grid-template-columns:1fr; }
+  .brandkh-lookbook{ grid-template-columns: repeat(2, 1fr); }
+  .brandkh-store{ grid-template-columns:1fr; }
+}

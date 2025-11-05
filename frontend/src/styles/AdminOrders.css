@@ -1,0 +1,97 @@
+/* 버튼 그룹 전체 */
+.admin-order-btns {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  align-items: center;
+  gap: 8px 12px;         /* 버튼 간격 살짝 여유 */
+  width: 280px;          /* 전체 폭 균형 */
+  margin: 0 auto;
+  padding: 4px 0;
+}
+
+/* 공통 버튼 스타일 */
+.admin-btn {
+  min-width: 88px;
+  height: 34px;
+  border-radius: 8px;
+  font-size: 13px;
+  font-weight: 600;
+  border: none;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  letter-spacing: -0.2px;
+}
+
+/* ===== 색상 톤 (SSF Shop 관리자 감성) ===== */
+
+/* 결제완료 */
+.btn-paid {
+  background: #f4f1ff;
+  color: #6542f6;
+  border: 1px solid #ddd5ff;
+}
+.btn-paid:hover {
+  background: #ece6ff;
+}
+
+/* 배송중 */
+.btn-shipping {
+  background: #f0fbf7;
+  color: #11895d;
+  border: 1px solid #cdeadd;
+}
+.btn-shipping:hover {
+  background: #e3f5ed;
+}
+
+/* 배송완료 */
+.btn-delivered {
+  background: #e9f6ff;
+  color: #0078d4;
+  border: 1px solid #cbe5fa;
+}
+.btn-delivered:hover {
+  background: #d8eeff;
+}
+
+/* 주문취소 */
+.btn-cancel {
+  background: #fff7e9;
+  color: #b36b00;
+  border: 1px solid #f2deb6;
+}
+.btn-cancel:hover {
+  background: #ffefcc;
+}
+
+/* 삭제 */
+.btn-delete {
+  background: #fff0f0;
+  color: #d93636;
+  border: 1px solid #ffcaca;
+}
+.btn-delete:hover {
+  background: #ffe0e0;
+}
+
+/* 아래쪽 버튼들(주문취소, 삭제)을 살짝 내림 */
+.btn-cancel,
+.btn-delete {
+  margin-top: 4px;
+}
+
+/* 살짝 그림자 효과로 입체감 */
+.admin-btn:hover {
+  box-shadow: 0 2px 6px rgba(0,0,0,0.05);
+}
+
+/* 선택: 상세 버튼 라이트 스타일 */
+.admin-btn.btn-outline {
+  background: #fff;
+  color: #5e37f4;
+  border: 1px solid #e3d9ff;
+}
+.admin-btn.btn-outline:hover {
+  background: #f6f2ff;
+}

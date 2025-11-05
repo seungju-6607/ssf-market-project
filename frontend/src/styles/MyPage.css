@@ -1,0 +1,58 @@
+.mypage-wrapper {
+  display: flex;
+  justify-content: center;
+  align-items: flex-start;
+  min-height: 80vh;
+  background: #fff;
+  padding-top: 60px;
+  font-family: 'Noto Sans KR', sans-serif;
+}
+
+.mypage-box {
+  background: #fff;
+  border: 1px solid #eee;
+  border-radius: 16px;
+  padding: 40px;
+  width: 480px;
+  box-shadow: 0 6px 16px rgba(0, 0, 0, 0.05);
+}
+
+.mypage-box h2 {
+  text-align: center;
+  font-size: 22px;
+  font-weight: 700;
+  margin-bottom: 24px;
+}
+
+.mypage-menu {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.mypage-item {
+  display: block;
+  text-decoration: none;
+  background: #fafafa;
+  border: 1px solid #e0e0e0;
+  border-radius: 8px;
+  padding: 14px 18px;
+  font-size: 16px;
+  color: #111;
+  transition: all 0.2s ease;
+}
+
+.mypage-item:hover {
+  background: #f0f0f0;
+  border-color: #ccc;
+}
+
+.mypage-btn {
+  display: inline-block;
+  padding: 10px 16px;
+  background: #6c3ef1;
+  color: #fff;
+  text-decoration: none;
+  border-radius: 8px;
+  margin-top: 20px;
+}

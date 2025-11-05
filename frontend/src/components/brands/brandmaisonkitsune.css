@@ -1,0 +1,172 @@
+/* MAISON KITSUNÉ — 독립 CSS (공용 없이 동작) */
+:root { --brand-mk: #ff6b3d; } /* fox-orange */
+
+.brandmk { position: relative; z-index: 1; color:#111; background:#fff; }
+.brandmk-hero, .brandmk-section { display:block; padding:36px 0; }
+.brandmk img { display:block; max-width:100%; height:auto; }
+.brandmk * { box-sizing:border-box; }
+
+/* Container */
+.brandmk-hero-inner,
+.brandmk-section .brandmk-section-head,
+.brandmk-section .brandmk-grid,
+.brandmk-section .brandmk-lookbook,
+.brandmk-section .brandmk-store,
+.benefit-wrap .inner {
+  width:min(1240px,94%);
+  margin:0 auto;
+}
+
+/* HERO */
+.brandmk-hero{
+  background:
+    linear-gradient(0deg, rgba(0,0,0,.25), rgba(0,0,0,.25)),
+    url("https://images.unsplash.com/photo-1542314831-068cd1dbfeeb?w=2000&q=80&auto=format&fit=crop")
+      center/cover no-repeat;
+  color:#fff;
+}
+.brandmk-hero-inner{ padding:92px 0 120px; }
+.brandmk-badge{
+  display:inline-block; padding:6px 10px; font-size:12px; font-weight:800;
+  border-radius:10px; background:var(--brand-mk);
+}
+.brandmk-title{ margin:14px 0 8px; font-size:40px; font-weight:900; line-height:1.15; }
+.brandmk-title span{ color:#ffe0d5; }
+.brandmk-sub{ opacity:.95; }
+
+.brandmk-cta{ margin-top:18px; display:flex; gap:10px; }
+.brandmk-btn{
+  padding:10px 16px; border-radius:10px; font-weight:800;
+  border:1px solid rgba(255,255,255,.75); color:#fff; text-decoration:none;
+}
+.brandmk-btn:hover{ border-color:#fff; }
+.brandmk-btn-primary{ background:var(--brand-mk); border-color:var(--brand-mk); }
+.brandmk-btn-ghost{ background:transparent; }
+
+/* 흰 배경에서도 보이도록(오프라인 섹션의 길찾기) */
+.mk-ghost-onwhite{
+  color:var(--brand-mk) !important;
+  border-color:var(--brand-mk) !important;
+}
+
+.brandmk-stats{ display:flex; gap:24px; margin-top:22px; }
+.brandmk-stats li strong{ display:block; font-size:22px; }
+
+/* Section Head */
+.brandmk-section-head{
+  display:flex; align-items:center; justify-content:space-between; margin-bottom:14px;
+}
+.brandmk-more{ font-weight:800; color:var(--brand-mk); text-decoration:none; }
+
+/* GRID */
+.brandmk-grid{
+  display:grid;
+  grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+  gap:18px;
+}
+.brandmk-card{
+  display:flex; flex-direction:column; border:1px solid #efefef; border-radius:16px;
+  overflow:hidden; background:#fff;
+}
+.brandmk-card-thumb{ position:relative; aspect-ratio:4/3; background:#f7f7f7; }
+.brandmk-card-thumb img{
+  position:absolute; inset:0; width:100%; height:100%; object-fit:cover; transition:transform .25s ease;
+}
+.brandmk-card:hover .brandmk-card-thumb img{ transform:scale(1.03); }
+
+.brandmk-tag{
+  position:absolute; left:10px; top:10px; z-index:2;
+  background:var(--brand-mk); color:#fff; font-weight:800;
+  padding:4px 8px; border-radius:10px; font-size:12px;
+}
+.brandmk-card-body{ padding:12px; display:flex; flex-direction:column; gap:10px; }
+.brandmk-name{ font-weight:800; line-height:1.3; min-height:40px; }
+.brandmk-price{ font-weight:900; }
+.brandmk-actions{ margin-top:auto; display:flex; gap:8px; }
+
+.brandmk-small-btn{
+  display:inline-block; padding:8px 12px; border-radius:8px; font-weight:700;
+  border:1px solid #ddd; color:#333; text-decoration:none; background:#fff; cursor:pointer;
+}
+.brandmk-small-primary{ background:var(--brand-mk); border-color:var(--brand-mk); color:#fff; }
+
+/* === size picker (추가) === */
+.brandmk-sizebox{
+  margin-top:10px; border:1px solid #eee; border-radius:12px; padding:10px; background:#fff;
+}
+.sizebox-title{ font-weight:800; font-size:14px; margin-bottom:8px; }
+.sizebox-chips{ display:flex; gap:8px; flex-wrap:wrap; }
+.sizebox-chip{
+  padding:6px 12px; border-radius:10px; border:1px solid #ddd; background:#fff;
+  font-weight:700; cursor:pointer; transition:all .15s ease;
+}
+.sizebox-chip:hover{ border-color:#bbb; }
+.sizebox-chip.active{ border:2px solid #111; }
+.sizebox-actions{ display:flex; gap:8px; justify-content:flex-end; margin-top:10px; }
+.sizebox-warn{ margin-top:6px; color:#c33; font-size:12px; }
+
+.brandmk-small-btn.disabled,
+.brandmk-small-btn[disabled]{
+  opacity:.45; cursor:not-allowed; pointer-events:none;
+}
+
+/* BENEFIT (독립) */
+.benefit-wrap{ background:#fff8f4; border:1px solid #ffe3d6; border-radius:16px; margin:28px auto; }
+.benefit-wrap .inner{ padding:18px; }
+.benefit-head{
+  display:flex; align-items:center; justify-content:space-between;
+  border-bottom:1px dashed #ffd6c6; padding-bottom:14px; margin-bottom:12px;
+}
+.benefit-eyebrow{ font-size:12px; font-weight:800; color:var(--brand-mk); margin-bottom:6px; }
+.benefit-head h3{ margin:4px 0 6px; font-size:20px; font-weight:900; color:#111; }
+.benefit-head p{ margin:0; color:#333; opacity:.9; }
+.benefit-cta{ display:flex; gap:10px; }
+.btn{ display:inline-block; padding:10px 14px; border-radius:10px; font-weight:800; text-decoration:none; }
+.b-solid{ background:var(--brand-mk); color:#fff; border:1px solid var(--brand-mk); }
+.b-ghost{ background:#fff; color:var(--brand-mk); border:1px solid var(--brand-mk); }
+.benefit-row{ display:grid; grid-template-columns:repeat(3,1fr); gap:10px; }
+.benefit-item{ border:1px dashed #ffd6c6; border-radius:12px; background:#fff; padding:12px 14px; }
+.benefit-item strong{ display:block; font-weight:900; color:#111; margin-bottom:4px; }
+.benefit-item span{ color:#444; opacity:.9; }
+
+/* LOOKBOOK */
+.brandmk-lookbook {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: 12px;
+}
+.brandmk-lookbook .lookbook-item {
+  position: relative;
+  aspect-ratio: 4 / 3;
+  border-radius: 12px;
+  overflow: hidden;
+  background: #f7f7f7;
+}
+.brandmk-lookbook .lookbook-item img {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+/* STORE */
+.brandmk-store{ display:grid; grid-template-columns:1fr 1.4fr; gap:20px; align-items:center; }
+.store-text h3{ font-size:18px; font-weight:900; margin:0 0 6px; }
+.store-text p{ margin:0 0 12px; color:#333; }
+.store-map img{ width:100%; border-radius:16px; border:1px solid #eee; }
+
+/* Responsive */
+@media (max-width:960px){
+  .brandmk-hero-inner{ padding:64px 0 84px; }
+  .brandmk-title{ font-size:32px; }
+  .brandmk-stats{ gap:14px; }
+  .brandmk-lookbook{ grid-template-columns: repeat(2, 1fr); }
+  .brandmk-store{ grid-template-columns:1fr; }
+  .benefit-row{ grid-template-columns:1fr; }
+}
+@media (max-width: 960px) {
+  .brandmk-lookbook {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+}

@@ -1,0 +1,493 @@
+/* =====================================
+   TOMMY HILFIGER (American Classic)
+   ===================================== */
+
+/* 기본 세팅 */
+.brand-th {
+  position: relative;
+  color: #111827;
+  background: #ffffff;
+  font-family: "Pretendard", "Noto Sans KR", system-ui, sans-serif;
+}
+.brand-th * {
+  box-sizing: border-box;
+}
+.brand-th img {
+  max-width: 100%;
+  height: auto;
+  display: block;
+}
+
+/* 공통 섹션 레이아웃 */
+.th-section {
+  width: min(1240px, 94%);
+  margin: 40px auto;
+}
+
+/* -------------------------------------
+   HERO
+   ------------------------------------- */
+
+.th-hero.with-image {
+  position: relative;
+  height: 420px;
+  overflow: hidden;
+  color: #ffffff;
+}
+.th-hero-bg {
+  position: absolute;
+  inset: 0;
+  background-size: cover;
+  background-position: center;
+  filter: brightness(0.82);
+  transform: scale(1.03);
+}
+.th-hero-overlay {
+  position: absolute;
+  inset: 0;
+  background:
+    linear-gradient(
+      120deg,
+      rgba(15, 23, 42, 0.92) 0%,
+      rgba(30, 64, 175, 0.85) 35%,
+      rgba(220, 38, 38, 0.8) 70%,
+      rgba(248, 250, 252, 0.2) 100%
+    );
+}
+.th-hero-inner {
+  position: relative;
+  z-index: 1;
+  width: min(1240px, 94%);
+  margin: 0 auto;
+  padding: 60px 0;
+}
+.th-hero-badge {
+  display: inline-block;
+  padding: 6px 12px;
+  border-radius: 999px;
+  background: #ffffff;
+  color: #111827;
+  font-size: 12px;
+  font-weight: 800;
+  letter-spacing: 0.12em;
+  margin-bottom: 10px;
+}
+.th-hero-title {
+  font-size: 32px;
+  font-weight: 900;
+  margin: 0 0 10px;
+}
+.th-hero-desc {
+  font-size: 14px;
+  color: #e5e7eb;
+  line-height: 1.7;
+  max-width: 560px;
+  margin-bottom: 20px;
+}
+.th-hero-cta {
+  display: flex;
+  gap: 10px;
+  margin-bottom: 22px;
+}
+
+/* HERO Stats */
+.th-stats {
+  display: flex;
+  gap: 20px;
+  padding: 12px 16px;
+  background: rgba(15, 23, 42, 0.7);
+  border-radius: 12px;
+  backdrop-filter: blur(6px);
+  max-width: 420px;
+}
+.th-stats li {
+  list-style: none;
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+.th-stats strong {
+  font-size: 18px;
+  font-weight: 800;
+}
+.th-stats span {
+  font-size: 12px;
+  color: #e5e7eb;
+}
+
+/* -------------------------------------
+   버튼 공통
+   ------------------------------------- */
+
+.brand-th .btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  height: 40px;
+  padding: 0 18px;
+  border-radius: 999px;
+  border: 1px solid #d1d5db;
+  font-size: 13px;
+  font-weight: 700;
+  cursor: pointer;
+  transition:
+    background 0.2s ease,
+    box-shadow 0.2s ease,
+    transform 0.2s ease,
+    border-color 0.2s ease,
+    color 0.2s ease;
+}
+
+/* 메인 버튼 – 네이비 */
+.brand-th .btn.primary {
+  background: #1f2937 !important;
+  border-color: #1f2937 !important;
+  color: #ffffff !important;
+}
+.brand-th .btn.primary:hover:not([disabled]) {
+  background: #111827 !important;
+}
+
+/* 기본 고스트 버튼 – 흰 배경용 */
+.brand-th .btn.ghost {
+  background: #ffffff !important;
+  color: #111827 !important;
+  border: 1px solid #d1d5db !important;
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.04);
+}
+.brand-th .btn.ghost:hover:not([disabled]) {
+  background: #f9fafb !important;
+}
+
+/* HERO 안의 고스트 버튼 – 어두운 배경용 */
+.th-hero-cta .btn.ghost {
+  background: rgba(255, 255, 255, 0.16) !important;
+  color: #f9fafb !important;
+  border-color: rgba(255, 255, 255, 0.6) !important;
+  box-shadow: none !important;
+}
+.th-hero-cta .btn.ghost:hover {
+  background: rgba(255, 255, 255, 0.26) !important;
+}
+
+.brand-th .btn[disabled] {
+  opacity: 0.45;
+  cursor: not-allowed;
+}
+
+/* -------------------------------------
+   섹션 헤더
+   ------------------------------------- */
+
+.th-head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 14px;
+}
+.th-head h2 {
+  font-size: 20px;
+  font-weight: 800;
+  color: #111827;
+}
+.link-more {
+  font-size: 13px;
+  color: #9ca3af;
+}
+
+/* -------------------------------------
+   상품 GRID
+   ------------------------------------- */
+
+.th-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(260px, 1fr));
+  gap: 22px;
+}
+.th-card {
+  border-radius: 16px;
+  border: 1px solid #e5e7eb;
+  background: #ffffff;
+  overflow: hidden;
+  transition: box-shadow 0.2s ease, transform 0.2s ease;
+}
+.th-card:hover {
+  box-shadow: 0 10px 24px rgba(15, 23, 42, 0.15);
+  transform: translateY(-2px);
+}
+
+.th-thumb {
+  position: relative;
+  padding-top: 72%;
+  background: #f3f4f6;
+}
+.th-thumb img {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+/* 배지 */
+.th-badges {
+  position: absolute;
+  top: 10px;
+  left: 10px;
+  display: flex;
+  gap: 6px;
+  z-index: 1;
+}
+.th-badges .bdg {
+  padding: 4px 8px;
+  border-radius: 999px;
+  background: #ffffff;
+  border: 1px solid #d1d5db;
+  font-size: 11px;
+  font-weight: 800;
+  letter-spacing: 0.06em;
+  color: #111827;
+}
+.th-badges .bdg.new {
+  border-color: #22c55e;
+}
+.th-badges .bdg.best {
+  border-color: #0ea5e9;
+}
+.th-badges .bdg.hot {
+  border-color: #f97316;
+  color: #f97316;
+}
+
+/* 카드 본문 */
+.th-meta {
+  padding: 14px;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+.th-name {
+  font-size: 14px;
+  font-weight: 700;
+  color: #111827;
+  line-height: 1.5;
+  min-height: 36px;
+}
+.th-price {
+  font-size: 15px;
+  font-weight: 900;
+  color: #000000;
+}
+.th-actions {
+  display: flex;
+  gap: 8px;
+  margin-top: 4px;
+}
+
+/* -------------------------------------
+   SIZEBOX
+   ------------------------------------- */
+
+.sizebox {
+  margin-top: 10px;
+  border-radius: 12px;
+  border: 1px solid #e5e7eb;
+  padding: 10px;
+  background: #f9fafb;
+}
+.sizebox-title {
+  font-size: 13px;
+  font-weight: 800;
+  margin-bottom: 6px;
+  color: #111827;
+}
+.sizebox-chips {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+}
+.sizebox-chip {
+  min-width: 40px;
+  padding: 6px 10px;
+  border-radius: 999px;
+  border: 1px solid #d1d5db;
+  background: #ffffff;
+  font-size: 12px;
+  font-weight: 700;
+  cursor: pointer;
+  color: #111827;
+}
+.sizebox-chip.active {
+  border-color: #1f2937;
+  background: #1f2937;
+  color: #ffffff;
+}
+.sizebox-actions {
+  display: flex;
+  justify-content: flex-end;
+  gap: 8px;
+  margin-top: 8px;
+}
+.sizebox-warn {
+  margin-top: 6px;
+  font-size: 12px;
+  color: #dc2626;
+}
+
+/* -------------------------------------
+   BENEFIT
+   ------------------------------------- */
+
+.th-benefit {
+  border-top: 1px solid #f3f4f6;
+  border-bottom: 1px solid #f3f4f6;
+  background: #f9fafb;
+  padding: 28px 0 36px;
+}
+.th-benefit .inner {
+  width: min(1240px, 94%);
+  margin: 0 auto;
+  display: grid;
+  gap: 18px;
+}
+
+.signup-card.th-signup {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+  padding: 20px 18px;
+  border-radius: 16px;
+  background: #ffffff;
+  border: 1px solid #e5e7eb;
+}
+.signup-card.th-signup .left .eyebrow {
+  font-size: 11px;
+  font-weight: 800;
+  color: #9ca3af;
+  letter-spacing: 0.08em;
+  margin-bottom: 4px;
+}
+.signup-card.th-signup .left h3 {
+  margin: 0 0 6px;
+  font-size: 20px;
+  font-weight: 900;
+  color: #111827;
+}
+.signup-card.th-signup .left p {
+  margin: 0;
+  font-size: 13px;
+  color: #4b5563;
+}
+.signup-card.th-signup .right {
+  display: flex;
+  gap: 10px;
+}
+
+/* 혜택 카드 */
+.benefit-grid.mini {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 10px;
+}
+.benefit-card {
+  padding: 14px 12px;
+  border-radius: 12px;
+  border: 1px solid #e5e7eb;
+  background: #ffffff;
+  font-size: 13px;
+  color: #374151;
+  transition: background 0.2s ease;
+}
+.benefit-card:hover {
+  background: #f3f4f6;
+}
+.benefit-card .tit {
+  font-weight: 800;
+  margin-bottom: 4px;
+  color: #111827;
+}
+
+/* -------------------------------------
+   LOOKBOOK
+   ------------------------------------- */
+
+.th-lookbook {
+  width: min(1240px, 94%);
+  margin: 20px auto 36px;
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 12px;
+}
+.lb-card {
+  border-radius: 16px;
+  overflow: hidden;
+  border: 1px solid #e5e7eb;
+  background: #ffffff;
+}
+.lb-card img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  aspect-ratio: 1 / 1;
+}
+
+/* -------------------------------------
+   RESPONSIVE
+   ------------------------------------- */
+
+@media (max-width: 1024px) {
+  .th-hero-inner {
+    padding: 48px 0;
+  }
+
+  .th-grid {
+    grid-template-columns: repeat(2, 1fr);
+  }
+
+  .th-lookbook {
+    grid-template-columns: repeat(2, 1fr);
+  }
+
+  .benefit-grid.mini {
+    grid-template-columns: repeat(2, 1fr);
+  }
+}
+
+@media (max-width: 640px) {
+  .th-hero.with-image {
+    height: 360px;
+  }
+
+  .th-hero-title {
+    font-size: 24px;
+  }
+
+  .th-hero-cta {
+    flex-direction: column;
+  }
+
+  .th-stats {
+    flex-direction: column;
+    max-width: 100%;
+  }
+
+  .th-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .th-lookbook {
+    grid-template-columns: 1fr;
+  }
+
+  .benefit-grid.mini {
+    grid-template-columns: 1fr;
+  }
+
+  .signup-card.th-signup {
+    flex-direction: column;
+    align-items: flex-start;
+  }
+}
+
+/* END brandtommyhilfiger.css */

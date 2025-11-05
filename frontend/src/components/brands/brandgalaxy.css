@@ -1,0 +1,494 @@
+/* =====================================
+   GALAXY (Business Classic)
+   ===================================== */
+
+/* 기본 세팅 */
+.brand-gx {
+  position: relative;
+  color: #111827;
+  background: #ffffff;
+  font-family: "Pretendard", "Noto Sans KR", system-ui, sans-serif;
+}
+.brand-gx * {
+  box-sizing: border-box;
+}
+.brand-gx img {
+  max-width: 100%;
+  height: auto;
+  display: block;
+}
+
+/* 공통 섹션 레이아웃 */
+.gx-section {
+  width: min(1240px, 94%);
+  margin: 40px auto;
+}
+
+/* -------------------------------------
+   HERO
+   ------------------------------------- */
+
+.gx-hero.with-image {
+  position: relative;
+  height: 420px;
+  overflow: hidden;
+  color: #ffffff;
+}
+.gx-hero-bg {
+  position: absolute;
+  inset: 0;
+  background-size: cover;
+  background-position: center;
+  filter: brightness(0.86);
+  transform: scale(1.03);
+}
+.gx-hero-overlay {
+  position: absolute;
+  inset: 0;
+  background:
+    radial-gradient(circle at 10% 20%, rgba(59, 130, 246, 0.55), transparent 60%),
+    linear-gradient(
+      120deg,
+      rgba(15, 23, 42, 0.94) 0%,
+      rgba(30, 64, 175, 0.88) 40%,
+      rgba(15, 23, 42, 0.9) 80%,
+      rgba(248, 250, 252, 0.18) 100%
+    );
+}
+.gx-hero-inner {
+  position: relative;
+  z-index: 1;
+  width: min(1240px, 94%);
+  margin: 0 auto;
+  padding: 60px 0;
+}
+.gx-hero-badge {
+  display: inline-block;
+  padding: 6px 12px;
+  border-radius: 999px;
+  background: #ffffff;
+  color: #111827;
+  font-size: 12px;
+  font-weight: 800;
+  letter-spacing: 0.12em;
+  margin-bottom: 10px;
+}
+.gx-hero-title {
+  font-size: 32px;
+  font-weight: 900;
+  margin: 0 0 10px;
+}
+.gx-hero-desc {
+  font-size: 14px;
+  color: #e5e7eb;
+  line-height: 1.7;
+  max-width: 560px;
+  margin-bottom: 20px;
+}
+.gx-hero-cta {
+  display: flex;
+  gap: 10px;
+  margin-bottom: 22px;
+}
+
+/* HERO Stats */
+.gx-stats {
+  display: flex;
+  gap: 20px;
+  padding: 12px 16px;
+  background: rgba(15, 23, 42, 0.75);
+  border-radius: 12px;
+  backdrop-filter: blur(6px);
+  max-width: 420px;
+}
+.gx-stats li {
+  list-style: none;
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+.gx-stats strong {
+  font-size: 18px;
+  font-weight: 800;
+}
+.gx-stats span {
+  font-size: 12px;
+  color: #e5e7eb;
+}
+
+/* -------------------------------------
+   버튼 공통
+   ------------------------------------- */
+
+.brand-gx .btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  height: 40px;
+  padding: 0 18px;
+  border-radius: 999px;
+  border: 1px solid #d1d5db;
+  font-size: 13px;
+  font-weight: 700;
+  cursor: pointer;
+  transition:
+    background 0.2s ease,
+    box-shadow 0.2s ease,
+    transform 0.2s ease,
+    border-color 0.2s ease,
+    color 0.2s ease;
+}
+
+/* 메인 버튼 – 네이비 */
+.brand-gx .btn.primary {
+  background: #1e3a8a !important;
+  border-color: #1e3a8a !important;
+  color: #ffffff !important;
+}
+.brand-gx .btn.primary:hover:not([disabled]) {
+  background: #1d4ed8 !important;
+}
+
+/* 기본 고스트 버튼 – 흰 배경용 */
+.brand-gx .btn.ghost {
+  background: #ffffff !important;
+  color: #111827 !important;
+  border: 1px solid #d1d5db !important;
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.04);
+}
+.brand-gx .btn.ghost:hover:not([disabled]) {
+  background: #f9fafb !important;
+}
+
+/* HERO 안의 고스트 버튼 – 어두운 배경용 */
+.gx-hero-cta .btn.ghost {
+  background: rgba(255, 255, 255, 0.16) !important;
+  color: #f9fafb !important;
+  border-color: rgba(255, 255, 255, 0.6) !important;
+  box-shadow: none !important;
+}
+.gx-hero-cta .btn.ghost:hover {
+  background: rgba(255, 255, 255, 0.26) !important;
+}
+
+.brand-gx .btn[disabled] {
+  opacity: 0.45;
+  cursor: not-allowed;
+}
+
+/* -------------------------------------
+   섹션 헤더
+   ------------------------------------- */
+
+.gx-head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 14px;
+}
+.gx-head h2 {
+  font-size: 20px;
+  font-weight: 800;
+  color: #111827;
+}
+.link-more {
+  font-size: 13px;
+  color: #9ca3af;
+}
+
+/* -------------------------------------
+   상품 GRID
+   ------------------------------------- */
+
+.gx-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(260px, 1fr));
+  gap: 22px;
+}
+.gx-card {
+  border-radius: 16px;
+  border: 1px solid #e5e7eb;
+  background: #ffffff;
+  overflow: hidden;
+  transition: box-shadow 0.2s ease, transform 0.2s ease;
+}
+.gx-card:hover {
+  box-shadow: 0 10px 24px rgba(15, 23, 42, 0.15);
+  transform: translateY(-2px);
+}
+
+.gx-thumb {
+  position: relative;
+  padding-top: 72%;
+  background: #f3f4f6;
+}
+.gx-thumb img {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+/* 배지 */
+.gx-badges {
+  position: absolute;
+  top: 10px;
+  left: 10px;
+  display: flex;
+  gap: 6px;
+  z-index: 1;
+}
+.gx-badges .bdg {
+  padding: 4px 8px;
+  border-radius: 999px;
+  background: #ffffff;
+  border: 1px solid #d1d5db;
+  font-size: 11px;
+  font-weight: 800;
+  letter-spacing: 0.06em;
+  color: #111827;
+}
+.gx-badges .bdg.new {
+  border-color: #22c55e;
+}
+.gx-badges .bdg.best {
+  border-color: #0ea5e9;
+}
+.gx-badges .bdg.hot {
+  border-color: #f97316;
+  color: #f97316;
+}
+
+/* 카드 본문 */
+.gx-meta {
+  padding: 14px;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+.gx-name {
+  font-size: 14px;
+  font-weight: 700;
+  color: #111827;
+  line-height: 1.5;
+  min-height: 36px;
+}
+.gx-price {
+  font-size: 15px;
+  font-weight: 900;
+  color: #000000;
+}
+.gx-actions {
+  display: flex;
+  gap: 8px;
+  margin-top: 4px;
+}
+
+/* -------------------------------------
+   SIZEBOX
+   ------------------------------------- */
+
+.sizebox {
+  margin-top: 10px;
+  border-radius: 12px;
+  border: 1px solid #e5e7eb;
+  padding: 10px;
+  background: #f9fafb;
+}
+.sizebox-title {
+  font-size: 13px;
+  font-weight: 800;
+  margin-bottom: 6px;
+  color: #111827;
+}
+.sizebox-chips {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+}
+.sizebox-chip {
+  min-width: 40px;
+  padding: 6px 10px;
+  border-radius: 999px;
+  border: 1px solid #d1d5db;
+  background: #ffffff;
+  font-size: 12px;
+  font-weight: 700;
+  cursor: pointer;
+  color: #111827;
+}
+.sizebox-chip.active {
+  border-color: #1e3a8a;
+  background: #1e3a8a;
+  color: #ffffff;
+}
+.sizebox-actions {
+  display: flex;
+  justify-content: flex-end;
+  gap: 8px;
+  margin-top: 8px;
+}
+.sizebox-warn {
+  margin-top: 6px;
+  font-size: 12px;
+  color: #dc2626;
+}
+
+/* -------------------------------------
+   BENEFIT
+   ------------------------------------- */
+
+.gx-benefit {
+  border-top: 1px solid #f3f4f6;
+  border-bottom: 1px solid #f3f4f6;
+  background: #f9fafb;
+  padding: 28px 0 36px;
+}
+.gx-benefit .inner {
+  width: min(1240px, 94%);
+  margin: 0 auto;
+  display: grid;
+  gap: 18px;
+}
+
+.signup-card.gx-signup {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+  padding: 20px 18px;
+  border-radius: 16px;
+  background: #ffffff;
+  border: 1px solid #e5e7eb;
+}
+.signup-card.gx-signup .left .eyebrow {
+  font-size: 11px;
+  font-weight: 800;
+  color: #9ca3af;
+  letter-spacing: 0.08em;
+  margin-bottom: 4px;
+}
+.signup-card.gx-signup .left h3 {
+  margin: 0 0 6px;
+  font-size: 20px;
+  font-weight: 900;
+  color: #111827;
+}
+.signup-card.gx-signup .left p {
+  margin: 0;
+  font-size: 13px;
+  color: #4b5563;
+}
+.signup-card.gx-signup .right {
+  display: flex;
+  gap: 10px;
+}
+
+/* 혜택 카드 */
+.benefit-grid.mini {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 10px;
+}
+.benefit-card {
+  padding: 14px 12px;
+  border-radius: 12px;
+  border: 1px solid #e5e7eb;
+  background: #ffffff;
+  font-size: 13px;
+  color: #374151;
+  transition: background 0.2s ease;
+}
+.benefit-card:hover {
+  background: #f3f4f6;
+}
+.benefit-card .tit {
+  font-weight: 800;
+  margin-bottom: 4px;
+  color: #111827;
+}
+
+/* -------------------------------------
+   LOOKBOOK
+   ------------------------------------- */
+
+.gx-lookbook {
+  width: min(1240px, 94%);
+  margin: 20px auto 36px;
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 12px;
+}
+.gx-card-img {
+  border-radius: 16px;
+  overflow: hidden;
+  border: 1px solid #e5e7eb;
+  background: #ffffff;
+}
+.gx-card-img img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  aspect-ratio: 1 / 1;
+}
+
+/* -------------------------------------
+   RESPONSIVE
+   ------------------------------------- */
+
+@media (max-width: 1024px) {
+  .gx-hero-inner {
+    padding: 48px 0;
+  }
+
+  .gx-grid {
+    grid-template-columns: repeat(2, 1fr);
+  }
+
+  .gx-lookbook {
+    grid-template-columns: repeat(2, 1fr);
+  }
+
+  .benefit-grid.mini {
+    grid-template-columns: repeat(2, 1fr);
+  }
+}
+
+@media (max-width: 640px) {
+  .gx-hero.with-image {
+    height: 360px;
+  }
+
+  .gx-hero-title {
+    font-size: 24px;
+  }
+
+  .gx-hero-cta {
+    flex-direction: column;
+  }
+
+  .gx-stats {
+    flex-direction: column;
+    max-width: 100%;
+  }
+
+  .gx-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .gx-lookbook {
+    grid-template-columns: 1fr;
+  }
+
+  .benefit-grid.mini {
+    grid-template-columns: 1fr;
+  }
+
+  .signup-card.gx-signup {
+    flex-direction: column;
+    align-items: flex-start;
+  }
+}
+
+/* END brandgalaxy.css */

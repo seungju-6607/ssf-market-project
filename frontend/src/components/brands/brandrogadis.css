@@ -1,0 +1,436 @@
+/* ===============================
+   ROGADIS (Modern Classic Line)
+   =============================== */
+
+.brand-rgds {
+  color: #111827;
+  background: #ffffff;
+}
+.brand-rgds * {
+  box-sizing: border-box;
+}
+.brand-rgds img {
+  max-width: 100%;
+  height: auto;
+  display: block;
+}
+
+.rgds-section {
+  width: min(1240px, 94%);
+  margin: 40px auto;
+}
+
+/* ---------- HERO ---------- */
+.rgds-hero.with-image {
+  position: relative;
+  height: 420px;
+  overflow: hidden;
+  color: #fff;
+}
+.rgds-hero-bg {
+  position: absolute;
+  inset: 0;
+  background-size: cover;
+  background-position: center;
+  filter: grayscale(25%) brightness(0.9);
+  transform: scale(1.05);
+}
+.rgds-hero-overlay {
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(
+    115deg,
+    rgba(17, 24, 39, 0.9) 0%,
+    rgba(15, 46, 55, 0.85) 40%,
+    rgba(18, 100, 95, 0.75) 80%,
+    rgba(243, 244, 246, 0.2) 100%
+  );
+}
+.rgds-hero-inner {
+  position: relative;
+  z-index: 1;
+  width: min(1240px, 94%);
+  margin: 0 auto;
+  padding: 60px 0;
+}
+.rgds-hero-badge {
+  background: #ffffff;
+  color: #111827;
+  padding: 6px 12px;
+  font-weight: 800;
+  border-radius: 999px;
+  margin-bottom: 10px;
+  display: inline-block;
+  letter-spacing: 0.12em;
+}
+.rgds-hero-title {
+  font-size: 32px;
+  font-weight: 900;
+  margin: 0 0 10px;
+}
+.rgds-hero-desc {
+  font-size: 14px;
+  color: #e5e7eb;
+  max-width: 560px;
+  line-height: 1.7;
+  margin-bottom: 20px;
+}
+.rgds-hero-cta {
+  display: flex;
+  gap: 10px;
+  margin-bottom: 22px;
+}
+
+/* ---------- 버튼 공통 ---------- */
+.brand-rgds .btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  height: 40px;
+  padding: 0 16px;
+  border-radius: 999px;
+  border: 1px solid #d1d5db;
+  background: #ffffff;
+  font-size: 13px;
+  font-weight: 700;
+  cursor: pointer;
+  transition:
+    background 0.2s ease,
+    box-shadow 0.2s ease,
+    transform 0.2s ease,
+    border-color 0.2s ease,
+    color 0.2s ease;
+}
+
+/* 메인(초록) 버튼 */
+.brand-rgds .btn.primary {
+  background: #0f766e !important;
+  border-color: #0f766e !important;
+  color: #ffffff !important;
+}
+
+/* 기본 고스트 버튼 – 카드/밝은 영역용 (자세히 / 쿠폰함 등) */
+.brand-rgds .btn.ghost {
+  background: #ffffff !important;
+  color: #111827 !important;
+  border-color: #d1d5db !important;
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.04);
+}
+
+/* HERO 안의 고스트 버튼 – 어두운 배경용 */
+.rgds-hero-cta .btn.ghost {
+  background: rgba(255, 255, 255, 0.1) !important;
+  color: #e5e7eb !important;
+  border-color: rgba(226, 232, 240, 0.8) !important;
+  box-shadow: none !important;
+}
+
+/* 하단 네이비 배너 안의 쿠폰함(고스트) – 흰색 테두리 버튼 */
+.rgds-benefit .signup-card.rgds-signup .btn.ghost {
+  background: transparent !important;
+  color: #f9fafb !important;
+  border-color: #f9fafb !important;
+  box-shadow: none !important;
+}
+
+.brand-rgds .btn:hover:not([disabled]) {
+  transform: translateY(-1px);
+  box-shadow: 0 10px 24px rgba(0, 0, 0, 0.28);
+}
+.brand-rgds .btn[disabled] {
+  opacity: 0.45;
+  cursor: not-allowed;
+}
+
+/* ---------- HERO STATS ---------- */
+.rgds-stats {
+  display: flex;
+  gap: 24px;
+  background: rgba(17, 24, 39, 0.6);
+  padding: 12px 16px;
+  border-radius: 14px;
+  backdrop-filter: blur(6px);
+  max-width: 420px;
+}
+.rgds-stats strong {
+  font-size: 18px;
+  font-weight: 800;
+}
+.rgds-stats span {
+  font-size: 12px;
+  color: #d1d5db;
+}
+
+/* ---------- SECTION HEAD ---------- */
+.rgds-head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 14px;
+}
+.rgds-head h2 {
+  font-size: 20px;
+  font-weight: 800;
+}
+.link-more {
+  font-size: 13px;
+  color: #9ca3af;
+}
+
+/* ---------- PRODUCT GRID ---------- */
+.rgds-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(240px, 1fr));
+  gap: 18px;
+}
+.rgds-card {
+  border-radius: 16px;
+  border: 1px solid #e5e7eb;
+  overflow: hidden;
+  background: #ffffff;
+  display: flex;
+  flex-direction: column;
+  transition: box-shadow 0.2s ease, transform 0.2s ease;
+}
+.rgds-card:hover {
+  box-shadow: 0 12px 26px rgba(0, 0, 0, 0.16);
+  transform: translateY(-2px);
+}
+
+.rgds-thumb {
+  position: relative;
+  padding-top: 72%;
+  background: #f3f4f6;
+}
+.rgds-thumb img {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+.rgds-badges {
+  position: absolute;
+  top: 10px;
+  left: 10px;
+  display: flex;
+  gap: 6px;
+  z-index: 1;
+}
+.rgds-badges .bdg {
+  padding: 4px 8px;
+  border-radius: 999px;
+  background: rgba(255, 255, 255, 0.96);
+  border: 1px solid #e5e7eb;
+  font-size: 11px;
+  font-weight: 800;
+  letter-spacing: 0.08em;
+  color: #111827;
+}
+.rgds-badges .bdg.new {
+  border-color: #22c55e;
+}
+.rgds-badges .bdg.best {
+  border-color: #0ea5e9;
+}
+.rgds-badges .bdg.hot {
+  border-color: #f97316;
+}
+
+.rgds-meta {
+  padding: 12px 12px 14px;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+.rgds-name {
+  font-size: 14px;
+  font-weight: 700;
+  line-height: 1.5;
+  min-height: 40px;
+}
+.rgds-price {
+  font-size: 15px;
+  font-weight: 900;
+}
+.rgds-actions {
+  display: flex;
+  gap: 8px;
+  margin-top: 4px;
+}
+
+/* ---------- SIZE BOX ---------- */
+.sizebox {
+  margin-top: 10px;
+  border-radius: 12px;
+  border: 1px solid #e5e7eb;
+  padding: 10px;
+  background: #f9fafb;
+}
+.sizebox-title {
+  font-size: 13px;
+  font-weight: 800;
+  margin-bottom: 6px;
+}
+.sizebox-chips {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+}
+.sizebox-chip {
+  min-width: 40px;
+  padding: 6px 10px;
+  border-radius: 999px;
+  border: 1px solid #d1d5db;
+  background: #ffffff;
+  font-size: 12px;
+  font-weight: 700;
+  cursor: pointer;
+}
+.sizebox-chip.active {
+  border-color: #0f766e;
+  background: #0f766e;
+  color: #ffffff;
+}
+.sizebox-actions {
+  display: flex;
+  justify-content: flex-end;
+  gap: 8px;
+  margin-top: 8px;
+}
+.sizebox-warn {
+  margin-top: 6px;
+  font-size: 12px;
+  color: #dc2626;
+}
+
+/* ---------- BENEFIT 영역 ---------- */
+.rgds-benefit {
+  border-top: 1px solid #e5e7eb;
+  border-bottom: 1px solid #e5e7eb;
+  background: #020617;
+  padding: 28px 0 30px;
+}
+.rgds-benefit .inner {
+  width: min(1240px, 94%);
+  margin: 0 auto;
+  display: grid;
+  gap: 14px;
+}
+.signup-card.rgds-signup {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+  padding: 20px 18px;
+  border-radius: 16px;
+  background: transparent;
+  border: none;
+  color: #f9fafb;
+}
+.signup-card.rgds-signup .left .eyebrow {
+  font-size: 11px;
+  font-weight: 800;
+  color: #9ca3af;
+  letter-spacing: 0.08em;
+  margin-bottom: 4px;
+}
+.signup-card.rgds-signup .left h3 {
+  margin: 0 0 6px;
+  font-size: 20px;
+  font-weight: 900;
+}
+.signup-card.rgds-signup .left p {
+  margin: 0;
+  font-size: 13px;
+  color: #e5e7eb;
+}
+.signup-card.rgds-signup .right {
+  display: flex;
+  gap: 10px;
+}
+
+/* 작은 혜택 카드 */
+.benefit-grid.mini {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 10px;
+}
+.benefit-card {
+  padding: 12px 10px;
+  border-radius: 12px;
+  border: 1px solid #1f2937;
+  background: #020617;
+  font-size: 13px;
+  color: #e5e7eb;
+}
+.benefit-card .tit {
+  font-weight: 800;
+  margin-bottom: 4px;
+}
+
+/* ---------- LOOKBOOK ---------- */
+.rgds-lookbook {
+  width: min(1240px, 94%);
+  margin: 0 auto 12px;
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 12px;
+}
+.lb-card {
+  border-radius: 16px;
+  overflow: hidden;
+  border: 1px solid #e5e7eb;
+  background: #f9fafb;
+}
+.lb-card img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  aspect-ratio: 1/1;
+}
+
+/* ---------- RESPONSIVE ---------- */
+@media (max-width: 1024px) {
+  .rgds-hero-inner {
+    padding: 40px 0;
+  }
+  .rgds-grid {
+    grid-template-columns: repeat(2, 1fr);
+  }
+  .rgds-lookbook {
+    grid-template-columns: repeat(2, 1fr);
+  }
+  .benefit-grid.mini {
+    grid-template-columns: repeat(2, 1fr);
+  }
+}
+
+@media (max-width: 640px) {
+  .rgds-hero.with-image {
+    height: 360px;
+  }
+  .rgds-hero-title {
+    font-size: 22px;
+  }
+  .rgds-stats {
+    flex-direction: column;
+    max-width: 100%;
+  }
+  .rgds-hero-cta {
+    flex-direction: column;
+  }
+  .rgds-grid {
+    grid-template-columns: 1fr;
+  }
+  .rgds-lookbook {
+    grid-template-columns: 1fr;
+  }
+  .benefit-grid.mini {
+    grid-template-columns: 1fr;
+  }
+  .signup-card.rgds-signup {
+    flex-direction: column;
+    align-items: flex-start;
+  }
+}

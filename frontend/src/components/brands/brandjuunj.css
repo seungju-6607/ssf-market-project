@@ -1,0 +1,440 @@
+/* =============== juun.j (8seconds 계열 스타일) =============== */
+.brand-jj {
+  position: relative;
+  z-index: 1;
+  color: #111;
+  background: #fff;
+}
+.brand-jj * {
+  box-sizing: border-box;
+}
+.brand-jj img {
+  display: block;
+  max-width: 100%;
+  height: auto;
+}
+.jj-section {
+  width: min(1240px, 94%);
+  margin: 40px auto 32px;
+}
+
+/* ---------- HERO ---------- */
+.jj-hero.with-image {
+  position: relative;
+  height: 420px;
+  overflow: hidden;
+  border-bottom: 1px solid #111;
+  color: #fff;
+}
+.jj-hero-bg {
+  position: absolute;
+  inset: 0;
+  background-position: center;
+  background-size: cover;
+  transform: scale(1.05);
+  filter: grayscale(100%);
+}
+.jj-hero-overlay {
+  position: absolute;
+  inset: 0;
+  background:
+    linear-gradient(
+      110deg,
+      rgba(0, 0, 0, 0.9) 0%,
+      rgba(15, 23, 42, 0.8) 40%,
+      rgba(17, 24, 39, 0.6) 75%,
+      rgba(243, 244, 246, 0.1) 100%
+    );
+}
+.jj-hero-inner {
+  position: relative;
+  z-index: 1;
+  width: min(1240px, 94%);
+  margin: 0 auto;
+  padding: 60px 0;
+  color: #fff;
+  text-shadow: 0 1px 2px rgba(0, 0, 0, 0.45);
+}
+.jj-hero-badge {
+  display: inline-block;
+  padding: 6px 12px;
+  font-size: 12px;
+  font-weight: 800;
+  border-radius: 999px;
+  background: #ffffff;
+  color: #000000;
+  letter-spacing: 0.12em;
+  margin-bottom: 10px;
+}
+.jj-hero-title {
+  margin: 0 0 10px;
+  font-size: 32px;
+  font-weight: 900;
+}
+.jj-hero-desc {
+  max-width: 560px;
+  line-height: 1.7;
+  font-size: 14px;
+  color: #e5e7eb;
+  margin-bottom: 20px;
+}
+.jj-hero-cta {
+  display: flex;
+  gap: 10px;
+  margin-bottom: 22px;
+}
+
+/* ---------- 버튼 공통 ---------- */
+.brand-jj .btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  height: 40px;
+  padding: 0 16px;
+  border-radius: 999px;
+  border: 1px solid #d1d5db;
+  background: #fff;
+  font-size: 13px;
+  font-weight: 700;
+  cursor: pointer;
+  transition: background 0.2s ease, box-shadow 0.2s ease,
+    transform 0.2s ease, border-color 0.2s ease;
+}
+
+/* 메인 버튼 – 블랙 */
+.brand-jj .btn.primary {
+  background: #000000;
+  border-color: #000000;
+  color: #ffffff;
+}
+
+/* 기본 고스트 버튼 (자세히/쿠폰함 등) – 흰 배경용 */
+.brand-jj .btn.ghost {
+  background: #ffffff !important;
+  color: #111827 !important;
+  border-color: #d1d5db !important;
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.04);
+}
+
+/* 히어로 영역의 고스트 버튼 – 반투명 화이트 */
+.jj-hero-cta .btn.ghost {
+  background: rgba(255, 255, 255, 0.12) !important;
+  color: #f9fafb !important;
+  border-color: rgba(243, 244, 246, 0.8) !important;
+  box-shadow: none !important;
+}
+
+.brand-jj .btn:hover:not([disabled]) {
+  transform: translateY(-1px);
+  box-shadow: 0 10px 24px rgba(0, 0, 0, 0.35);
+}
+.brand-jj .btn[disabled] {
+  opacity: 0.45;
+  cursor: not-allowed;
+  pointer-events: none;
+}
+
+.hero-btn {
+  min-width: 140px;
+}
+
+/* Hero 하단 통계 */
+.jj-stats {
+  display: flex;
+  gap: 24px;
+  padding: 12px 16px;
+  border-radius: 14px;
+  background: rgba(0, 0, 0, 0.6);
+  backdrop-filter: blur(6px);
+  max-width: 420px;
+}
+.jj-stats li {
+  list-style: none;
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+.jj-stats strong {
+  font-size: 18px;
+  font-weight: 800;
+}
+.jj-stats span {
+  font-size: 12px;
+  color: #d1d5db;
+}
+
+/* ---------- SECTION HEAD ---------- */
+.jj-head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 14px;
+}
+.jj-head h2 {
+  font-size: 20px;
+  font-weight: 800;
+}
+.link-more {
+  font-size: 13px;
+  color: #9ca3af;
+}
+
+/* ---------- GRID ---------- */
+.jj-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(240px, 1fr));
+  gap: 18px;
+}
+.jj-card {
+  border-radius: 16px;
+  border: 1px solid #e5e7eb;
+  overflow: hidden;
+  background: #ffffff;
+  display: flex;
+  flex-direction: column;
+  transition: box-shadow 0.2s ease, transform 0.2s ease;
+}
+.jj-card:hover {
+  box-shadow: 0 12px 26px rgba(0, 0, 0, 0.16);
+  transform: translateY(-2px);
+}
+
+.jj-thumb {
+  position: relative;
+  padding-top: 72%;
+  background: #f3f4f6;
+}
+.jj-thumb img {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+/* 배지 */
+.jj-badges {
+  position: absolute;
+  top: 10px;
+  left: 10px;
+  display: flex;
+  gap: 6px;
+  z-index: 1;
+}
+.jj-badges .bdg {
+  padding: 4px 8px;
+  border-radius: 999px;
+  background: rgba(255, 255, 255, 0.96);
+  border: 1px solid #e5e7eb;
+  font-size: 11px;
+  font-weight: 800;
+  letter-spacing: 0.08em;
+  color: #111827;
+}
+.jj-badges .bdg.new {
+  border-color: #22c55e;
+}
+.jj-badges .bdg.best {
+  border-color: #0ea5e9;
+}
+.jj-badges .bdg.hot {
+  border-color: #f97316;
+}
+
+/* 카드 본문 */
+.jj-meta {
+  padding: 12px 12px 14px;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+.jj-name {
+  font-size: 14px;
+  font-weight: 700;
+  line-height: 1.5;
+  min-height: 40px;
+}
+.jj-price {
+  font-size: 15px;
+  font-weight: 900;
+}
+.jj-actions {
+  display: flex;
+  gap: 8px;
+  margin-top: 4px;
+}
+
+/* ---------- SIZEBOX ---------- */
+.sizebox {
+  margin-top: 10px;
+  border-radius: 12px;
+  border: 1px solid #e5e7eb;
+  padding: 10px;
+  background: #f9fafb;
+}
+.sizebox-title {
+  font-size: 13px;
+  font-weight: 800;
+  margin-bottom: 6px;
+}
+.sizebox-chips {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+}
+.sizebox-chip {
+  min-width: 40px;
+  padding: 6px 10px;
+  border-radius: 999px;
+  border: 1px solid #d1d5db;
+  background: #ffffff;
+  font-size: 12px;
+  font-weight: 700;
+  cursor: pointer;
+}
+.sizebox-chip.active {
+  border-color: #000000;
+  background: #000000;
+  color: #ffffff;
+}
+.sizebox-actions {
+  display: flex;
+  justify-content: flex-end;
+  gap: 8px;
+  margin-top: 8px;
+}
+.sizebox-warn {
+  margin-top: 6px;
+  font-size: 12px;
+  color: #dc2626;
+}
+
+/* ---------- BENEFIT ---------- */
+.jj-benefit {
+  border-top: 1px solid #e5e7eb;
+  border-bottom: 1px solid #e5e7eb;
+  background: #f3f4f6;
+  padding: 28px 0 30px;
+}
+.jj-benefit .inner {
+  width: min(1240px, 94%);
+  margin: 0 auto;
+  display: grid;
+  gap: 14px;
+}
+.signup-card.jj-signup {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+  padding: 20px 18px;
+  border-radius: 16px;
+  background: #111827;
+  border: 1px solid #020617;
+  color: #f9fafb;
+}
+.signup-card.jj-signup .left .eyebrow {
+  font-size: 11px;
+  font-weight: 800;
+  color: #9ca3af;
+  letter-spacing: 0.08em;
+  margin-bottom: 4px;
+}
+.signup-card.jj-signup .left h3 {
+  margin: 0 0 6px;
+  font-size: 20px;
+  font-weight: 900;
+}
+.signup-card.jj-signup .left p {
+  margin: 0;
+  font-size: 13px;
+  color: #e5e7eb;
+}
+.signup-card.jj-signup .right {
+  display: flex;
+  gap: 10px;
+}
+
+/* 작은 혜택 카드 */
+.benefit-grid.mini {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 10px;
+}
+.benefit-card {
+  padding: 12px 10px;
+  border-radius: 12px;
+  border: 1px solid #d1d5db;
+  background: #ffffff;
+  font-size: 13px;
+}
+.benefit-card .tit {
+  font-weight: 800;
+  margin-bottom: 4px;
+}
+
+/* ---------- LOOKBOOK ---------- */
+.jj-lookbook {
+  width: min(1240px, 94%);
+  margin: 0 auto 12px;
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 12px;
+}
+.lb-card {
+  border-radius: 16px;
+  overflow: hidden;
+  border: 1px solid #efefef;
+  background: #fafafa;
+}
+.lb-card img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  aspect-ratio: 1/1;
+}
+
+/* ---------- RESPONSIVE ---------- */
+@media (max-width: 1024px) {
+  .jj-hero-inner {
+    padding: 40px 0;
+  }
+  .jj-grid {
+    grid-template-columns: repeat(2, 1fr);
+  }
+  .jj-lookbook {
+    grid-template-columns: repeat(2, 1fr);
+  }
+  .benefit-grid.mini {
+    grid-template-columns: repeat(2, 1fr);
+  }
+}
+
+@media (max-width: 640px) {
+  .jj-hero.with-image {
+    height: 360px;
+  }
+  .jj-hero-title {
+    font-size: 22px;
+  }
+  .jj-stats {
+    flex-direction: column;
+    max-width: 100%;
+  }
+  .jj-hero-cta {
+    flex-direction: column;
+  }
+  .jj-grid {
+    grid-template-columns: 1fr;
+  }
+  .jj-lookbook {
+    grid-template-columns: 1fr;
+  }
+  .benefit-grid.mini {
+    grid-template-columns: 1fr;
+  }
+  .signup-card.jj-signup {
+    flex-direction: column;
+    align-items: flex-start;
+  }
+}

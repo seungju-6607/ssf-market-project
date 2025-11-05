@@ -1,0 +1,123 @@
+/* =============== Sporty & Rich (8seconds 기준으로 통일) =============== */
+.brand-sr { color:#111; }
+
+/* ---------- HERO ---------- */
+.sr-hero.with-image{
+  position:relative; height:420px; display:flex; align-items:center; justify-content:flex-start;
+  color:#fff; overflow:hidden; border-bottom:1px solid #eee;
+}
+.sr-hero-bg{ position:absolute; inset:0; background:center/cover no-repeat; transform:scale(1.05); z-index:0; }
+.sr-hero-overlay{
+  position:absolute; inset:0; z-index:1;
+  background:
+    linear-gradient(90deg, rgba(0,0,0,.55) 0%, rgba(0,0,0,.2) 60%, rgba(0,0,0,0) 100%),
+    radial-gradient(800px 400px at 20% 0%, rgba(255, 190, 150, .15), transparent 60%);
+}
+.sr-hero-inner{ position:relative; z-index:2; width:min(1240px,92%); margin:0 auto; color:#fff; text-align:left; }
+.sr-hero-badge{
+  display:inline-block; padding:8px 14px; border-radius:999px; background:#111; color:#fff;
+  font-weight:700; letter-spacing:.5px; margin-bottom:12px;
+}
+.sr-hero-title{ font-size:clamp(28px, 4.2vw, 44px); margin:4px 0 10px; line-height:1.18; font-weight:800; color:#fff; }
+.sr-hero-desc{ color:#f0f0f0; font-size:15px; margin-bottom:18px; }
+
+/* 8seconds와 동일 규격 버튼 */
+.sr-hero-cta{ display:flex; gap:10px; }
+.sr-btn{
+  display:inline-flex; align-items:center; justify-content:center;
+  height:42px; padding:0 16px; border-radius:10px; font-weight:700;
+  border:1px solid #e7e7ef; background:#fff; color:#222; text-decoration:none; cursor:pointer;
+}
+.sr-btn:hover{ box-shadow:0 6px 16px rgba(0,0,0,.08); transform: translateY(-1px); }
+.sr-btn-primary{ background:#6b4cff; color:#fff; border-color:#6b4cff; }
+.sr-btn-ghost{ background:#fff; color:#333; }
+
+/* HERO 통계 */
+.sr-hero-stats{ display:flex; gap:28px; margin-top:16px; color:#ddd; }
+.sr-hero-stats li{ display:flex; flex-direction:column; align-items:flex-start; }
+.sr-hero-stats li strong{ font-size:18px; color:#fff; }
+
+/* ---------- 공통 섹션 ---------- */
+.sr-section{ width:min(1240px,92%); margin:36px auto 28px; }
+.sr-head{ display:flex; align-items:center; justify-content:space-between; margin-bottom:12px; }
+.sr-head h2{ font-size:20px; font-weight:800; margin:0; }
+.link-more{ color:#8a8aa3; font-size:14px; text-decoration:none; }
+
+/* ---------- 카드 그리드 ---------- */
+.sr-grid{
+  display:grid; grid-template-columns:repeat(auto-fill, minmax(240px, 1fr)); gap:18px;
+}
+.sr-card{
+  border:1px solid #eee; border-radius:14px; overflow:hidden; background:#fff;
+  transition: box-shadow .2s ease, transform .2s ease;
+}
+.sr-card:hover{ box-shadow:0 10px 24px rgba(0,0,0,.07); transform:translateY(-2px); }
+.sr-thumb{ position:relative; padding-top:72%; background:#f8f8fa; overflow:hidden; }
+.sr-thumb img{ position:absolute; inset:0; width:100%; height:100%; object-fit:cover; }
+.sr-badges{ position:absolute; top:10px; left:10px; display:flex; gap:6px; }
+.sr-badges .bdg{ padding:4px 8px; border-radius:999px; font-size:12px; font-weight:800; background:#111; color:#fff; }
+.sr-badges .bdg.new{ background:#111; }
+.sr-badges .bdg.best{ background:#111; }
+.sr-badges .bdg.hot{ background:#111; }
+
+.sr-meta{ padding:12px 12px 14px; }
+.sr-name{ font-size:14px; line-height:1.45; margin:2px 0 6px; }
+.sr-price{ font-weight:800; }
+
+/* 8seconds와 동일한 작은 버튼 */
+.sr-actions{ display:flex; gap:8px; margin-top:8px; }
+.sr-small-btn{
+  border:1px solid #ececec; padding:7px 10px; border-radius:8px; font-size:13px; color:#333; background:#fff; text-decoration:none; cursor:pointer;
+}
+.sr-small-primary{ border-color:#6b4cff; background:#6b4cff; color:#fff; }
+
+/* ---------- 사이즈 피커 ---------- */
+.sr-sizebox{ margin-top:10px; border:1px solid #eee; border-radius:12px; padding:10px; background:#fff; }
+.sizebox-title{ font-weight:800; font-size:14px; margin-bottom:8px; }
+.sizebox-chips{ display:flex; gap:8px; flex-wrap:wrap; }
+.sizebox-chip{
+  padding:6px 12px; border-radius:10px; border:1px solid #ddd; background:#fff; font-weight:700; cursor:pointer; transition:all .15s ease;
+}
+.sizebox-chip:hover{ border-color:#bbb; }
+.sizebox-chip.active{ border:2px solid #111; }
+.sizebox-actions{ display:flex; gap:8px; justify-content:flex-end; margin-top:10px; }
+.sizebox-warn{ margin-top:6px; color:#c33; font-size:12px; }
+.sr-small-btn.disabled, .sr-small-btn[disabled]{ opacity:.45; cursor:not-allowed; pointer-events:none; }
+
+/* ---------- 혜택 ---------- */
+.sr-benefit{ background:#fbfdfb; border-top:1px solid #f1f1f1; border-bottom:1px solid #f1f1f1; padding:24px 0 28px; }
+.sr-benefit .inner{ width:min(1240px,92%); margin:0 auto; display:grid; gap:14px; }
+.signup-card{
+  display:flex; align-items:center; justify-content:space-between; gap:12px;
+  border:1px solid #eee; border-radius:16px; padding:18px; background:#fafaff;
+}
+.signup-card .left .eyebrow{ color:#6b4cff; font-weight:800; font-size:12px; letter-spacing:.4px; margin-bottom:4px; }
+.signup-card .left h3{ margin:8px 0 4px; font-size:18px; font-weight:800; }
+.signup-card .right{ display:flex; gap:10px; }
+
+/* ---------- LOOKBOOK ---------- */
+.sr-lookbook{
+  width:min(1240px,92%); margin:0 auto; display:grid; grid-template-columns:repeat(4, 1fr); gap:12px;
+}
+.lb-card{ border-radius:12px; overflow:hidden; }
+.lb-card img{ width:100%; height:220px; object-fit:cover; display:block; }
+
+/* ---------- 매장 안내 ---------- */
+.sr-store{
+  width:min(1240px,92%); margin:0 auto; display:grid; grid-template-columns:1.2fr 1fr; gap:18px; align-items:center;
+}
+.store-card{ border:1px solid #efefef; border-radius:16px; padding:18px; background:#fff; }
+.store-card .tit{ font-size:16px; font-weight:900; margin-bottom:6px; }
+
+/* ---------- 반응형 ---------- */
+@media (max-width: 900px){
+  .sr-lookbook{ grid-template-columns: repeat(2, 1fr); }
+  .sr-store{ grid-template-columns: 1fr; }
+}
+@media (max-width: 640px){
+  .sr-hero.with-image{ height:360px; }
+  .sr-hero-title{ font-size:22px; }
+  .sr-grid{ grid-template-columns: 1fr; }
+  .signup-card{ flex-direction:column; align-items:flex-start; }
+  .benefit-grid.mini{ grid-template-columns: 1fr; }
+}

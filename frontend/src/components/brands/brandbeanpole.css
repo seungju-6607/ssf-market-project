@@ -1,0 +1,239 @@
+/* ========== Common Layout ========== */
+.brandbp {
+  color: #111;
+  font-family: 'Noto Sans KR', sans-serif;
+}
+.brandbp a {
+  text-decoration: none;
+}
+
+/* ========== Hero Section ========== */
+.brandbp-hero {
+  width: 100%;
+  background: url("https://images.unsplash.com/photo-1509228627152-72ae9ae6848d?w=2000&q=80&auto=format&fit=crop") center/cover no-repeat;
+  color: #fff;
+}
+.brandbp-hero-inner {
+  width: min(1240px, 94%);
+  margin: 0 auto;
+  padding: 80px 0 120px;
+}
+.brandbp-badge {
+  display: inline-block;
+  padding: 6px 10px;
+  font-size: 12px;
+  font-weight: 800;
+  border-radius: 10px;
+  background: #0b6b3a;
+}
+.brandbp-title {
+  margin: 14px 0 8px;
+  font-size: 40px;
+  font-weight: 900;
+  line-height: 1.15;
+}
+.brandbp-title span { color: #b7f5cc; }
+.brandbp-sub { opacity: 0.95; }
+.brandbp-cta { margin-top: 18px; display: flex; gap: 8px; }
+.brandbp-btn {
+  padding: 10px 16px;
+  border-radius: 10px;
+  font-weight: 800;
+  border: 1px solid rgba(255, 255, 255, 0.6);
+  color: #fff;
+}
+.brandbp-btn:hover { border-color: #fff; }
+.brandbp-btn-primary { background: #0b6b3a; border-color: #0b6b3a; }
+.brandbp-btn-ghost { background: transparent; }
+.brandbp-stats { display: flex; gap: 24px; margin-top: 20px; }
+.brandbp-stats li strong { display: block; font-size: 22px; }
+
+/* ========== Section Wrapper ========== */
+.brandbp-section {
+  width: min(1240px, 94%);
+  margin: 40px auto 60px;
+}
+.brandbp-section-head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 12px;
+}
+.brandbp-more { font-weight: 800; color: #0b6b3a; }
+
+/* ========== Product Grid ========== */
+.brandbp-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+  gap: 18px;
+}
+.brandbp-card {
+  display: flex;
+  flex-direction: column;
+  border: 1px solid #efefef;
+  border-radius: 16px;
+  overflow: hidden;
+  background: #fff;
+}
+.brandbp-card-thumb {
+  position: relative;
+  aspect-ratio: 4 / 3;
+  background: #f7f7f7;
+}
+.brandbp-card-thumb img {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  transition: transform 0.25s ease;
+}
+.brandbp-card:hover .brandbp-card-thumb img { transform: scale(1.03); }
+.brandbp-tag {
+  position: absolute;
+  left: 10px; top: 10px;
+  z-index: 2;
+  background: #0b6b3a; color: #fff;
+  font-weight: 800; padding: 4px 8px;
+  border-radius: 10px; font-size: 12px;
+}
+.brandbp-card-body { padding: 12px; display: flex; flex-direction: column; gap: 10px; }
+.brandbp-name { font-weight: 800; line-height: 1.3; min-height: 40px; }
+.brandbp-price { font-weight: 900; }
+.brandbp-actions { margin-top: auto; display: flex; gap: 8px; }
+
+/* --- 카드 내 스몰 버튼 --- */
+.brandbp-small-btn{
+  border:1px solid #ececec;
+  padding:7px 10px;
+  border-radius:8px;
+  font-size:13px;
+  color:#333;
+  background:#fff;
+  font-weight:700;
+  cursor:pointer;
+}
+.brandbp-small-primary{
+  border-color:#0b6b3a;
+  background:#0b6b3a;
+  color:#fff;
+}
+
+/* --- size picker (8seconds와 동일 패턴) --- */
+.brandbp-sizebox {
+  margin-top: 10px;
+  border: 1px solid #eee;
+  border-radius: 12px;
+  padding: 10px;
+  background: #fff;
+}
+.sizebox-title {
+  font-weight: 800;
+  font-size: 14px;
+  margin-bottom: 8px;
+}
+.sizebox-chips { display: flex; gap: 8px; flex-wrap: wrap; }
+.sizebox-chip {
+  padding: 6px 12px;
+  border-radius: 10px;
+  border: 1px solid #ddd;
+  background: #fff;
+  font-weight: 700;
+  cursor: pointer;
+  transition: all .15s ease;
+}
+.sizebox-chip:hover { border-color: #bbb; }
+.sizebox-chip.active { border: 2px solid #111; }
+.sizebox-actions {
+  display: flex;
+  gap: 8px;
+  justify-content: flex-end;
+  margin-top: 10px;
+}
+.sizebox-warn {
+  margin-top: 6px;
+  color: #c33;
+  font-size: 12px;
+}
+/* disabled state */
+.brandbp-small-btn.disabled,
+.brandbp-small-btn[disabled] {
+  opacity: .45;
+  cursor: not-allowed;
+  pointer-events: none;
+}
+
+/* ========== Benefit Section ========== */
+.brandbp-benefits {
+  width: min(1240px, 94%);
+  margin: 40px auto;
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+.brandbp-benefit-card {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 18px;
+  padding: 24px 28px;
+  border-radius: 16px;
+  background: #fafafa;
+  border: 1px solid #eee;
+  box-shadow: 0 1px 2px rgba(0, 0, 0, 0.03);
+}
+.benefit-left { display: flex; flex-direction: column; gap: 6px; }
+.benefit-eyebrow { font-size: 13px; color: #0b6b3a; font-weight: 800; }
+.brandbp-benefit-card h3 { font-size: 20px; line-height: 1.25; margin: 0; font-weight: 900; }
+.brandbp-benefit-card p { margin: 0; color: #555; font-size: 14px; }
+.benefit-right { display: flex; gap: 8px; }
+.brandbp-btn-primary { background: #0b6b3a; color: #fff; border-color: #0b6b3a; }
+.brandbp-btn-ghost { background: #fff; color: #0b6b3a; border-color: #0b6b3a; }
+.brandbp-btn-ghost:hover { background: #f3faf6; }
+.brandbp-benefit-sub {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 12px;
+}
+.brandbp-benefit-sub > div {
+  border: 1px solid #eee;
+  border-radius: 12px;
+  background: #fff;
+  padding: 16px 18px;
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+.brandbp-benefit-sub strong { font-weight: 900; color: #111; font-size: 14px; }
+.brandbp-benefit-sub span { color: #666; font-size: 13px; }
+
+/* ========== Lookbook & Store ========== */
+.brandbp-lookbook {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+  gap: 14px;
+}
+.lookbook-item img { width: 100%; border-radius: 12px; object-fit: cover; }
+.brandbp-store {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 20px;
+  align-items: center;
+}
+.brandbp-store img { width: 100%; border-radius: 16px; object-fit: cover; }
+
+/* Lookbook & Store 아래에 추가 */
+.brandbp-store .store-text { display: flex; flex-direction: column; }
+.brandbp-store .store-text .brandbp-btn {  /* 길찾기 버튼 */
+  margin-top: 14px;      /* 필요시 24px로 조절 */
+  align-self: flex-start;
+}
+
+/* ========== Responsive ========== */
+@media (max-width: 960px) {
+  .brandbp-lookbook { grid-template-columns: repeat(2, 1fr); }
+  .brandbp-store { grid-template-columns: 1fr; }
+  .brandbp-benefit-card { flex-direction: column; align-items: flex-start; }
+  .brandbp-benefit-sub { grid-template-columns: 1fr; }
+  .brandbp-store .store-text .brandbp-btn { margin-top: 10px; }
+}

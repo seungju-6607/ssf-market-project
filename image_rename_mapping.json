@@ -1,0 +1,602 @@
+[
+  {
+    "old": "c:\\dev\\ecommerce-fullstack-app\\docs\\assets\\images\\setup\\cmdImage01.webp",
+    "new": "c:\\dev\\ecommerce-fullstack-app\\docs\\assets\\images\\setup\\cmd-image-01.png",
+    "old_name": "cmdImage01.webp",
+    "new_name": "cmd-image-01.png"
+  },
+  {
+    "old": "c:\\dev\\ecommerce-fullstack-app\\docs\\assets\\images\\setup\\cmdImage02.PNG",
+    "new": "c:\\dev\\ecommerce-fullstack-app\\docs\\assets\\images\\setup\\cmd-image-02.png",
+    "old_name": "cmdImage02.PNG",
+    "new_name": "cmd-image-02.png"
+  },
+  {
+    "old": "c:\\dev\\ecommerce-fullstack-app\\docs\\assets\\images\\setup\\cmdImage02.PNG",
+    "new": "c:\\dev\\ecommerce-fullstack-app\\docs\\assets\\images\\setup\\cmd-image-02.png",
+    "old_name": "cmdImage02.PNG",
+    "new_name": "cmd-image-02.png"
+  },
+  {
+    "old": "c:\\dev\\ecommerce-fullstack-app\\docs\\assets\\images\\setup\\cmdImage02.webp",
+    "new": "c:\\dev\\ecommerce-fullstack-app\\docs\\assets\\images\\setup\\cmd-image-02.png",
+    "old_name": "cmdImage02.webp",
+    "new_name": "cmd-image-02.png"
+  },
+  {
+    "old": "c:\\dev\\ecommerce-fullstack-app\\docs\\assets\\images\\setup\\featureBranch.PNG",
+    "new": "c:\\dev\\ecommerce-fullstack-app\\docs\\assets\\images\\setup\\feature-branch.png",
+    "old_name": "featureBranch.PNG",
+    "new_name": "feature-branch.png"
+  },
+  {
+    "old": "c:\\dev\\ecommerce-fullstack-app\\docs\\assets\\images\\setup\\featureBranch.PNG",
+    "new": "c:\\dev\\ecommerce-fullstack-app\\docs\\assets\\images\\setup\\feature-branch.png",
+    "old_name": "featureBranch.PNG",
+    "new_name": "feature-branch.png"
+  },
+  {
+    "old": "c:\\dev\\ecommerce-fullstack-app\\docs\\assets\\images\\setup\\featureBranch.webp",
+    "new": "c:\\dev\\ecommerce-fullstack-app\\docs\\assets\\images\\setup\\feature-branch.png",
+    "old_name": "featureBranch.webp",
+    "new_name": "feature-branch.png"
+  },
+  {
+    "old": "c:\\dev\\ecommerce-fullstack-app\\docs\\assets\\images\\setup\\myFeatureBranch.PNG",
+    "new": "c:\\dev\\ecommerce-fullstack-app\\docs\\assets\\images\\setup\\my-feature-branch.png",
+    "old_name": "myFeatureBranch.PNG",
+    "new_name": "my-feature-branch.png"
+  },
+  {
+    "old": "c:\\dev\\ecommerce-fullstack-app\\docs\\assets\\images\\setup\\myFeatureBranch.PNG",
+    "new": "c:\\dev\\ecommerce-fullstack-app\\docs\\assets\\images\\setup\\my-feature-branch.png",
+    "old_name": "myFeatureBranch.PNG",
+    "new_name": "my-feature-branch.png"
+  },
+  {
+    "old": "c:\\dev\\ecommerce-fullstack-app\\docs\\assets\\images\\setup\\myFeatureBranch.webp",
+    "new": "c:\\dev\\ecommerce-fullstack-app\\docs\\assets\\images\\setup\\my-feature-branch.png",
+    "old_name": "myFeatureBranch.webp",
+    "new_name": "my-feature-branch.png"
+  },
+  {
+    "old": "c:\\dev\\ecommerce-fullstack-app\\docs\\assets\\images\\setup\\pullRequest.PNG",
+    "new": "c:\\dev\\ecommerce-fullstack-app\\docs\\assets\\images\\setup\\pull-request.png",
+    "old_name": "pullRequest.PNG",
+    "new_name": "pull-request.png"
+  },
+  {
+    "old": "c:\\dev\\ecommerce-fullstack-app\\docs\\assets\\images\\setup\\pullRequest.PNG",
+    "new": "c:\\dev\\ecommerce-fullstack-app\\docs\\assets\\images\\setup\\pull-request.png",
+    "old_name": "pullRequest.PNG",
+    "new_name": "pull-request.png"
+  },
+  {
+    "old": "c:\\dev\\ecommerce-fullstack-app\\docs\\assets\\images\\setup\\pullRequest.webp",
+    "new": "c:\\dev\\ecommerce-fullstack-app\\docs\\assets\\images\\setup\\pull-request.png",
+    "old_name": "pullRequest.webp",
+    "new_name": "pull-request.png"
+  },
+  {
+    "old": "c:\\dev\\ecommerce-fullstack-app\\frontend\\public\\icons\\brand_갤럭시.webp",
+    "new": "c:\\dev\\ecommerce-fullstack-app\\frontend\\public\\icons\\brand_galaxy.webp",
+    "old_name": "brand_갤럭시.webp",
+    "new_name": "brand_galaxy.webp"
+  },
+  {
+    "old": "c:\\dev\\ecommerce-fullstack-app\\frontend\\public\\icons\\brand_갤럭시라이프스타일.webp",
+    "new": "c:\\dev\\ecommerce-fullstack-app\\frontend\\public\\icons\\brand_galaxy.webp",
+    "old_name": "brand_갤럭시라이프스타일.webp",
+    "new_name": "brand_galaxy.webp"
+  },
+  {
+    "old": "c:\\dev\\ecommerce-fullstack-app\\frontend\\public\\icons\\brand_구호.webp",
+    "new": "c:\\dev\\ecommerce-fullstack-app\\frontend\\public\\icons\\brand_kuho.webp",
+    "old_name": "brand_구호.webp",
+    "new_name": "brand_kuho.webp"
+  },
+  {
+    "old": "c:\\dev\\ecommerce-fullstack-app\\frontend\\public\\icons\\brand_구호플러스.webp",
+    "new": "c:\\dev\\ecommerce-fullstack-app\\frontend\\public\\icons\\brand_kuho.webp",
+    "old_name": "brand_구호플러스.webp",
+    "new_name": "brand_kuho.webp"
+  },
+  {
+    "old": "c:\\dev\\ecommerce-fullstack-app\\frontend\\public\\icons\\brand_꼼데가르송.webp",
+    "new": "c:\\dev\\ecommerce-fullstack-app\\frontend\\public\\icons\\brand_comme-des-garcons.webp",
+    "old_name": "brand_꼼데가르송.webp",
+    "new_name": "brand_comme-des-garcons.webp"
+  },
+  {
+    "old": "c:\\dev\\ecommerce-fullstack-app\\frontend\\public\\icons\\brand_디애퍼처.webp",
+    "new": "c:\\dev\\ecommerce-fullstack-app\\frontend\\public\\icons\\brand_departure.webp",
+    "old_name": "brand_디애퍼처.webp",
+    "new_name": "brand_departure.webp"
+  },
+  {
+    "old": "c:\\dev\\ecommerce-fullstack-app\\frontend\\public\\icons\\brand_띠어리.webp",
+    "new": "c:\\dev\\ecommerce-fullstack-app\\frontend\\public\\icons\\brand_theory.webp",
+    "old_name": "brand_띠어리.webp",
+    "new_name": "brand_theory.webp"
+  },
+  {
+    "old": "c:\\dev\\ecommerce-fullstack-app\\frontend\\public\\icons\\brand_라코스테.webp",
+    "new": "c:\\dev\\ecommerce-fullstack-app\\frontend\\public\\icons\\brand_cos.webp",
+    "old_name": "brand_라코스테.webp",
+    "new_name": "brand_cos.webp"
+  },
+  {
+    "old": "c:\\dev\\ecommerce-fullstack-app\\frontend\\public\\icons\\brand_랙앤본.webp",
+    "new": "c:\\dev\\ecommerce-fullstack-app\\frontend\\public\\icons\\brand_rag-and-bone.webp",
+    "old_name": "brand_랙앤본.webp",
+    "new_name": "brand_rag-and-bone.webp"
+  },
+  {
+    "old": "c:\\dev\\ecommerce-fullstack-app\\frontend\\public\\icons\\brand_로가디스.webp",
+    "new": "c:\\dev\\ecommerce-fullstack-app\\frontend\\public\\icons\\brand_rogatis.webp",
+    "old_name": "brand_로가디스.webp",
+    "new_name": "brand_rogatis.webp"
+  },
+  {
+    "old": "c:\\dev\\ecommerce-fullstack-app\\frontend\\public\\icons\\brand_르무통.webp",
+    "new": "c:\\dev\\ecommerce-fullstack-app\\frontend\\public\\icons\\brand_le-mouton.webp",
+    "old_name": "brand_르무통.webp",
+    "new_name": "brand_le-mouton.webp"
+  },
+  {
+    "old": "c:\\dev\\ecommerce-fullstack-app\\frontend\\public\\icons\\brand_메종키츠네.webp",
+    "new": "c:\\dev\\ecommerce-fullstack-app\\frontend\\public\\icons\\brand_maison-kitsune.webp",
+    "old_name": "brand_메종키츠네.webp",
+    "new_name": "brand_maison-kitsune.webp"
+  },
+  {
+    "old": "c:\\dev\\ecommerce-fullstack-app\\frontend\\public\\icons\\brand_비이커.webp",
+    "new": "c:\\dev\\ecommerce-fullstack-app\\frontend\\public\\icons\\brand_beaker.webp",
+    "old_name": "brand_비이커.webp",
+    "new_name": "brand_beaker.webp"
+  },
+  {
+    "old": "c:\\dev\\ecommerce-fullstack-app\\frontend\\public\\icons\\brand_빈폴.webp",
+    "new": "c:\\dev\\ecommerce-fullstack-app\\frontend\\public\\icons\\brand_beanpole.webp",
+    "old_name": "brand_빈폴.webp",
+    "new_name": "brand_beanpole.webp"
+  },
+  {
+    "old": "c:\\dev\\ecommerce-fullstack-app\\frontend\\public\\icons\\brand_샌드사운드.webp",
+    "new": "c:\\dev\\ecommerce-fullstack-app\\frontend\\public\\icons\\brand_sand-sound.webp",
+    "old_name": "brand_샌드사운드.webp",
+    "new_name": "brand_sand-sound.webp"
+  },
+  {
+    "old": "c:\\dev\\ecommerce-fullstack-app\\frontend\\public\\icons\\brand_세인트제임스.webp",
+    "new": "c:\\dev\\ecommerce-fullstack-app\\frontend\\public\\icons\\brand_saint-james.webp",
+    "old_name": "brand_세인트제임스.webp",
+    "new_name": "brand_saint-james.webp"
+  },
+  {
+    "old": "c:\\dev\\ecommerce-fullstack-app\\frontend\\public\\icons\\brand_스포티앤리치.webp",
+    "new": "c:\\dev\\ecommerce-fullstack-app\\frontend\\public\\icons\\brand_sporty-and-rich.webp",
+    "old_name": "brand_스포티앤리치.webp",
+    "new_name": "brand_sporty-and-rich.webp"
+  },
+  {
+    "old": "c:\\dev\\ecommerce-fullstack-app\\frontend\\public\\icons\\brand_시에.webp",
+    "new": "c:\\dev\\ecommerce-fullstack-app\\frontend\\public\\icons\\brand_cie.webp",
+    "old_name": "brand_시에.webp",
+    "new_name": "brand_cie.webp"
+  },
+  {
+    "old": "c:\\dev\\ecommerce-fullstack-app\\frontend\\public\\icons\\brand_에잇세컨즈.webp",
+    "new": "c:\\dev\\ecommerce-fullstack-app\\frontend\\public\\icons\\brand_eight-seconds.webp",
+    "old_name": "brand_에잇세컨즈.webp",
+    "new_name": "brand_eight-seconds.webp"
+  },
+  {
+    "old": "c:\\dev\\ecommerce-fullstack-app\\frontend\\public\\icons\\brand_이뉴골프.webp",
+    "new": "c:\\dev\\ecommerce-fullstack-app\\frontend\\public\\icons\\brand_inew-golf.webp",
+    "old_name": "brand_이뉴골프.webp",
+    "new_name": "brand_inew-golf.webp"
+  },
+  {
+    "old": "c:\\dev\\ecommerce-fullstack-app\\frontend\\public\\icons\\brand_이세이미야케.webp",
+    "new": "c:\\dev\\ecommerce-fullstack-app\\frontend\\public\\icons\\brand_issey-miyake.webp",
+    "old_name": "brand_이세이미야케.webp",
+    "new_name": "brand_issey-miyake.webp"
+  },
+  {
+    "old": "c:\\dev\\ecommerce-fullstack-app\\frontend\\public\\icons\\brand_제너럴 아이디어.webp",
+    "new": "c:\\dev\\ecommerce-fullstack-app\\frontend\\public\\icons\\brand_general-idea.webp",
+    "old_name": "brand_제너럴 아이디어.webp",
+    "new_name": "brand_general-idea.webp"
+  },
+  {
+    "old": "c:\\dev\\ecommerce-fullstack-app\\frontend\\public\\icons\\brand_캐나다구스.webp",
+    "new": "c:\\dev\\ecommerce-fullstack-app\\frontend\\public\\icons\\brand_canada-goose.webp",
+    "old_name": "brand_캐나다구스.webp",
+    "new_name": "brand_canada-goose.webp"
+  },
+  {
+    "old": "c:\\dev\\ecommerce-fullstack-app\\frontend\\public\\icons\\brand_코스.webp",
+    "new": "c:\\dev\\ecommerce-fullstack-app\\frontend\\public\\icons\\brand_cos.webp",
+    "old_name": "brand_코스.webp",
+    "new_name": "brand_cos.webp"
+  },
+  {
+    "old": "c:\\dev\\ecommerce-fullstack-app\\frontend\\public\\icons\\brand_텐꼬르소꼬모.webp",
+    "new": "c:\\dev\\ecommerce-fullstack-app\\frontend\\public\\icons\\brand_ten-corso-como.webp",
+    "old_name": "brand_텐꼬르소꼬모.webp",
+    "new_name": "brand_ten-corso-como.webp"
+  },
+  {
+    "old": "c:\\dev\\ecommerce-fullstack-app\\frontend\\public\\icons\\brand_파타고니아.webp",
+    "new": "c:\\dev\\ecommerce-fullstack-app\\frontend\\public\\icons\\brand_patagonia.webp",
+    "old_name": "brand_파타고니아.webp",
+    "new_name": "brand_patagonia.webp"
+  },
+  {
+    "old": "c:\\dev\\ecommerce-fullstack-app\\frontend\\public\\icons\\brand_헤라.webp",
+    "new": "c:\\dev\\ecommerce-fullstack-app\\frontend\\public\\icons\\brand_hera.webp",
+    "old_name": "brand_헤라.webp",
+    "new_name": "brand_hera.webp"
+  },
+  {
+    "old": "c:\\dev\\ecommerce-fullstack-app\\frontend\\public\\icons\\구호.webp",
+    "new": "c:\\dev\\ecommerce-fullstack-app\\frontend\\public\\icons\\brand_kuho.webp",
+    "old_name": "구호.webp",
+    "new_name": "brand_kuho.webp"
+  },
+  {
+    "old": "c:\\dev\\ecommerce-fullstack-app\\frontend\\public\\icons\\꼼데가르송.webp",
+    "new": "c:\\dev\\ecommerce-fullstack-app\\frontend\\public\\icons\\brand_comme-des-garcons.webp",
+    "old_name": "꼼데가르송.webp",
+    "new_name": "brand_comme-des-garcons.webp"
+  },
+  {
+    "old": "c:\\dev\\ecommerce-fullstack-app\\frontend\\public\\icons\\띠어리.webp",
+    "new": "c:\\dev\\ecommerce-fullstack-app\\frontend\\public\\icons\\brand_theory.webp",
+    "old_name": "띠어리.webp",
+    "new_name": "brand_theory.webp"
+  },
+  {
+    "old": "c:\\dev\\ecommerce-fullstack-app\\frontend\\public\\icons\\비이커.webp",
+    "new": "c:\\dev\\ecommerce-fullstack-app\\frontend\\public\\icons\\brand_beaker.webp",
+    "old_name": "비이커.webp",
+    "new_name": "brand_beaker.webp"
+  },
+  {
+    "old": "c:\\dev\\ecommerce-fullstack-app\\frontend\\public\\icons\\빈폴.webp",
+    "new": "c:\\dev\\ecommerce-fullstack-app\\frontend\\public\\icons\\brand_beanpole.webp",
+    "old_name": "빈폴.webp",
+    "new_name": "brand_beanpole.webp"
+  },
+  {
+    "old": "c:\\dev\\ecommerce-fullstack-app\\frontend\\public\\icons\\에잇세컨드.webp",
+    "new": "c:\\dev\\ecommerce-fullstack-app\\frontend\\public\\icons\\brand_eight-seconds.webp",
+    "old_name": "에잇세컨드.webp",
+    "new_name": "brand_eight-seconds.webp"
+  },
+  {
+    "old": "c:\\dev\\ecommerce-fullstack-app\\frontend\\public\\icons\\이세이미야케.webp",
+    "new": "c:\\dev\\ecommerce-fullstack-app\\frontend\\public\\icons\\brand_issey-miyake.webp",
+    "old_name": "이세이미야케.webp",
+    "new_name": "brand_issey-miyake.webp"
+  },
+  {
+    "old": "c:\\dev\\ecommerce-fullstack-app\\frontend\\public\\icons\\코스.webp",
+    "new": "c:\\dev\\ecommerce-fullstack-app\\frontend\\public\\icons\\brand_cos.webp",
+    "old_name": "코스.webp",
+    "new_name": "brand_cos.webp"
+  },
+  {
+    "old": "c:\\dev\\ecommerce-fullstack-app\\frontend\\public\\icons\\파타고니아.webp",
+    "new": "c:\\dev\\ecommerce-fullstack-app\\frontend\\public\\icons\\brand_patagonia.webp",
+    "old_name": "파타고니아.webp",
+    "new_name": "brand_patagonia.webp"
+  },
+  {
+    "old": "c:\\dev\\ecommerce-fullstack-app\\frontend\\public\\images\\brands\\brand_갤럭시.webp",
+    "new": "c:\\dev\\ecommerce-fullstack-app\\frontend\\public\\images\\brands\\brand_galaxy.webp",
+    "old_name": "brand_갤럭시.webp",
+    "new_name": "brand_galaxy.webp"
+  },
+  {
+    "old": "c:\\dev\\ecommerce-fullstack-app\\frontend\\public\\images\\brands\\brand_갤럭시라이프스타일.webp",
+    "new": "c:\\dev\\ecommerce-fullstack-app\\frontend\\public\\images\\brands\\brand_galaxy.webp",
+    "old_name": "brand_갤럭시라이프스타일.webp",
+    "new_name": "brand_galaxy.webp"
+  },
+  {
+    "old": "c:\\dev\\ecommerce-fullstack-app\\frontend\\public\\images\\brands\\brand_구호.webp",
+    "new": "c:\\dev\\ecommerce-fullstack-app\\frontend\\public\\images\\brands\\brand_kuho.webp",
+    "old_name": "brand_구호.webp",
+    "new_name": "brand_kuho.webp"
+  },
+  {
+    "old": "c:\\dev\\ecommerce-fullstack-app\\frontend\\public\\images\\brands\\brand_구호플러스.webp",
+    "new": "c:\\dev\\ecommerce-fullstack-app\\frontend\\public\\images\\brands\\brand_kuho.webp",
+    "old_name": "brand_구호플러스.webp",
+    "new_name": "brand_kuho.webp"
+  },
+  {
+    "old": "c:\\dev\\ecommerce-fullstack-app\\frontend\\public\\images\\brands\\brand_꼼데가르송.webp",
+    "new": "c:\\dev\\ecommerce-fullstack-app\\frontend\\public\\images\\brands\\brand_comme-des-garcons.webp",
+    "old_name": "brand_꼼데가르송.webp",
+    "new_name": "brand_comme-des-garcons.webp"
+  },
+  {
+    "old": "c:\\dev\\ecommerce-fullstack-app\\frontend\\public\\images\\brands\\brand_디애퍼처.webp",
+    "new": "c:\\dev\\ecommerce-fullstack-app\\frontend\\public\\images\\brands\\brand_departure.webp",
+    "old_name": "brand_디애퍼처.webp",
+    "new_name": "brand_departure.webp"
+  },
+  {
+    "old": "c:\\dev\\ecommerce-fullstack-app\\frontend\\public\\images\\brands\\brand_띠어리.webp",
+    "new": "c:\\dev\\ecommerce-fullstack-app\\frontend\\public\\images\\brands\\brand_theory.webp",
+    "old_name": "brand_띠어리.webp",
+    "new_name": "brand_theory.webp"
+  },
+  {
+    "old": "c:\\dev\\ecommerce-fullstack-app\\frontend\\public\\images\\brands\\brand_라코스테.webp",
+    "new": "c:\\dev\\ecommerce-fullstack-app\\frontend\\public\\images\\brands\\brand_cos.webp",
+    "old_name": "brand_라코스테.webp",
+    "new_name": "brand_cos.webp"
+  },
+  {
+    "old": "c:\\dev\\ecommerce-fullstack-app\\frontend\\public\\images\\brands\\brand_랙앤본.webp",
+    "new": "c:\\dev\\ecommerce-fullstack-app\\frontend\\public\\images\\brands\\brand_rag-and-bone.webp",
+    "old_name": "brand_랙앤본.webp",
+    "new_name": "brand_rag-and-bone.webp"
+  },
+  {
+    "old": "c:\\dev\\ecommerce-fullstack-app\\frontend\\public\\images\\brands\\brand_로가디스.webp",
+    "new": "c:\\dev\\ecommerce-fullstack-app\\frontend\\public\\images\\brands\\brand_rogatis.webp",
+    "old_name": "brand_로가디스.webp",
+    "new_name": "brand_rogatis.webp"
+  },
+  {
+    "old": "c:\\dev\\ecommerce-fullstack-app\\frontend\\public\\images\\brands\\brand_르무통.webp",
+    "new": "c:\\dev\\ecommerce-fullstack-app\\frontend\\public\\images\\brands\\brand_le-mouton.webp",
+    "old_name": "brand_르무통.webp",
+    "new_name": "brand_le-mouton.webp"
+  },
+  {
+    "old": "c:\\dev\\ecommerce-fullstack-app\\frontend\\public\\images\\brands\\brand_메종키츠네.webp",
+    "new": "c:\\dev\\ecommerce-fullstack-app\\frontend\\public\\images\\brands\\brand_maison-kitsune.webp",
+    "old_name": "brand_메종키츠네.webp",
+    "new_name": "brand_maison-kitsune.webp"
+  },
+  {
+    "old": "c:\\dev\\ecommerce-fullstack-app\\frontend\\public\\images\\brands\\brand_비이커.webp",
+    "new": "c:\\dev\\ecommerce-fullstack-app\\frontend\\public\\images\\brands\\brand_beaker.webp",
+    "old_name": "brand_비이커.webp",
+    "new_name": "brand_beaker.webp"
+  },
+  {
+    "old": "c:\\dev\\ecommerce-fullstack-app\\frontend\\public\\images\\brands\\brand_빈폴.webp",
+    "new": "c:\\dev\\ecommerce-fullstack-app\\frontend\\public\\images\\brands\\brand_beanpole.webp",
+    "old_name": "brand_빈폴.webp",
+    "new_name": "brand_beanpole.webp"
+  },
+  {
+    "old": "c:\\dev\\ecommerce-fullstack-app\\frontend\\public\\images\\brands\\brand_샌드사운드.webp",
+    "new": "c:\\dev\\ecommerce-fullstack-app\\frontend\\public\\images\\brands\\brand_sand-sound.webp",
+    "old_name": "brand_샌드사운드.webp",
+    "new_name": "brand_sand-sound.webp"
+  },
+  {
+    "old": "c:\\dev\\ecommerce-fullstack-app\\frontend\\public\\images\\brands\\brand_세인트제임스.webp",
+    "new": "c:\\dev\\ecommerce-fullstack-app\\frontend\\public\\images\\brands\\brand_saint-james.webp",
+    "old_name": "brand_세인트제임스.webp",
+    "new_name": "brand_saint-james.webp"
+  },
+  {
+    "old": "c:\\dev\\ecommerce-fullstack-app\\frontend\\public\\images\\brands\\brand_스포티앤리치.webp",
+    "new": "c:\\dev\\ecommerce-fullstack-app\\frontend\\public\\images\\brands\\brand_sporty-and-rich.webp",
+    "old_name": "brand_스포티앤리치.webp",
+    "new_name": "brand_sporty-and-rich.webp"
+  },
+  {
+    "old": "c:\\dev\\ecommerce-fullstack-app\\frontend\\public\\images\\brands\\brand_시에.webp",
+    "new": "c:\\dev\\ecommerce-fullstack-app\\frontend\\public\\images\\brands\\brand_cie.webp",
+    "old_name": "brand_시에.webp",
+    "new_name": "brand_cie.webp"
+  },
+  {
+    "old": "c:\\dev\\ecommerce-fullstack-app\\frontend\\public\\images\\brands\\brand_에잇세컨즈.webp",
+    "new": "c:\\dev\\ecommerce-fullstack-app\\frontend\\public\\images\\brands\\brand_eight-seconds.webp",
+    "old_name": "brand_에잇세컨즈.webp",
+    "new_name": "brand_eight-seconds.webp"
+  },
+  {
+    "old": "c:\\dev\\ecommerce-fullstack-app\\frontend\\public\\images\\brands\\brand_이뉴골프.webp",
+    "new": "c:\\dev\\ecommerce-fullstack-app\\frontend\\public\\images\\brands\\brand_inew-golf.webp",
+    "old_name": "brand_이뉴골프.webp",
+    "new_name": "brand_inew-golf.webp"
+  },
+  {
+    "old": "c:\\dev\\ecommerce-fullstack-app\\frontend\\public\\images\\brands\\brand_이세이미야케.webp",
+    "new": "c:\\dev\\ecommerce-fullstack-app\\frontend\\public\\images\\brands\\brand_issey-miyake.webp",
+    "old_name": "brand_이세이미야케.webp",
+    "new_name": "brand_issey-miyake.webp"
+  },
+  {
+    "old": "c:\\dev\\ecommerce-fullstack-app\\frontend\\public\\images\\brands\\brand_제너럴 아이디어.webp",
+    "new": "c:\\dev\\ecommerce-fullstack-app\\frontend\\public\\images\\brands\\brand_general-idea.webp",
+    "old_name": "brand_제너럴 아이디어.webp",
+    "new_name": "brand_general-idea.webp"
+  },
+  {
+    "old": "c:\\dev\\ecommerce-fullstack-app\\frontend\\public\\images\\brands\\brand_캐나다구스.webp",
+    "new": "c:\\dev\\ecommerce-fullstack-app\\frontend\\public\\images\\brands\\brand_canada-goose.webp",
+    "old_name": "brand_캐나다구스.webp",
+    "new_name": "brand_canada-goose.webp"
+  },
+  {
+    "old": "c:\\dev\\ecommerce-fullstack-app\\frontend\\public\\images\\brands\\brand_코스.webp",
+    "new": "c:\\dev\\ecommerce-fullstack-app\\frontend\\public\\images\\brands\\brand_cos.webp",
+    "old_name": "brand_코스.webp",
+    "new_name": "brand_cos.webp"
+  },
+  {
+    "old": "c:\\dev\\ecommerce-fullstack-app\\frontend\\public\\images\\brands\\brand_텐꼬르소꼬모.webp",
+    "new": "c:\\dev\\ecommerce-fullstack-app\\frontend\\public\\images\\brands\\brand_ten-corso-como.webp",
+    "old_name": "brand_텐꼬르소꼬모.webp",
+    "new_name": "brand_ten-corso-como.webp"
+  },
+  {
+    "old": "c:\\dev\\ecommerce-fullstack-app\\frontend\\public\\images\\brands\\brand_파타고니아.webp",
+    "new": "c:\\dev\\ecommerce-fullstack-app\\frontend\\public\\images\\brands\\brand_patagonia.webp",
+    "old_name": "brand_파타고니아.webp",
+    "new_name": "brand_patagonia.webp"
+  },
+  {
+    "old": "c:\\dev\\ecommerce-fullstack-app\\frontend\\public\\images\\brands\\brand_헤라.webp",
+    "new": "c:\\dev\\ecommerce-fullstack-app\\frontend\\public\\images\\brands\\brand_hera.webp",
+    "old_name": "brand_헤라.webp",
+    "new_name": "brand_hera.webp"
+  },
+  {
+    "old": "c:\\dev\\ecommerce-fullstack-app\\frontend\\src\\assets\\brands\\brand_갤럭시.webp",
+    "new": "c:\\dev\\ecommerce-fullstack-app\\frontend\\src\\assets\\brands\\brand_galaxy.webp",
+    "old_name": "brand_갤럭시.webp",
+    "new_name": "brand_galaxy.webp"
+  },
+  {
+    "old": "c:\\dev\\ecommerce-fullstack-app\\frontend\\src\\assets\\brands\\brand_갤럭시라이프스타일.webp",
+    "new": "c:\\dev\\ecommerce-fullstack-app\\frontend\\src\\assets\\brands\\brand_galaxy.webp",
+    "old_name": "brand_갤럭시라이프스타일.webp",
+    "new_name": "brand_galaxy.webp"
+  },
+  {
+    "old": "c:\\dev\\ecommerce-fullstack-app\\frontend\\src\\assets\\brands\\brand_구호플러스.webp",
+    "new": "c:\\dev\\ecommerce-fullstack-app\\frontend\\src\\assets\\brands\\brand_kuho.webp",
+    "old_name": "brand_구호플러스.webp",
+    "new_name": "brand_kuho.webp"
+  },
+  {
+    "old": "c:\\dev\\ecommerce-fullstack-app\\frontend\\src\\assets\\brands\\brand_꼼데가르송.webp",
+    "new": "c:\\dev\\ecommerce-fullstack-app\\frontend\\src\\assets\\brands\\brand_comme-des-garcons.webp",
+    "old_name": "brand_꼼데가르송.webp",
+    "new_name": "brand_comme-des-garcons.webp"
+  },
+  {
+    "old": "c:\\dev\\ecommerce-fullstack-app\\frontend\\src\\assets\\brands\\brand_디애퍼처.webp",
+    "new": "c:\\dev\\ecommerce-fullstack-app\\frontend\\src\\assets\\brands\\brand_departure.webp",
+    "old_name": "brand_디애퍼처.webp",
+    "new_name": "brand_departure.webp"
+  },
+  {
+    "old": "c:\\dev\\ecommerce-fullstack-app\\frontend\\src\\assets\\brands\\brand_랙앤본.webp",
+    "new": "c:\\dev\\ecommerce-fullstack-app\\frontend\\src\\assets\\brands\\brand_rag-and-bone.webp",
+    "old_name": "brand_랙앤본.webp",
+    "new_name": "brand_rag-and-bone.webp"
+  },
+  {
+    "old": "c:\\dev\\ecommerce-fullstack-app\\frontend\\src\\assets\\brands\\brand_로가디스.webp",
+    "new": "c:\\dev\\ecommerce-fullstack-app\\frontend\\src\\assets\\brands\\brand_rogatis.webp",
+    "old_name": "brand_로가디스.webp",
+    "new_name": "brand_rogatis.webp"
+  },
+  {
+    "old": "c:\\dev\\ecommerce-fullstack-app\\frontend\\src\\assets\\brands\\brand_르무통.webp",
+    "new": "c:\\dev\\ecommerce-fullstack-app\\frontend\\src\\assets\\brands\\brand_le-mouton.webp",
+    "old_name": "brand_르무통.webp",
+    "new_name": "brand_le-mouton.webp"
+  },
+  {
+    "old": "c:\\dev\\ecommerce-fullstack-app\\frontend\\src\\assets\\brands\\brand_메종키츠네.webp",
+    "new": "c:\\dev\\ecommerce-fullstack-app\\frontend\\src\\assets\\brands\\brand_maison-kitsune.webp",
+    "old_name": "brand_메종키츠네.webp",
+    "new_name": "brand_maison-kitsune.webp"
+  },
+  {
+    "old": "c:\\dev\\ecommerce-fullstack-app\\frontend\\src\\assets\\brands\\brand_비이커.webp",
+    "new": "c:\\dev\\ecommerce-fullstack-app\\frontend\\src\\assets\\brands\\brand_beaker.webp",
+    "old_name": "brand_비이커.webp",
+    "new_name": "brand_beaker.webp"
+  },
+  {
+    "old": "c:\\dev\\ecommerce-fullstack-app\\frontend\\src\\assets\\brands\\brand_빈폴.webp",
+    "new": "c:\\dev\\ecommerce-fullstack-app\\frontend\\src\\assets\\brands\\brand_beanpole.webp",
+    "old_name": "brand_빈폴.webp",
+    "new_name": "brand_beanpole.webp"
+  },
+  {
+    "old": "c:\\dev\\ecommerce-fullstack-app\\frontend\\src\\assets\\brands\\brand_샌드사운드.webp",
+    "new": "c:\\dev\\ecommerce-fullstack-app\\frontend\\src\\assets\\brands\\brand_sand-sound.webp",
+    "old_name": "brand_샌드사운드.webp",
+    "new_name": "brand_sand-sound.webp"
+  },
+  {
+    "old": "c:\\dev\\ecommerce-fullstack-app\\frontend\\src\\assets\\brands\\brand_세인트제임스.webp",
+    "new": "c:\\dev\\ecommerce-fullstack-app\\frontend\\src\\assets\\brands\\brand_saint-james.webp",
+    "old_name": "brand_세인트제임스.webp",
+    "new_name": "brand_saint-james.webp"
+  },
+  {
+    "old": "c:\\dev\\ecommerce-fullstack-app\\frontend\\src\\assets\\brands\\brand_스포티앤리치.webp",
+    "new": "c:\\dev\\ecommerce-fullstack-app\\frontend\\src\\assets\\brands\\brand_sporty-and-rich.webp",
+    "old_name": "brand_스포티앤리치.webp",
+    "new_name": "brand_sporty-and-rich.webp"
+  },
+  {
+    "old": "c:\\dev\\ecommerce-fullstack-app\\frontend\\src\\assets\\brands\\brand_시에.webp",
+    "new": "c:\\dev\\ecommerce-fullstack-app\\frontend\\src\\assets\\brands\\brand_cie.webp",
+    "old_name": "brand_시에.webp",
+    "new_name": "brand_cie.webp"
+  },
+  {
+    "old": "c:\\dev\\ecommerce-fullstack-app\\frontend\\src\\assets\\brands\\brand_에잇세컨즈.webp",
+    "new": "c:\\dev\\ecommerce-fullstack-app\\frontend\\src\\assets\\brands\\brand_eight-seconds.webp",
+    "old_name": "brand_에잇세컨즈.webp",
+    "new_name": "brand_eight-seconds.webp"
+  },
+  {
+    "old": "c:\\dev\\ecommerce-fullstack-app\\frontend\\src\\assets\\brands\\brand_이뉴골프.webp",
+    "new": "c:\\dev\\ecommerce-fullstack-app\\frontend\\src\\assets\\brands\\brand_inew-golf.webp",
+    "old_name": "brand_이뉴골프.webp",
+    "new_name": "brand_inew-golf.webp"
+  },
+  {
+    "old": "c:\\dev\\ecommerce-fullstack-app\\frontend\\src\\assets\\brands\\brand_이세이미야케.webp",
+    "new": "c:\\dev\\ecommerce-fullstack-app\\frontend\\src\\assets\\brands\\brand_issey-miyake.webp",
+    "old_name": "brand_이세이미야케.webp",
+    "new_name": "brand_issey-miyake.webp"
+  },
+  {
+    "old": "c:\\dev\\ecommerce-fullstack-app\\frontend\\src\\assets\\brands\\brand_제너럴 아이디어.webp",
+    "new": "c:\\dev\\ecommerce-fullstack-app\\frontend\\src\\assets\\brands\\brand_general-idea.webp",
+    "old_name": "brand_제너럴 아이디어.webp",
+    "new_name": "brand_general-idea.webp"
+  },
+  {
+    "old": "c:\\dev\\ecommerce-fullstack-app\\frontend\\src\\assets\\brands\\brand_캐나다구스.webp",
+    "new": "c:\\dev\\ecommerce-fullstack-app\\frontend\\src\\assets\\brands\\brand_canada-goose.webp",
+    "old_name": "brand_캐나다구스.webp",
+    "new_name": "brand_canada-goose.webp"
+  },
+  {
+    "old": "c:\\dev\\ecommerce-fullstack-app\\frontend\\src\\assets\\brands\\brand_코스.webp",
+    "new": "c:\\dev\\ecommerce-fullstack-app\\frontend\\src\\assets\\brands\\brand_cos.webp",
+    "old_name": "brand_코스.webp",
+    "new_name": "brand_cos.webp"
+  },
+  {
+    "old": "c:\\dev\\ecommerce-fullstack-app\\frontend\\src\\assets\\brands\\brand_텐꼬르소꼬모.webp",
+    "new": "c:\\dev\\ecommerce-fullstack-app\\frontend\\src\\assets\\brands\\brand_ten-corso-como.webp",
+    "old_name": "brand_텐꼬르소꼬모.webp",
+    "new_name": "brand_ten-corso-como.webp"
+  },
+  {
+    "old": "c:\\dev\\ecommerce-fullstack-app\\frontend\\src\\assets\\brands\\brand_파타고니아.webp",
+    "new": "c:\\dev\\ecommerce-fullstack-app\\frontend\\src\\assets\\brands\\brand_patagonia.webp",
+    "old_name": "brand_파타고니아.webp",
+    "new_name": "brand_patagonia.webp"
+  },
+  {
+    "old": "c:\\dev\\ecommerce-fullstack-app\\frontend\\src\\assets\\brands\\brand_헤라.webp",
+    "new": "c:\\dev\\ecommerce-fullstack-app\\frontend\\src\\assets\\brands\\brand_hera.webp",
+    "old_name": "brand_헤라.webp",
+    "new_name": "brand_hera.webp"
+  }
+]

@@ -1,0 +1,75 @@
+/* 레이아웃 */
+.pp-wrap {
+  max-width: 1080px;
+  margin: 40px auto 90px;
+  padding: 0 20px;
+}
+.pp-breadcrumb { color:#9aa0a6; font-size:13px; margin-bottom:8px; }
+.pp-title { font-size:34px; font-weight:800; text-align:center; letter-spacing:-.3px; margin:6px 0 18px; }
+.pp-lead { text-align:center; color:#555; margin:6px auto 22px; max-width:820px; }
+
+/* 카드 그리드 */
+.pp-grid {
+  display:grid;
+  grid-template-columns: repeat(6, 1fr);
+  gap:14px;
+  margin: 12px 0 22px;
+}
+.pp-card {
+  background:#fff;
+  border:1px solid #eee;
+  border-radius:12px;
+  height:120px;
+  display:flex;
+  flex-direction:column;
+  align-items:center;
+  justify-content:center;
+  gap:8px;
+  position:relative;
+  outline:none;
+  transition: box-shadow .2s ease, transform .1s ease, border-color .2s ease;
+}
+.pp-card:hover, .pp-card:focus {
+  border-color:#e6defe;
+  box-shadow:0 4px 16px rgba(107,59,245,.12);
+  transform: translateY(-1px);
+}
+.pp-icon { font-size:34px; line-height:1; }
+.pp-card-title { font-weight:700; font-size:14px; color:#222; }
+
+/* hover 요약 박스 */
+.pp-popover {
+  position:absolute;
+  left:0; right:0;
+  bottom:-14px;           /* 카드 아래로 자연스럽게 */
+  transform: translateY(100%);
+  display:none;
+  z-index: 5;
+}
+.pp-card:hover .pp-popover,
+.pp-card:focus .pp-popover { display:block; }
+
+.pp-popover-inner {
+  background:#fff;
+  border:1px solid #eee;
+  border-radius:12px;
+  padding:14px 16px;
+  box-shadow:0 10px 24px rgba(0,0,0,.08);
+}
+.pp-popover-title { font-weight:800; margin-bottom:6px; }
+.pp-popover-desc { margin:0; white-space:pre-line; color:#444; font-size:13px; line-height:1.7; }
+
+/* 본문 */
+.pp-section { margin-top:28px; }
+.pp-section h2 { font-size:18px; font-weight:800; margin:20px 0 10px; }
+.pp-section ul { margin:0 0 14px 18px; color:#333; line-height:1.9; }
+.pp-section li { margin: 2px 0; }
+
+/* 반응형 */
+@media (max-width: 1024px) {
+  .pp-grid { grid-template-columns: repeat(3, 1fr); }
+}
+@media (max-width: 560px) {
+  .pp-grid { grid-template-columns: repeat(2, 1fr); }
+  .pp-popover-inner { font-size:13px; }
+}

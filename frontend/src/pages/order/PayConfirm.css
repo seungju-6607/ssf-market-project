@@ -1,0 +1,138 @@
+/* src/pages/order/PayConfirm.css */
+.pc-wrap {
+  max-width: 1100px;
+  margin: 40px auto;
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 28px;
+}
+
+.pc-title {
+  font-size: 22px;
+  font-weight: 700;
+  margin-bottom: 14px;
+}
+
+/* QR 영역 */
+.pc-qrbox {
+  width: 380px;
+  height: 380px;
+  border-radius: 12px;
+  border: 1px solid #eee;
+  display: grid;
+  place-items: center;
+  overflow: hidden;
+  background: #fff;
+}
+.pc-qrbox img {
+  width: 84%;
+  height: 84%;
+  object-fit: contain;
+}
+
+/* 주문 요약 */
+.pc-subtitle {
+  font-size: 18px;
+  font-weight: 700;
+  margin: 6px 0 12px;
+}
+
+.pc-items {
+  border: 1px solid #f0f0f0;
+  border-radius: 12px;
+  overflow: hidden;
+  background: #fff;
+}
+.pc-item {
+  display: grid;
+  grid-template-columns: 64px 1fr auto;
+  gap: 12px;
+  align-items: center;
+  padding: 12px 14px;
+  border-bottom: 1px solid #f5f5f5;
+}
+.pc-item:last-child {
+  border-bottom: none;
+}
+
+.pc-thumb {
+  width: 64px;
+  height: 80px;
+  object-fit: cover;
+  border-radius: 8px;
+  background: #fafafa;
+}
+
+.pc-info .pc-name {
+  font-weight: 600;
+}
+.pc-info .pc-meta {
+  color: #666;
+  font-size: 13px;
+  margin-top: 4px;
+}
+
+.pc-price {
+  font-weight: 700;
+}
+
+/* 합계 섹션 */
+.pc-totals {
+  margin-top: 14px;
+}
+.pc-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-top: 8px;
+}
+.pc-row.total {
+  margin-top: 14px;
+  padding-top: 10px;
+  border-top: 1px dashed #e7e7e7;
+  font-size: 18px;
+}
+
+/* 버튼 */
+.pc-actions {
+  display: flex;
+  gap: 10px;
+  margin-top: 18px;
+}
+.pc-actions .ghost,
+.pc-actions .primary {
+  padding: 12px 16px;
+  border-radius: 10px;
+  font-weight: 600;
+  cursor: pointer;
+}
+.pc-actions .ghost {
+  background: #fff;
+  border: 1px solid #e6e6e6;
+}
+.pc-actions .primary {
+  background: #5b21ff;
+  color: #fff;
+  border: none;
+}
+.pc-wrap{max-width:1100px;margin:32px auto;display:grid;grid-template-columns:1fr 1fr;gap:36px}
+.pc-title{font-size:22px;margin-bottom:12px}
+.pc-qr-box{background:#fff;border:1px solid #eee;border-radius:16px;padding:28px;display:flex;align-items:center;justify-content:center}
+.pc-qr{width:340px;height:340px;object-fit:contain}
+
+.pc-right-title{font-size:18px;margin-bottom:12px}
+.pc-items{border:1px solid #eee;border-radius:12px;overflow:hidden;background:#fff}
+.pc-item{display:flex;align-items:center;gap:14px;padding:12px 14px;border-bottom:1px solid #f3f3f3}
+.pc-item:last-child{border-bottom:none}
+.pc-thumb{width:60px;height:60px;border-radius:8px;object-fit:cover;background:#f6f6f6}
+.pc-item-info{flex:1}
+.pc-item-name{font-weight:600}
+.pc-item-sub{color:#666;font-size:13px;margin-top:2px}
+.pc-item-price{font-weight:700}
+
+.pc-sum{margin-top:18px;border-top:1px dashed #eee;padding-top:12px}
+.pc-row{display:flex;justify-content:space-between;padding:6px 0}
+.pc-total{font-size:18px;font-weight:800}
+
+.pc-actions{margin-top:16px;display:flex;gap:10px}
+.pc-back{height:40px;padding:0 14px;border-radius:8px;border:1px solid #ddd;background:#fff}
