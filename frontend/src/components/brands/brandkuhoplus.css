@@ -1,0 +1,150 @@
+/* ================= KUHO PLUS (단일 전용) ================= */
+.brandkuhop { position:relative; z-index:1; color:#111; background:#fff; }
+.brandkuhop-hero, .brandkuhop-section { display:block; padding:36px 0; }
+.brandkuhop * { box-sizing:border-box; }
+.brandkuhop img{ display:block; max-width:100%; height:auto; }
+
+/* 컨테이너 */
+.brandkuhop-hero-inner,
+.brandkuhop-section .brandkuhop-section-head,
+.brandkuhop-section .brandkuhop-grid,
+.brandkuhop-section .brandkuhop-lookbook,
+.brandkuhop-section .brandkuhop-store,
+.kp-benefit .inner { width:min(1240px,94%); margin:0 auto; }
+
+/* ---------- HERO ---------- */
+.brandkuhop-hero{
+  background: linear-gradient(to bottom right, rgba(18,38,34,.35), rgba(18,38,34,.45)),
+              url("https://images.unsplash.com/photo-1542314831-068cd1dbfeeb?w=2000&q=80&auto=format&fit=crop")
+              center/cover no-repeat;
+  color:#fff; min-height:420px; display:flex; align-items:center;
+}
+.brandkuhop-hero-inner{ padding:90px 0 120px; position:relative; }
+.brandkuhop-badge{
+  display:inline-block; padding:6px 12px; font-size:12px; font-weight:800;
+  border-radius:20px; background:#0f4c3a; color:#fff; letter-spacing:.5px;
+}
+.brandkuhop-title{ margin:18px 0 10px; font-size:42px; font-weight:900; line-height:1.15; color:#fff; }
+.brandkuhop-title span{ color:#bff5df; }
+.brandkuhop-sub{ color:rgba(255,255,255,.92); }
+
+.brandkuhop-cta{ margin-top:22px; display:flex; gap:12px; }
+.brandkuhop-btn{
+  padding:11px 18px; border-radius:10px; font-weight:800;
+  border:1px solid rgba(255,255,255,.85); color:#fff; text-decoration:none;
+  transition:all .2s ease;
+}
+.brandkuhop-btn-primary{ background:#0f4c3a; border-color:#0f4c3a; }
+.brandkuhop-btn-primary:hover{ background:#0c3d2f; }
+.brandkuhop-btn-ghost{ background:rgba(255,255,255,.15); }
+.brandkuhop-btn-ghost:hover{ background:rgba(255,255,255,.28); }
+
+.brandkuhop-stats{ display:flex; gap:28px; margin-top:28px; color:#eaf5f1; }
+.brandkuhop-stats li strong{ display:block; font-size:22px; color:#fff; }
+
+/* ---------- Section Head ---------- */
+.brandkuhop-section-head{
+  display:flex; align-items:center; justify-content:space-between; margin-bottom:14px;
+}
+.brandkuhop-section-head h2{ font-size:22px; font-weight:800; color:#111; }
+.brandkuhop-more{ font-weight:800; color:#0f4c3a; text-decoration:none; }
+
+/* ---------- GRID ---------- */
+.brandkuhop-grid{
+  display:grid; grid-template-columns:repeat(auto-fit,minmax(260px,1fr)); gap:20px;
+}
+.brandkuhop-card{
+  display:flex; flex-direction:column; border:1px solid #ececec; border-radius:16px;
+  overflow:hidden; background:#fff; transition:box-shadow .25s ease;
+}
+.brandkuhop-card:hover{ box-shadow:0 6px 18px rgba(0,0,0,.08); }
+.brandkuhop-card-thumb{ position:relative; aspect-ratio:4/3; background:#f7f7f7; }
+.brandkuhop-card-thumb img{
+  position:absolute; inset:0; width:100%; height:100%; object-fit:cover; transition:transform .25s;
+}
+.brandkuhop-card:hover .brandkuhop-card-thumb img{ transform:scale(1.03); }
+
+.brandkuhop-tag{
+  position:absolute; left:10px; top:10px; z-index:2;
+  background:#0f4c3a; color:#fff; font-weight:800; padding:4px 8px; border-radius:10px; font-size:12px;
+}
+.brandkuhop-card-body{ padding:14px; display:flex; flex-direction:column; gap:10px; }
+.brandkuhop-name{ font-weight:800; line-height:1.4; min-height:40px; color:#222; }
+.brandkuhop-price{ font-weight:900; color:#0f4c3a; }
+.brandkuhop-actions{ margin-top:auto; display:flex; gap:8px; }
+.brandkuhop-small-btn{
+  display:inline-block; padding:8px 12px; border-radius:8px; font-weight:700; border:1px solid #ddd;
+  color:#333; text-decoration:none; transition:all .2s; background:#fff; cursor:pointer;
+}
+.brandkuhop-small-btn:hover{ background:#f7f7f7; }
+.brandkuhop-small-primary{ background:#0f4c3a; border-color:#0f4c3a; color:#fff; }
+.brandkuhop-small-primary:hover{ background:#0c3d2f; }
+
+/* ====== size picker (추가) ====== */
+.brandkuhop-sizebox{
+  margin-top:10px; border:1px solid #eee; border-radius:12px; padding:10px; background:#fff;
+}
+.sizebox-title{ font-weight:800; font-size:14px; margin-bottom:8px; }
+.sizebox-chips{ display:flex; gap:8px; flex-wrap:wrap; }
+.sizebox-chip{
+  padding:6px 12px; border-radius:10px; border:1px solid #ddd; background:#fff;
+  font-weight:700; cursor:pointer; transition:all .15s ease;
+}
+.sizebox-chip:hover{ border-color:#bbb; }
+.sizebox-chip.active{ border:2px solid #111; }
+.sizebox-actions{ display:flex; gap:8px; justify-content:flex-end; margin-top:10px; }
+.sizebox-warn{ margin-top:6px; color:#c33; font-size:12px; }
+
+/* disabled state */
+.brandkuhop-small-btn.disabled,
+.brandkuhop-small-btn[disabled]{ opacity:.45; cursor:not-allowed; pointer-events:none; }
+
+/* ---------- BENEFIT ---------- */
+.kp-benefit{ background:linear-gradient(135deg,#f6fffb,#eef7f3); border:1px solid #dff1ea; border-radius:16px; margin:40px auto; }
+.kp-benefit .inner{ padding:20px; }
+.benefit-head{ display:flex; align-items:center; justify-content:space-between; border-bottom:1px dashed #dff1ea; padding-bottom:14px; margin-bottom:14px; }
+.benefit-eyebrow{ font-size:12px; font-weight:800; color:#0f4c3a; margin-bottom:6px; }
+.benefit-head h3{ margin:4px 0 6px; font-size:20px; font-weight:900; color:#111; }
+.benefit-head p{ margin:0; color:#333; opacity:.9; }
+.benefit-cta{ display:flex; gap:10px; }
+.btn{ display:inline-block; padding:10px 14px; border-radius:10px; font-weight:800; text-decoration:none; transition:all .2s ease; }
+.b-solid{ background:#0f4c3a; color:#fff; border:1px solid #0f4c3a; }
+.b-solid:hover{ background:#0c3d2f; }
+.b-ghost{ background:#fff; color:#0f4c3a; border:1px solid #0f4c3a; }
+.b-ghost:hover{ background:#f6fffb; }
+.benefit-row{ display:grid; grid-template-columns:repeat(3,1fr); gap:10px; }
+.benefit-item{ border:1px dashed #dff1ea; border-radius:12px; background:#fff; padding:12px 14px; transition:transform .2s; }
+.benefit-item:hover{ transform:translateY(-3px); }
+
+/* ---------- LOOKBOOK (통일 규격) ---------- */
+.brandkuhop-lookbook{ display:grid; grid-template-columns:repeat(4,minmax(0,1fr)); gap:12px; }
+.brandkuhop-lookbook .lookbook-item{ position:relative; aspect-ratio:4/3; border-radius:12px; overflow:hidden; background:#f7f7f7; }
+.brandkuhop-lookbook .lookbook-item img{
+  position:absolute; inset:0; width:100%; height:100%; object-fit:cover; transition:transform .3s ease;
+}
+.brandkuhop-lookbook .lookbook-item:hover img{ transform:scale(1.05); }
+
+/* ---------- STORE (길찾기 강조) ---------- */
+.brandkuhop-store{ display:grid; grid-template-columns:1fr 1.4fr; gap:20px; align-items:center; }
+.store-text h3{ font-size:18px; font-weight:900; margin:0 0 6px; }
+.store-text p{ margin:0 0 10px; color:#333; }
+
+/* 길찾기 버튼 – 어떤 배경에서도 선명하게 보이도록 */
+.btn.btn-locator{
+  background:#0f4c3a; color:#fff; border:2px solid #0a3a2c;
+  box-shadow:0 4px 16px rgba(15,76,58,.35); font-weight:900;
+}
+.btn.btn-locator:hover{ background:#0c3d2f; box-shadow:0 6px 18px rgba(15,76,58,.45); }
+.store-map-link{ margin-top:8px; display:inline-block; }
+
+.store-map img{ width:100%; border-radius:16px; border:1px solid #eee; transition:transform .25s ease; }
+.store-map img:hover{ transform:scale(1.02); }
+
+/* ---------- Responsive ---------- */
+@media (max-width:960px){
+  .brandkuhop-hero-inner{ padding:64px 0 84px; }
+  .brandkuhop-title{ font-size:32px; }
+  .brandkuhop-lookbook{ grid-template-columns:repeat(2,1fr); }
+  .brandkuhop-store{ grid-template-columns:1fr; }
+  .benefit-row{ grid-template-columns:1fr; }
+}

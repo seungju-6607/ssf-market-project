@@ -1,0 +1,26 @@
+.section-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-end;
+  margin-bottom: 20px;
+}
+
+.section-header h3 {
+  font-size: var(--font-lg);
+  font-weight: var(--font-weight-bold);
+  line-height: var(--leading-tight);
+}
+
+.section-header p {
+  font-size: var(--font-xs);
+  color: var(--text-light);
+  margin-top: 4px;
+  line-height: var(--leading-normal);
+}
+
+.section-header .more {
+  font-size: var(--font-xs);
+  color: var(--text-tertiary);
+  text-decoration: underline;
+  line-height: var(--leading-normal);
+}

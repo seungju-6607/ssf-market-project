@@ -1,0 +1,272 @@
+/* ========================== THEORY (단일 전용 CSS – 리디자인 버전) ========================== */
+.brandth { position:relative; z-index:1; color:#111; background:#fff; font-family:'Noto Sans KR',sans-serif; }
+.brandth-hero, .brandth-section { display:block; padding:36px 0; }
+.brandth img { display:block; max-width:100%; height:auto; }
+.brandth * { box-sizing:border-box; }
+
+/* 공통 컨테이너 */
+.brandth-hero-inner,
+.brandth-section .brandth-section-head,
+.brandth-section .brandth-grid,
+.brandth-section .brandth-lookbook,
+.brandth-section .brandth-store,
+.th-benefit .inner {
+  width:min(1240px, 94%);
+  margin:0 auto;
+}
+
+/* ---------- HERO ---------- */
+.brandth-hero {
+  position: relative;
+  background: linear-gradient(to bottom right, rgba(90,90,90,0.25), rgba(50,50,50,0.45)),
+              url("https://images.unsplash.com/photo-1507679799987-c73779587ccf?w=2000&q=80&auto=format&fit=crop")
+              center/cover no-repeat;
+  color:#fff;
+  min-height:420px;
+  display:flex;
+  align-items:center;
+}
+.brandth-hero::before {
+  content:"";
+  position:absolute; inset:0;
+  background:linear-gradient(to bottom, rgba(0,0,0,.3), rgba(0,0,0,.45));
+  pointer-events:none;
+}
+.brandth-hero-inner { position:relative; padding:90px 0 120px; }
+
+.brandth-badge {
+  display:inline-block;
+  padding:6px 12px;
+  font-size:12px;
+  font-weight:800;
+  border-radius:20px;
+  background:#1b5242;
+  color:#fff;
+  letter-spacing:0.5px;
+}
+.brandth-title {
+  margin:18px 0 10px;
+  font-size:42px;
+  font-weight:900;
+  line-height:1.15;
+  color:#fff;
+  text-shadow:0 2px 12px rgba(0,0,0,.3);
+}
+.brandth-title span { color:#bafee4; }
+.brandth-sub {
+  color:rgba(255,255,255,.9);
+  text-shadow:0 1px 8px rgba(0,0,0,.25);
+  font-weight:500;
+}
+
+.brandth-cta { margin-top:22px; display:flex; gap:12px; }
+.brandth-btn {
+  padding:11px 18px;
+  border-radius:10px;
+  font-weight:800;
+  border:1px solid rgba(255,255,255,.8);
+  color:#fff;
+  text-decoration:none;
+  transition:all .2s ease;
+}
+.brandth-btn-primary {
+  background:#1b5242;
+  border-color:#1b5242;
+}
+.brandth-btn-primary:hover { background:#174637; }
+.brandth-btn-ghost {
+  background:rgba(255,255,255,.15);
+  backdrop-filter:blur(2px);
+}
+.brandth-btn-ghost:hover { background:rgba(255,255,255,.3); }
+
+.brandth-stats { display:flex; gap:28px; margin-top:28px; color:#e9f2f0; }
+.brandth-stats li strong { display:block; font-size:22px; color:#fff; }
+
+/* ---------- SECTION HEADER ---------- */
+.brandth-section-head {
+  display:flex; align-items:center; justify-content:space-between; margin-bottom:14px;
+}
+.brandth-section-head h2 { font-size:22px; font-weight:800; color:#111; }
+.brandth-more { font-weight:800; color:#1b5242; text-decoration:none; }
+
+/* ---------- GRID ---------- */
+.brandth-grid {
+  display:grid;
+  grid-template-columns:repeat(auto-fit,minmax(260px,1fr));
+  gap:20px;
+}
+.brandth-card {
+  display:flex; flex-direction:column;
+  border:1px solid #ececec;
+  border-radius:16px;
+  overflow:hidden;
+  background:#fff;
+  transition:box-shadow .25s ease;
+}
+.brandth-card:hover { box-shadow:0 6px 18px rgba(0,0,0,.08); }
+.brandth-card-thumb {
+  position:relative; aspect-ratio:4/3; background:#f7f7f7;
+}
+.brandth-card-thumb img {
+  position:absolute; inset:0; width:100%; height:100%;
+  object-fit:cover; transition:transform .25s ease;
+}
+.brandth-card:hover .brandth-card-thumb img { transform:scale(1.03); }
+
+.brandth-tag {
+  position:absolute; left:10px; top:10px;
+  background:#1b5242; color:#fff;
+  font-weight:800; padding:4px 9px;
+  border-radius:10px; font-size:12px;
+}
+.brandth-card-body { padding:14px; display:flex; flex-direction:column; gap:10px; }
+.brandth-name { font-weight:800; line-height:1.4; min-height:40px; color:#222; }
+.brandth-price { font-weight:900; color:#1b5242; }
+.brandth-actions { margin-top:auto; display:flex; gap:8px; }
+.brandth-small-btn {
+  display:inline-block;
+  padding:8px 12px;
+  border-radius:8px;
+  font-weight:700;
+  border:1px solid #ddd;
+  color:#333;
+  text-decoration:none;
+  transition:all .2s;
+  background:#fff;
+  cursor:pointer;
+}
+.brandth-small-btn:hover { background:#f7f7f7; }
+.brandth-small-primary {
+  background:#1b5242;
+  border-color:#1b5242;
+  color:#fff;
+}
+.brandth-small-primary:hover { background:#174637; }
+
+/* ===== size picker (추가) ===== */
+.brandth-sizebox{
+  margin-top:10px;
+  border:1px solid #eee;
+  border-radius:12px;
+  padding:10px;
+  background:#fff;
+}
+.sizebox-title{
+  font-weight:800;
+  font-size:14px;
+  margin-bottom:8px;
+}
+.sizebox-chips{
+  display:flex;
+  gap:8px;
+  flex-wrap:wrap;
+}
+.sizebox-chip{
+  padding:6px 12px;
+  border-radius:10px;
+  border:1px solid #ddd;
+  background:#fff;
+  font-weight:700;
+  cursor:pointer;
+  transition:all .15s ease;
+}
+.sizebox-chip:hover{ border-color:#bbb; }
+.sizebox-chip.active{ border:2px solid #111; }
+.sizebox-actions{
+  display:flex;
+  gap:8px;
+  justify-content:flex-end;
+  margin-top:10px;
+}
+.sizebox-warn{
+  margin-top:6px;
+  color:#c33;
+  font-size:12px;
+}
+
+/* disabled state */
+.brandth-small-btn.disabled,
+.brandth-small-btn[disabled]{
+  opacity:.45;
+  cursor:not-allowed;
+  pointer-events:none;
+}
+
+/* ---------- BENEFIT ---------- */
+.th-benefit {
+  background:linear-gradient(135deg,#f8fffd,#f2faf7);
+  border:1px solid #def3ee;
+  border-radius:16px;
+  margin:40px auto;
+  box-shadow:0 2px 10px rgba(0,0,0,.03);
+}
+.th-benefit .inner { padding:20px; }
+.benefit-head {
+  display:flex; align-items:center; justify-content:space-between;
+  border-bottom:1px dashed #d7efe9;
+  padding-bottom:14px; margin-bottom:14px;
+}
+.benefit-eyebrow { font-size:12px; font-weight:800; color:#1b5242; margin-bottom:6px; }
+.benefit-head h3 { margin:4px 0 6px; font-size:20px; font-weight:900; color:#111; }
+.benefit-head p { margin:0; color:#333; opacity:.9; }
+.benefit-cta { display:flex; gap:10px; }
+.btn { display:inline-block; padding:10px 14px; border-radius:10px; font-weight:800; text-decoration:none; transition:all .2s ease; }
+.b-solid { background:#1b5242; color:#fff; border:1px solid #1b5242; }
+.b-solid:hover { background:#174637; }
+.b-ghost { background:#fff; color:#1b5242; border:1px solid #1b5242; }
+.b-ghost:hover { background:#f8fffd; }
+.benefit-row { display:grid; grid-template-columns:repeat(3,1fr); gap:10px; }
+.benefit-item { border:1px dashed #d7efe9; border-radius:12px; background:#fff; padding:12px 14px; transition:transform .2s; }
+.benefit-item:hover { transform:translateY(-3px); }
+.benefit-item strong { display:block; font-weight:900; color:#111; margin-bottom:4px; }
+.benefit-item span { color:#444; opacity:.9; }
+
+/* ---------- LOOKBOOK ---------- */
+.brandth-lookbook {
+  display:grid;
+  grid-template-columns:repeat(4,minmax(0,1fr));
+  gap:12px;
+}
+.brandth-lookbook .lookbook-item {
+  position:relative; aspect-ratio:4/3;
+  border-radius:12px; overflow:hidden; background:#f7f7f7;
+}
+.brandth-lookbook .lookbook-item img {
+  position:absolute; inset:0; width:100%; height:100%; object-fit:cover;
+  transition:transform .3s ease;
+}
+.brandth-lookbook .lookbook-item:hover img { transform:scale(1.05); }
+
+/* ---------- STORE ---------- */
+.brandth-store {
+  display:grid;
+  grid-template-columns:1fr 1.4fr;
+  gap:20px;
+  align-items:center;
+}
+
+/* 오프라인 섹션 버튼 가시성 보정 */
+.brandth-store .brandth-btn {
+  color: var(--brand);
+  border: 1px solid var(--brand);
+  background: #fff;
+}
+.brandth-store .brandth-btn:hover {
+  background: var(--brand);
+  color: #fff;
+}
+
+.store-text h3 { font-size:18px; font-weight:900; margin:0 0 6px; }
+.store-text p { margin:0 0 12px; color:#333; }
+.store-map img { width:100%; border-radius:16px; border:1px solid #eee; transition:transform .25s ease; }
+.store-map img:hover { transform:scale(1.02); }
+
+/* ---------- Responsive ---------- */
+@media (max-width:960px){
+  .brandth-hero-inner{ padding:64px 0 84px; }
+  .brandth-title{ font-size:32px; }
+  .brandth-lookbook{ grid-template-columns:repeat(2,1fr); }
+  .brandth-store{ grid-template-columns:1fr; }
+  .benefit-row{ grid-template-columns:1fr; }
+}

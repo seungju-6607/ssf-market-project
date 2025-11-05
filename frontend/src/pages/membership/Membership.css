@@ -1,0 +1,135 @@
+.mb-wrap {
+  max-width: 1200px;
+  margin: 40px auto 80px;
+  padding: 0 16px;
+}
+
+.mb-head h1 {
+  font-size: 36px;
+  font-weight: 800;
+  letter-spacing: -0.02em;
+  margin: 10px 0 8px;
+}
+.mb-desc {
+  color: #666;
+  margin-bottom: 18px;
+}
+
+/* 가로 스크롤 컨테이너 */
+.mb-table-scroller {
+  overflow-x: auto;
+  border-radius: 16px;
+  box-shadow: 0 8px 24px rgba(17, 17, 26, 0.06);
+  border: 1px solid #eee;
+}
+
+/* 테이블 */
+.mb-table {
+  width: 1200px;
+  border-collapse: collapse;
+  background: #fff;
+}
+.mb-table th,
+.mb-table td {
+  border-left: 1px solid #f1f1f5;
+  border-right: 1px solid #f1f1f5;
+  border-bottom: 1px solid #f1f1f5;
+  padding: 18px 16px;
+  vertical-align: top;
+  text-align: center;
+  font-size: 14px;
+}
+.mb-table thead th {
+  background: #fafafe;
+  font-weight: 700;
+  position: sticky;
+  top: 0;
+  z-index: 1;
+}
+.col-title {
+  width: 160px;
+  text-align: left !important;
+}
+.col-tier {
+  width: 170px;
+}
+
+.row-title {
+  text-align: left !important;
+  background: #fcfcff;
+  font-weight: 700;
+}
+.row-title.big {
+  padding-top: 24px;
+}
+
+.title-line {
+  font-weight: 700;
+  margin-bottom: 4px;
+}
+.sub {
+  color: #999;
+  font-size: 12px;
+}
+
+.badge {
+  width: 40px;
+  height: 40px;
+  border-radius: 50%;
+  color: #fff;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  margin: 0 auto 8px;
+  font-weight: 800;
+}
+.badge.diamond { background: #5b6bff; }
+.badge.platinum { background: #7e8bff; }
+.badge.gold { background: #dda52d; }
+.badge.silver { background: #b7c0d0; }
+.badge.bronze { background: #9f7348; }
+.badge.family { background: #6e5bff; }
+
+.tier-name {
+  font-weight: 700;
+  letter-spacing: .02em;
+}
+
+.row-section td {
+  background: #fff;
+}
+.cell-ctr {
+  font-weight: 700;
+}
+
+.cell-benefits ul {
+  list-style: none;
+  margin: 0;
+  padding: 0 8px;
+  text-align: left;
+}
+.cell-benefits li {
+  margin: 10px 0;
+  line-height: 1.5;
+}
+
+.mb-notes {
+  margin-top: 16px;
+  color: #666;
+}
+.mb-notes ul {
+  margin: 0;
+  padding-left: 18px;
+}
+.mb-notes li {
+  list-style: disc;
+  margin: 6px 0;
+}
+
+/* 반응형: 폭이 좁으면 테이블을 스크롤로 */
+@media (max-width: 1280px) {
+  .mb-table { width: 1000px; }
+}
+@media (max-width: 1024px) {
+  .mb-table { width: 900px; }
+}

@@ -1,0 +1,271 @@
+/*
+ * Footer Component Styles
+ * 전역 container는 src/index.css에 정의되어 있습니다.
+ */
+
+/* Footer 전체 스타일 */
+.footer {
+  background: #f8f8f8;
+  color: #666;
+  padding: 40px 0 100px;
+  font-size: var(--font-sm);
+  line-height: var(--leading-normal);
+}
+
+/* Footer Top - 링크 섹션 */
+.footer-top {
+  padding-bottom: 24px;
+  margin-bottom: 24px;
+  border-bottom: 1px solid var(--border-color);
+}
+
+.footer-links-wrapper {
+  display: flex;
+  align-items: center;
+  gap: 24px;
+}
+
+.footer-links-group {
+  display: flex;
+  gap: 24px;
+  flex-wrap: wrap;
+}
+
+.footer-links-group a {
+  font-size: var(--font-sm);
+  color: #b8b8b8;
+  text-decoration: none;
+  transition: color 0.2s ease;
+  white-space: nowrap;
+}
+
+.footer-links-group a:hover {
+  color: #000;
+}
+
+.footer-links-group a.strong {
+  font-weight: var(--font-weight-bold);
+  color: #000;
+}
+
+/* 세로 구분선 - 헤더의 nav-divider와 동일 */
+.footer-divider {
+  width: 1px;
+  height: 16px;
+  background: var(--border-color);
+  flex-shrink: 0;
+}
+
+/* 오른쪽 정렬 그룹 */
+.footer-links-right {
+  margin-left: auto;
+}
+
+/* Footer Content - 회사 정보 */
+.footer-content {
+  margin-top: 20px;
+}
+
+.company-info h3 {
+  color: #000;
+  font-size: var(--font-sm);
+  font-weight: var(--font-weight-bold);
+  margin-bottom: 15px;
+  line-height: var(--leading-tight);
+}
+
+.company-info p {
+  font-size: var(--font-xs);
+  font-weight: var(--font-weight-normal);
+  line-height: var(--leading-tight);
+  margin-bottom: 8px;
+  color: #999999;
+}
+
+.company-info a.info-link {
+  color: #666;
+  text-decoration: underline;
+  transition: color 0.2s ease;
+}
+
+.company-info a.info-link:hover {
+  color: #000;
+}
+
+/* Footer Bottom - 저작권 및 인증마크 */
+.footer-bottom {
+  margin-top: 24px;
+}
+
+.footer-bottom-left {
+  margin-bottom: 56px;
+}
+
+.footer-bottom-left p {
+  font-size: var(--font-xs);
+  color: #999;
+  margin: 0;
+  line-height: var(--leading-normal);
+}
+
+.footer-bottom-right {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 30px;
+}
+
+/* 인증 영역 */
+.certification {
+  display: flex;
+  align-items: center;
+  gap: 15px;
+  flex: 1;
+}
+
+.certification img {
+  width: 40px;
+  height: auto;
+  object-fit: contain;
+  flex-shrink: 0;
+}
+
+.certification p {
+  font-size: var(--font-xs);
+  color: #999;
+  line-height: var(--leading-relaxed);
+  margin: 0;
+}
+
+/* SNS 아이콘 */
+.social-icons {
+  display: flex;
+  gap: 10px;
+  align-items: center;
+  flex-shrink: 0;
+}
+
+.social-icons a {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: opacity 0.2s ease;
+}
+
+.social-icons a:hover {
+  opacity: 0.7;
+}
+
+.social-icons svg {
+  display: block;
+}
+
+/* 반응형 디자인 */
+@media (max-width: 1024px) {
+  .footer-bottom-right {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 20px;
+  }
+
+  .certification {
+    width: 100%;
+  }
+
+  .social-icons {
+    width: 100%;
+    justify-content: flex-start;
+  }
+}
+
+@media (max-width: 768px) {
+  .footer {
+    padding: 30px 0 20px;
+  }
+
+  .footer-links-wrapper {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 15px;
+  }
+
+  .footer-links-group {
+    gap: 15px;
+  }
+
+  .footer-links-group a {
+    font-size: var(--font-xs);
+  }
+
+  .footer-divider {
+    display: none;
+  }
+
+  .footer-links-right {
+    margin-left: 0;
+  }
+
+  .company-info h3 {
+    font-size: var(--font-sm);
+  }
+
+  .company-info p {
+    font-size: var(--font-xs);
+    line-height: var(--leading-relaxed);
+  }
+
+  .footer-bottom {
+    flex-direction: column;
+    gap: 15px;
+  }
+
+  .footer-bottom-right {
+    width: 100%;
+  }
+
+  .certification {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 10px;
+  }
+
+  .certification img {
+    width: 50px;
+  }
+
+  .certification p {
+    font-size: var(--font-xs);
+  }
+
+  .social-icons {
+    gap: 8px;
+  }
+
+  .social-icons svg {
+    width: 28px;
+    height: 28px;
+  }
+}
+
+@media (max-width: 480px) {
+  .footer-links-group {
+    flex-direction: column;
+    gap: 10px;
+  }
+
+  .company-info h3 {
+    font-size: var(--font-xs);
+  }
+
+  .company-info p {
+    font-size: var(--font-xs);
+  }
+
+  .footer-bottom-left p {
+    font-size: var(--font-xs);
+  }
+
+  .certification p {
+    font-size: var(--font-xs);
+  }
+}

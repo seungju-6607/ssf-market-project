@@ -1,0 +1,67 @@
+/* 페이지 레이아웃 */
+.policy-wrap {
+  max-width: 1000px;
+  margin: 40px auto 80px;
+  padding: 0 20px;
+}
+.policy-breadcrumb {
+  color: #9aa0a6;
+  font-size: 13px;
+  margin-bottom: 8px;
+}
+.policy-title {
+  font-size: 34px;
+  font-weight: 800;
+  text-align: center;
+  letter-spacing: -0.3px;
+  margin: 6px 0 18px;
+}
+.section-title {
+  font-size: 18px;
+  font-weight: 700;
+  margin: 18px 0 8px;
+  color: #222;
+}
+
+/* 스크롤 박스 */
+.terms-scroll {
+  background: #F5F5F5;                /* 스샷과 같은 톤 */
+  border: 1px solid #e9e9e9;
+  border-radius: 8px;
+  padding: 30px;
+  margin: 10px 0 18px;
+  height: 620px;                       /* 고정 높이 */
+  overflow: auto;                      /* 스크롤 */
+  box-shadow: inset 0 0 0 1px rgba(0,0,0,0.02);
+}
+
+/* 본문 타이포 */
+.terms-content {
+  font-family: Pretendard, "Noto Sans KR", system-ui, -apple-system, Segoe UI, Roboto, "Apple SD Gothic Neo", "맑은 고딕", sans-serif;
+  font-size: 14px;
+  line-height: 1.9;
+  color: #333;
+  white-space: pre-wrap;
+}
+
+/* 커스텀 스크롤바 (WebKit) */
+.terms-scroll::-webkit-scrollbar {
+  width: 10px;
+}
+.terms-scroll::-webkit-scrollbar-track {
+  background: transparent;
+}
+.terms-scroll::-webkit-scrollbar-thumb {
+  background: #d4d4d4;
+  border-radius: 10px;
+  border: 2px solid #F5F5F5; /* 트랙 색에 맞춰 여백 느낌 */
+}
+.terms-scroll::-webkit-scrollbar-thumb:hover {
+  background: #c4c4c4;
+}
+
+/* Firefox */
+.terms-scroll {
+  scrollbar-width: thin;
+  scrollbar-color: #d4d4d4 transparent;
+}

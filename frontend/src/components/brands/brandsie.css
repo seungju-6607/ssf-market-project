@@ -1,0 +1,432 @@
+/* ========== Common Layout (SIE) ========== */
+.brand-sie,
+.brandsie {
+  color: #111;
+  font-family: 'Noto Sans KR', sans-serif;
+}
+.brand-sie a,
+.brandsie a {
+  text-decoration: none;
+}
+
+/* ========== HERO ========== */
+.brandsie-hero {
+  width: 100%;
+  background:
+    linear-gradient(135deg, #1d2740 0%, #222b3f 45%, #111827 100%),
+    url("https://images.unsplash.com/photo-1530893609608-32a9af3aa95c?w=2000&q=80&auto=format&fit=crop")
+      center/cover no-repeat;
+  color: #fff;
+}
+.brandsie-hero-inner {
+  width: min(1240px, 94%);
+  margin: 0 auto;
+  padding: 80px 0 120px;
+}
+
+.brandsie-badge {
+  display: inline-block;
+  padding: 6px 12px;
+  font-size: 12px;
+  font-weight: 800;
+  border-radius: 999px;
+  background: rgba(15, 23, 42, 0.9);
+  border: 1px solid rgba(209, 213, 219, 0.5);
+  letter-spacing: 0.08em;
+}
+.brandsie-title {
+  margin: 16px 0 10px;
+  font-size: 40px;
+  font-weight: 900;
+  line-height: 1.18;
+}
+.brandsie-title span {
+  color: #cbd5ff;
+}
+.brandsie-sub {
+  max-width: 520px;
+  font-size: 14px;
+  line-height: 1.7;
+  color: #e5e7eb;
+}
+
+.brandsie-cta {
+  margin-top: 22px;
+  display: flex;
+  gap: 10px;
+}
+
+.brandsie-btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  padding: 0 20px;
+  height: 42px;
+  border-radius: 999px;
+  border: 1px solid rgba(148, 163, 184, 0.6);
+  font-size: 14px;
+  font-weight: 700;
+  cursor: pointer;
+  background: rgba(15, 23, 42, 0.7);
+  color: #e5e7eb;
+  transition: background 0.2s ease, transform 0.2s ease,
+    box-shadow 0.2s ease, border-color 0.2s ease;
+}
+.brandsie-btn-primary {
+  background: #6366f1;
+  border-color: #6366f1;
+  color: #fff;
+}
+.brandsie-btn-ghost {
+  background: rgba(15, 23, 42, 0.4);
+}
+.brandsie-btn:hover {
+  transform: translateY(-1px);
+  box-shadow: 0 12px 28px rgba(15, 23, 42, 0.35);
+}
+
+/* Hero 하단 간단 통계 */
+.brandsie-stats {
+  margin-top: 28px;
+  padding: 14px 18px;
+  border-radius: 16px;
+  background: rgba(15, 23, 42, 0.65);
+  display: flex;
+  gap: 24px;
+}
+.brandsie-stats li {
+  list-style: none;
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+.brandsie-stats strong {
+  font-size: 18px;
+  font-weight: 800;
+}
+.brandsie-stats span {
+  font-size: 12px;
+  color: #cbd5f5;
+}
+
+/* ========== 공통 섹션 레이아웃 ========== */
+.brandsie-section {
+  width: min(1240px, 94%);
+  margin: 40px auto 32px;
+}
+.brandsie-section-head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 14px;
+}
+.brandsie-section-head h2 {
+  font-size: 20px;
+  font-weight: 800;
+}
+.brandsie-more {
+  font-size: 14px;
+  color: #8a8aa3;
+}
+
+/* ========== 상품 그리드 ========== */
+.brandsie-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(240px, 1fr));
+  gap: 18px;
+}
+
+.brandsie-card {
+  display: flex;
+  flex-direction: column;
+  border: 1px solid #eee;
+  border-radius: 16px;
+  overflow: hidden;
+  background: #fff;
+  transition: box-shadow 0.2s ease, transform 0.2s ease;
+}
+.brandsie-card:hover {
+  box-shadow: 0 12px 26px rgba(15, 23, 42, 0.12);
+  transform: translateY(-2px);
+}
+
+.brandsie-card-thumb {
+  position: relative;
+  aspect-ratio: 4 / 3;
+  background: #f7f7f7;
+}
+.brandsie-card-thumb img {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  display: block;
+}
+.brandsie-tag {
+  position: absolute;
+  top: 10px;
+  left: 10px;
+  padding: 4px 9px;
+  border-radius: 999px;
+  font-size: 11px;
+  font-weight: 800;
+  letter-spacing: 0.08em;
+  background: rgba(15, 23, 42, 0.88);
+  color: #e5e7eb;
+}
+
+.brandsie-card-body {
+  padding: 12px 12px 14px;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+.brandsie-name {
+  font-size: 14px;
+  font-weight: 700;
+  line-height: 1.5;
+  min-height: 40px;
+}
+.brandsie-price {
+  font-size: 15px;
+  font-weight: 900;
+}
+
+/* 버튼 (카드 안 작은 버튼) */
+.brandsie-actions {
+  display: flex;
+  gap: 8px;
+  margin-top: 4px;
+}
+.brandsie-small-btn {
+  flex: 1;
+  height: 36px;
+  border-radius: 999px;
+  border: 1px solid #e5e7eb;
+  background: #fff;
+  font-size: 13px;
+  font-weight: 700;
+  cursor: pointer;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  transition: background 0.15s ease, transform 0.15s ease,
+    box-shadow 0.15s ease;
+  color: #111827;
+}
+.brandsie-small-primary {
+  background: #111827;
+  border-color: #111827;
+  color: #fff;
+}
+.brandsie-small-btn:hover {
+  transform: translateY(-1px);
+  box-shadow: 0 6px 16px rgba(0, 0, 0, 0.08);
+}
+
+/* disabled */
+.brandsie-small-btn.disabled,
+.brandsie-small-btn[disabled] {
+  opacity: 0.45;
+  cursor: not-allowed;
+  pointer-events: none;
+}
+
+/* ========== 사이즈 선택 박스 (Beaker/Beanpole 공통 스타일) ========== */
+.brandsie-sizebox {
+  margin-top: 10px;
+  border-radius: 12px;
+  border: 1px solid #eee;
+  padding: 10px 10px 12px;
+  background: #fafafa;
+}
+.sizebox-title {
+  font-size: 13px;
+  font-weight: 800;
+  margin-bottom: 6px;
+}
+.sizebox-chips {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+}
+.sizebox-chip {
+  min-width: 40px;
+  padding: 6px 10px;
+  border-radius: 999px;
+  border: 1px solid #ddd;
+  background: #fff;
+  font-size: 12px;
+  font-weight: 700;
+  cursor: pointer;
+}
+.sizebox-chip.active {
+  border-color: #111827;
+  background: #111827;
+  color: #fff;
+}
+.sizebox-actions {
+  display: flex;
+  justify-content: flex-end;
+  gap: 8px;
+  margin-top: 8px;
+}
+.sizebox-warn {
+  margin-top: 6px;
+  font-size: 12px;
+  color: #c62828;
+}
+
+/* ========== 혜택/쿠폰 ========== */
+.brandsie-benefits {
+  width: min(1240px, 94%);
+  margin: 30px auto 36px;
+}
+.brandsie-benefit-card {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 18px;
+  padding: 22px 20px;
+  border-radius: 16px;
+  background: #f3f4ff;
+  border: 1px solid #e0e3ff;
+}
+.benefit-left .benefit-eyebrow {
+  font-size: 11px;
+  font-weight: 800;
+  letter-spacing: 0.08em;
+  color: #4f46e5;
+  margin-bottom: 4px;
+}
+.benefit-left h3 {
+  margin: 0 0 6px;
+  font-size: 20px;
+  font-weight: 900;
+}
+.benefit-left p {
+  margin: 0;
+  font-size: 13px;
+  color: #4b5563;
+}
+.benefit-right {
+  display: flex;
+  gap: 10px;
+}
+.brandsie-benefit-btn {
+  min-width: 120px;
+}
+
+.brandsie-benefit-sub {
+  margin-top: 16px;
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 10px;
+  font-size: 13px;
+}
+.brandsie-benefit-sub > div {
+  padding: 12px 12px;
+  border-radius: 12px;
+  border: 1px solid #f0f0f0;
+  background: #fafafa;
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+.brandsie-benefit-sub strong {
+  font-weight: 800;
+}
+
+/* ========== LOOKBOOK ========== */
+.brandsie-lookbook {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: 12px;
+}
+.brandsie-lookbook .lookbook-item {
+  border-radius: 16px;
+  overflow: hidden;
+  border: 1px solid #eee;
+  background: #f7f7f7;
+}
+.brandsie-lookbook img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  display: block;
+}
+
+/* ========== 오프라인 매장 ========== */
+.brandsie-store {
+  display: grid;
+  grid-template-columns: 1.1fr 1.4fr;
+  gap: 22px;
+  align-items: center;
+}
+.brandsie-store .store-text h3 {
+  margin: 0 0 6px;
+  font-size: 18px;
+  font-weight: 800;
+}
+.brandsie-store .store-text p {
+  margin: 0;
+  font-size: 13px;
+  color: #4b5563;
+}
+.brandsie-store .store-text .brandsie-btn {
+  margin-top: 14px;
+}
+.brandsie-store .store-map img {
+  width: 100%;
+  border-radius: 16px;
+  object-fit: cover;
+}
+
+/* ========== Responsive ========== */
+@media (max-width: 960px) {
+  .brandsie-hero-inner {
+    padding: 60px 0 80px;
+  }
+  .brandsie-title {
+    font-size: 32px;
+  }
+  .brandsie-stats {
+    flex-direction: column;
+    gap: 8px;
+  }
+  .brandsie-lookbook {
+    grid-template-columns: repeat(2, 1fr);
+  }
+  .brandsie-store {
+    grid-template-columns: 1fr;
+  }
+  .brandsie-benefit-card {
+    flex-direction: column;
+    align-items: flex-start;
+  }
+  .benefit-right {
+    width: 100%;
+  }
+  .benefit-right .brandsie-btn {
+    flex: 1;
+  }
+  .brandsie-benefit-sub {
+    grid-template-columns: 1fr;
+  }
+}
+@media (max-width: 640px) {
+  .brandsie-section {
+    margin-top: 30px;
+  }
+  .brandsie-hero-inner {
+    padding: 46px 0 60px;
+  }
+  .brandsie-cta {
+    flex-direction: column;
+    align-items: flex-start;
+  }
+  .brandsie-lookbook {
+    grid-template-columns: 1fr;
+  }
+}

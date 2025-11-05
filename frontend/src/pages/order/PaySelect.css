@@ -1,0 +1,106 @@
+/* src/pages/order/PaySelect.css
+   SSF 톤의 결제수단 선택 화면 (기존 클래스명 유지) */
+
+/* 레이아웃 */
+.ps-wrap {
+  width: 100%;
+  background: #fff;
+}
+
+.ps-card {
+  width: min(960px, 92%);
+  margin: 28px auto 80px;
+}
+
+/* 타이틀 */
+.ps-title {
+  font-size: 24px;
+  font-weight: 800;
+  letter-spacing: -0.2px;
+  color: #111;
+  margin: 10px 0 22px;
+}
+
+/* 결제수단 리스트 */
+.ps-methods {
+  display: grid;
+  gap: 10px;
+  margin-bottom: 18px;
+}
+
+.ps-row {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 14px 16px;
+  border: 1px solid #ececec;
+  border-radius: 12px;
+  background: #fff;
+  transition: border-color .15s ease, box-shadow .15s ease, background .15s ease;
+  font-size: 15px;
+  color: #222;
+}
+.ps-row input[type="radio"] {
+  transform: translateY(1px);
+}
+.ps-row:hover {
+  border-color: #e2e2e2;
+  box-shadow: 0 2px 10px rgba(0,0,0,.04);
+}
+.ps-row.active {
+  border-color: #6b3bf5;        /* SSF 보라 */
+  background: #f7f4ff;
+  box-shadow: 0 2px 12px rgba(107,59,245,.12);
+}
+
+/* 요약 한 줄 */
+.ps-summary {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  align-items: center;
+  padding: 10px 2px 6px;
+  margin: 6px 0 14px;
+  color: #333;
+  font-size: 14px;
+}
+.ps-summary > div { display: flex; align-items: center; gap: 8px; }
+.ps-summary > div:first-child { justify-content: flex-start; }
+.ps-summary > div:last-child  { justify-content: flex-end; }
+.ps-summary b { font-size: 15px; }
+
+/* 버튼 */
+.ps-actions {
+  margin-top: 8px;
+  display: flex;
+  justify-content: center;
+}
+.ps-next {
+  width: min(680px, 100%);
+  height: 48px;
+  border: none;
+  border-radius: 12px;
+  background: #6b3bf5;          /* 메인 보라 */
+  color: #fff;
+  font-weight: 700;
+  letter-spacing: .2px;
+  cursor: pointer;
+  transition: transform .03s ease, box-shadow .15s ease, background .15s ease;
+  box-shadow: 0 6px 18px rgba(107,59,245,.24);
+}
+.ps-next:hover { background: #5f2df6; box-shadow: 0 8px 20px rgba(107,59,245,.28); }
+.ps-next:active { transform: translateY(1px); }
+
+/* 반응형 */
+@media (max-width: 768px) {
+  .ps-card { width: min(720px, 92%); margin: 22px auto 60px; }
+  .ps-title { font-size: 22px; margin-bottom: 18px; }
+  .ps-next { height: 46px; }
+}
+@media (max-width: 520px) {
+  .ps-card { width: min(520px, 92%); }
+  .ps-title { font-size: 20px; }
+  .ps-row { padding: 12px 14px; }
+  .ps-summary { grid-template-columns: 1fr; row-gap: 6px; }
+  .ps-summary > div:last-child { justify-content: flex-start; }
+  .ps-next { width: 100%; height: 44px; }
+}

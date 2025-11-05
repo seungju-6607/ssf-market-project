@@ -1,0 +1,438 @@
+/* =============== INYOU GOLF (8seconds 계열 스타일) =============== */
+.brand-ig {
+  position: relative;
+  z-index: 1;
+  color: #111;
+  background: #fff;
+}
+.brand-ig * {
+  box-sizing: border-box;
+}
+.brand-ig img {
+  display: block;
+  max-width: 100%;
+  height: auto;
+}
+.ig-section {
+  width: min(1240px, 94%);
+  margin: 40px auto 32px;
+}
+
+/* ---------- HERO ---------- */
+.ig-hero.with-image {
+  position: relative;
+  height: 420px;
+  overflow: hidden;
+  border-bottom: 1px solid #eee;
+  color: #fff;
+}
+.ig-hero-bg {
+  position: absolute;
+  inset: 0;
+  background-position: center;
+  background-size: cover;
+  transform: scale(1.05);
+}
+.ig-hero-overlay {
+  position: absolute;
+  inset: 0;
+  background:
+    linear-gradient(
+      110deg,
+      rgba(0, 0, 0, 0.7) 0%,
+      rgba(0, 0, 0, 0.4) 40%,
+      rgba(18, 83, 50, 0.4) 75%,
+      rgba(242, 252, 245, 0.1) 100%
+    );
+}
+.ig-hero-inner {
+  position: relative;
+  z-index: 1;
+  width: min(1240px, 94%);
+  margin: 0 auto;
+  padding: 60px 0;
+  color: #fff;
+  text-shadow: 0 1px 2px rgba(0, 0, 0, 0.25);
+}
+.ig-hero-badge {
+  display: inline-block;
+  padding: 6px 12px;
+  font-size: 12px;
+  font-weight: 800;
+  border-radius: 999px;
+  background: rgba(255, 255, 255, 0.92);
+  color: #064e3b;
+  letter-spacing: 0.08em;
+  margin-bottom: 10px;
+}
+.ig-hero-title {
+  margin: 0 0 10px;
+  font-size: 32px;
+  font-weight: 900;
+}
+.ig-hero-desc {
+  max-width: 560px;
+  line-height: 1.7;
+  font-size: 14px;
+  color: #e5f4ee;
+  margin-bottom: 20px;
+}
+.ig-hero-cta {
+  display: flex;
+  gap: 10px;
+  margin-bottom: 22px;
+}
+
+/* ---------- 버튼 공통 ---------- */
+.brand-ig .btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  height: 40px;
+  padding: 0 16px;
+  border-radius: 999px;
+  border: 1px solid #d1d5db;
+  background: #fff;
+  font-size: 13px;
+  font-weight: 700;
+  cursor: pointer;
+  transition: background 0.2s ease, box-shadow 0.2s ease,
+    transform 0.2s ease, border-color 0.2s ease;
+}
+
+/* 초록 버튼 (바로구매, 회원가입 등) */
+.brand-ig .btn.primary {
+  background: #059669;
+  border-color: #059669;
+  color: #fff;
+}
+
+/* 기본 고스트 버튼 (자세히 / 쿠폰함 등) – 흰 배경에서도 선명하게 */
+.brand-ig .btn.ghost {
+  background: #ffffff !important;
+  color: #111827 !important;      /* 진한 글자색 */
+  border-color: #d1d5db !important;
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.04);
+}
+
+/* 히어로 영역(위 어두운 부분)에서는 연한 고스트 스타일로 덮어쓰기 */
+.ig-hero-cta .btn.ghost {
+  background: rgba(255, 255, 255, 0.06) !important;
+  color: #e5e7eb !important;
+  border-color: rgba(209, 213, 219, 0.7) !important;
+  box-shadow: none !important;
+}
+
+.brand-ig .btn:hover:not([disabled]) {
+  transform: translateY(-1px);
+  box-shadow: 0 10px 24px rgba(15, 23, 42, 0.25);
+}
+.brand-ig .btn[disabled] {
+  opacity: 0.45;
+  cursor: not-allowed;
+  pointer-events: none;
+}
+
+.hero-btn {
+  min-width: 140px;
+}
+
+/* Hero 하단 통계 */
+.ig-stats {
+  display: flex;
+  gap: 24px;
+  padding: 12px 16px;
+  border-radius: 14px;
+  background: rgba(15, 23, 42, 0.45);
+  backdrop-filter: blur(6px);
+  max-width: 420px;
+}
+.ig-stats li {
+  list-style: none;
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+.ig-stats strong {
+  font-size: 18px;
+  font-weight: 800;
+}
+.ig-stats span {
+  font-size: 12px;
+  color: #bbf7d0;
+}
+
+/* ---------- SECTION HEAD ---------- */
+.ig-head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 14px;
+}
+.ig-head h2 {
+  font-size: 20px;
+  font-weight: 800;
+}
+.link-more {
+  font-size: 13px;
+  color: #9ca3af;
+}
+
+/* ---------- GRID ---------- */
+.ig-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(240px, 1fr));
+  gap: 18px;
+}
+.ig-card {
+  border-radius: 16px;
+  border: 1px solid #e5e7eb;
+  overflow: hidden;
+  background: #fff;
+  display: flex;
+  flex-direction: column;
+  transition: box-shadow 0.2s ease, transform 0.2s ease;
+}
+.ig-card:hover {
+  box-shadow: 0 12px 26px rgba(15, 23, 42, 0.12);
+  transform: translateY(-2px);
+}
+
+.ig-thumb {
+  position: relative;
+  padding-top: 72%;
+  background: #f5f7fa;
+}
+.ig-thumb img {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+/* 배지 */
+.ig-badges {
+  position: absolute;
+  top: 10px;
+  left: 10px;
+  display: flex;
+  gap: 6px;
+  z-index: 1;
+}
+.ig-badges .bdg {
+  padding: 4px 8px;
+  border-radius: 999px;
+  background: rgba(255, 255, 255, 0.96);
+  border: 1px solid #e5e7eb;
+  font-size: 11px;
+  font-weight: 800;
+  letter-spacing: 0.08em;
+  color: #047857;
+}
+.ig-badges .bdg.new {
+  border-color: #22c55e;
+}
+.ig-badges .bdg.best {
+  border-color: #0ea5e9;
+}
+.ig-badges .bdg.hot {
+  border-color: #f97316;
+}
+
+/* 카드 본문 */
+.ig-meta {
+  padding: 12px 12px 14px;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+.ig-name {
+  font-size: 14px;
+  font-weight: 700;
+  line-height: 1.5;
+  min-height: 40px;
+}
+.ig-price {
+  font-size: 15px;
+  font-weight: 900;
+}
+.ig-actions {
+  display: flex;
+  gap: 8px;
+  margin-top: 4px;
+}
+
+/* ---------- SIZEBOX ---------- */
+.sizebox {
+  margin-top: 10px;
+  border-radius: 12px;
+  border: 1px solid #e5e7eb;
+  padding: 10px;
+  background: #f9fafb;
+}
+.sizebox-title {
+  font-size: 13px;
+  font-weight: 800;
+  margin-bottom: 6px;
+}
+.sizebox-chips {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+}
+.sizebox-chip {
+  min-width: 40px;
+  padding: 6px 10px;
+  border-radius: 999px;
+  border: 1px solid #d1d5db;
+  background: #fff;
+  font-size: 12px;
+  font-weight: 700;
+  cursor: pointer;
+}
+.sizebox-chip.active {
+  border-color: #059669;
+  background: #059669;
+  color: #fff;
+}
+.sizebox-actions {
+  display: flex;
+  justify-content: flex-end;
+  gap: 8px;
+  margin-top: 8px;
+}
+.sizebox-warn {
+  margin-top: 6px;
+  font-size: 12px;
+  color: #dc2626;
+}
+
+/* ---------- BENEFIT ---------- */
+.ig-benefit {
+  border-top: 1px solid #f3f4f6;
+  border-bottom: 1px solid #f3f4f6;
+  background: #f9fafb;
+  padding: 28px 0 30px;
+}
+.ig-benefit .inner {
+  width: min(1240px, 94%);
+  margin: 0 auto;
+  display: grid;
+  gap: 14px;
+}
+.signup-card {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+  padding: 20px 18px;
+  border-radius: 16px;
+  background: #e0f2fe;
+  border: 1px solid #bae6fd;
+}
+.signup-card .left .eyebrow {
+  font-size: 11px;
+  font-weight: 800;
+  color: #0369a1;
+  letter-spacing: 0.08em;
+  margin-bottom: 4px;
+}
+.signup-card .left h3 {
+  margin: 0 0 6px;
+  font-size: 20px;
+  font-weight: 900;
+}
+.signup-card .left p {
+  margin: 0;
+  font-size: 13px;
+  color: #1f2933;
+}
+.signup-card .right {
+  display: flex;
+  gap: 10px;
+}
+
+/* 작은 혜택 카드 */
+.benefit-grid.mini {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 10px;
+}
+.benefit-card {
+  padding: 12px 10px;
+  border-radius: 12px;
+  border: 1px solid #e5e7eb;
+  background: #fff;
+  font-size: 13px;
+}
+.benefit-card .tit {
+  font-weight: 800;
+  margin-bottom: 4px;
+}
+
+/* ---------- LOOKBOOK ---------- */
+.ig-lookbook {
+  width: min(1240px, 94%);
+  margin: 0 auto 12px;
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 12px;
+}
+.lb-card {
+  border-radius: 16px;
+  overflow: hidden;
+  border: 1px solid #efefef;
+  background: #fafafa;
+}
+.lb-card img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  aspect-ratio: 1/1;
+}
+
+/* ---------- RESPONSIVE ---------- */
+@media (max-width: 1024px) {
+  .ig-hero-inner {
+    padding: 40px 0;
+  }
+  .ig-grid {
+    grid-template-columns: repeat(2, 1fr);
+  }
+  .ig-lookbook {
+    grid-template-columns: repeat(2, 1fr);
+  }
+  .benefit-grid.mini {
+    grid-template-columns: repeat(2, 1fr);
+  }
+}
+
+@media (max-width: 640px) {
+  .ig-hero.with-image {
+    height: 360px;
+  }
+  .ig-hero-title {
+    font-size: 22px;
+  }
+  .ig-stats {
+    flex-direction: column;
+    max-width: 100%;
+  }
+  .ig-hero-cta {
+    flex-direction: column;
+  }
+  .ig-grid {
+    grid-template-columns: 1fr;
+  }
+  .ig-lookbook {
+    grid-template-columns: 1fr;
+  }
+  .benefit-grid.mini {
+    grid-template-columns: 1fr;
+  }
+  .signup-card {
+    flex-direction: column;
+    align-items: flex-start;
+  }
+}

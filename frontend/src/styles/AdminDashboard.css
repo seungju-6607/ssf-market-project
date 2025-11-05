@@ -1,0 +1,171 @@
+/* === 기본 관리자 페이지 레이아웃 === */
+.admin-wrap {
+  max-width: 1200px;
+  margin: 50px auto;
+  padding: 20px;
+  font-family: "Pretendard", sans-serif;
+  color: #111;
+}
+
+.admin-topbar {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 25px;
+}
+
+.admin-title {
+  font-size: var(--font-xl);
+  font-weight: var(--font-weight-bold);
+  line-height: var(--leading-tight);
+}
+
+.admin-actions {
+  display: flex;
+  gap: 10px;
+}
+
+.admin-card {
+  background: var(--color-white);
+  border-radius: var(--radius-xl);
+  box-shadow: var(--shadow-md);
+  padding: 20px;
+  margin-top: 10px;
+}
+
+.admin-card-head {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 12px;
+}
+
+.admin-card-title {
+  font-size: var(--font-md);
+  font-weight: var(--font-weight-semibold);
+  line-height: var(--leading-tight);
+}
+
+.admin-controls {
+  display: flex;
+  gap: 8px;
+}
+
+.admin-input {
+  padding: 7px 12px;
+  border: 1px solid var(--border-medium);
+  border-radius: var(--radius-md);
+  outline: none;
+  font-size: var(--font-sm);
+  line-height: var(--leading-normal);
+}
+
+.admin-input:focus {
+  border-color: var(--text-light);
+}
+
+/* === 테이블 === */
+.admin-table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: var(--font-sm);
+  line-height: var(--leading-normal);
+}
+
+.admin-table th,
+.admin-table td {
+  border-bottom: 1px solid var(--border-light);
+  padding: 12px 10px;
+  text-align: center;
+}
+
+.admin-table th {
+  background: var(--bg-light);
+  font-weight: var(--font-weight-bold);
+}
+
+.empty {
+  text-align: center;
+  color: var(--text-tertiary);
+  padding: 30px 0;
+  font-size: var(--font-sm);
+  line-height: var(--leading-normal);
+}
+
+/* === 버튼 기본 === */
+.btn-group {
+  display: flex;
+  gap: 8px;
+  flex-wrap: wrap;
+  align-items: center;
+}
+
+.btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-width: 90px;
+  height: 34px;
+  padding: 0 14px;
+  border-radius: var(--radius-md);
+  font-size: var(--font-sm);
+  font-weight: var(--font-weight-semibold);
+  border: 1px solid var(--border-medium);
+  background: var(--color-white);
+  color: var(--color-dark);
+  cursor: pointer;
+  transition: all 0.2s ease;
+  line-height: var(--leading-normal);
+}
+
+.btn:hover {
+  background: var(--bg-light);
+  transform: translateY(-1px);
+}
+
+/* === 버튼 색상 종류 === */
+.btn--primary {
+  background: var(--color-dark);
+  color: var(--color-white);
+  border-color: var(--color-dark);
+}
+.btn--primary:hover {
+  background: var(--color-black);
+}
+
+.btn--neutral {
+  background: var(--color-white);
+  color: var(--text-medium);
+  border-color: var(--border-medium);
+}
+.btn--neutral:hover {
+  background: var(--bg-secondary);
+}
+
+.btn--warning {
+  background: var(--color-warning);
+  color: var(--color-dark);
+  border-color: var(--color-warning-border);
+}
+.btn--warning:hover {
+  background: var(--color-warning-hover);
+}
+
+.btn--danger {
+  background: var(--color-danger);
+  color: var(--color-white);
+  border-color: var(--color-danger);
+}
+.btn--danger:hover {
+  background: var(--color-danger-hover);
+}
+
+@media (max-width: 920px) {
+  .admin-wrap {
+    padding: 10px;
+  }
+  .btn {
+    min-width: 84px;
+    font-size: var(--font-sm);
+  }
+}

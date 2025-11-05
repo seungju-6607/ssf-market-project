@@ -1,0 +1,68 @@
+.ne-wrap{ max-width:1200px; margin:36px auto 100px; padding:0 20px; }
+.ne-breadcrumb{ color:#9aa0a6; font-size:13px; margin-bottom:10px; }
+.ne-title{ text-align:center; font-size:36px; font-weight:900; letter-spacing:-.4px; margin:6px 0 14px; }
+
+.ne-controls{
+  display:flex; align-items:center; justify-content:space-between;
+  gap:12px; margin:10px 0 18px;
+}
+.ne-tabs{ display:inline-flex; background:#f6f7fb; padding:6px; border-radius:12px; border:1px solid #eef0f7; }
+.ne-tab{
+  min-width:110px; height:40px; padding:0 14px; border-radius:10px; border:none; cursor:pointer;
+  font-weight:800; color:#444; background:transparent; transition:.15s;
+}
+.ne-tab.is-active{ background:#fff; color:#5e37f4; box-shadow:0 2px 10px rgba(0,0,0,.06); }
+
+.ne-search{ position:relative; display:flex; align-items:center; gap:8px; }
+.ne-search input{
+  width:320px; height:40px; border:1px solid #e6e8f0; border-radius:10px; padding:0 40px 0 12px;
+}
+.ne-search-btn{
+  height:40px; border:none; border-radius:10px; padding:0 14px; font-weight:800;
+  background:#6b3bf5; color:#fff; box-shadow:0 6px 18px rgba(107,59,245,.25);
+}
+.ne-clear{
+  position:absolute; right:86px; width:26px; height:26px; border:none; border-radius:50%;
+  background:#f1f3f7; cursor:pointer; line-height:1; font-size:18px;
+}
+
+/* 이벤트 카드 */
+.ne-card-grid{
+  display:grid; grid-template-columns: repeat(3, 1fr); gap:22px;
+}
+@media (max-width: 1024px){ .ne-card-grid{ grid-template-columns: repeat(2, 1fr); } }
+@media (max-width: 640px){ .ne-card-grid{ grid-template-columns: 1fr; } }
+
+.ne-card{
+  background:#fff; border:1px solid #eee; border-radius:16px; overflow:hidden;
+  box-shadow:0 10px 24px rgba(0,0,0,.06); transition: transform .12s ease, box-shadow .12s ease;
+}
+.ne-card:hover{ transform: translateY(-3px); box-shadow:0 14px 30px rgba(0,0,0,.1); }
+.ne-card-img{ position:relative; aspect-ratio: 16/9; background:#f6f6f6; }
+.ne-card-img img{ width:100%; height:100%; object-fit:cover; display:block; }
+.ne-badge{
+  position:absolute; left:12px; top:12px; padding:6px 10px; border-radius:999px;
+  font-size:12px; font-weight:800; color:#5e37f4; background:#f0eaff; border:1px solid #e3d9ff;
+}
+.ne-card-body{ padding:14px 18px 16px; }
+.ne-card-title{ font-size:18px; font-weight:900; margin:4px 0 6px; letter-spacing:-.2px; }
+.ne-card-desc{ color:#666; margin:0; }
+
+/* 공지 테이블 */
+.ne-table-wrap{ margin-top:8px; background:#fff; border:1px solid #eee; border-radius:14px; overflow:hidden; }
+.ne-table{ width:100%; border-collapse:collapse; }
+.ne-table thead th{
+  text-align:left; height:48px; padding:0 16px; background:#fafbff; border-bottom:1px solid #eee; color:#555;
+}
+.ne-table tbody td{
+  height:52px; padding:0 16px; border-bottom:1px solid #f2f2f2; color:#333;
+}
+.ne-title-cell .ne-link{
+  background:none; border:none; padding:0; margin:0; text-align:left; color:#111; cursor:pointer; font-weight:700;
+}
+.ne-title-cell .ne-link:hover{ color:#5e37f4; text-decoration:underline; }
+.ne-empty{ text-align:center; color:#8a8f99; padding:26px 0; }
+
+/* 기타 */
+.ne-card, .ne-table-wrap{ animation: fadeIn .14s ease; }
+@keyframes fadeIn { from { opacity:.85; transform:translateY(6px);} to{ opacity:1; transform:none; } }

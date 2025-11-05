@@ -1,0 +1,291 @@
+/* 회사 소개 페이지 */
+.company-page {
+  background: var(--bg-secondary);
+  min-height: 100vh;
+}
+
+/* Hero 섹션 */
+.company-hero {
+  background: linear-gradient(135deg, var(--primary-color) 0%, var(--primary-hover) 100%);
+  color: white;
+  text-align: center;
+  padding: 80px var(--container-padding);
+}
+
+.company-hero h1 {
+  font-size: var(--font-5xl);
+  font-weight: var(--font-weight-bold);
+  margin-bottom: var(--spacing-md);
+  line-height: var(--leading-tight);
+}
+
+.company-hero p {
+  font-size: var(--font-lg);
+  opacity: 0.9;
+  line-height: var(--leading-normal);
+}
+
+/* 컨테이너 */
+.company-container {
+  max-width: 1000px;
+  margin: 0 auto;
+  padding: 60px var(--container-padding);
+}
+
+/* 섹션 */
+.company-section {
+  margin-bottom: 80px;
+}
+
+.company-section h2 {
+  font-size: var(--font-3xl);
+  font-weight: var(--font-weight-bold);
+  color: var(--text-primary);
+  margin-bottom: var(--spacing-xl);
+  text-align: center;
+  line-height: var(--leading-tight);
+}
+
+.company-content p {
+  font-size: var(--font-base);
+  line-height: var(--leading-loose);
+  color: var(--text-secondary);
+  margin-bottom: var(--spacing-md);
+}
+
+/* 핵심 가치 */
+.values-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: var(--spacing-xl);
+  margin-top: 40px;
+}
+
+.value-card {
+  background: var(--bg-primary);
+  padding: 40px var(--spacing-xl);
+  border-radius: var(--radius-lg);
+  text-align: center;
+  box-shadow: var(--shadow-md);
+  transition: transform 0.2s ease;
+}
+
+.value-card:hover {
+  transform: translateY(-5px);
+  box-shadow: var(--shadow-lg);
+}
+
+.value-icon {
+  font-size: var(--font-5xl);
+  margin-bottom: var(--spacing-lg);
+}
+
+.value-card h3 {
+  font-size: var(--font-lg);
+  font-weight: var(--font-weight-bold);
+  color: var(--text-primary);
+  margin-bottom: var(--spacing-md);
+  line-height: var(--leading-tight);
+}
+
+.value-card p {
+  font-size: var(--font-base);
+  color: var(--text-secondary);
+  line-height: var(--leading-relaxed);
+}
+
+/* 연혁 */
+.timeline {
+  max-width: 700px;
+  margin: 40px auto 0;
+}
+
+.timeline-item {
+  display: flex;
+  gap: var(--spacing-xl);
+  margin-bottom: 40px;
+  position: relative;
+}
+
+.timeline-item::before {
+  content: "";
+  position: absolute;
+  left: 70px;
+  top: 30px;
+  bottom: -40px;
+  width: 2px;
+  background: var(--border-light);
+}
+
+.timeline-item:last-child::before {
+  display: none;
+}
+
+.timeline-year {
+  flex-shrink: 0;
+  width: 80px;
+  font-size: var(--font-md);
+  font-weight: var(--font-weight-bold);
+  color: var(--primary-color);
+  line-height: var(--leading-normal);
+}
+
+.timeline-content {
+  flex: 1;
+  background: var(--bg-primary);
+  padding: var(--spacing-lg);
+  border-radius: var(--radius-md);
+  box-shadow: var(--shadow-md);
+}
+
+.timeline-content h4 {
+  font-size: var(--font-md);
+  font-weight: var(--font-weight-semibold);
+  color: var(--text-primary);
+  margin-bottom: var(--spacing-sm);
+  line-height: var(--leading-normal);
+}
+
+.timeline-content p {
+  font-size: var(--font-sm);
+  color: var(--text-secondary);
+  margin: 0;
+  line-height: var(--leading-normal);
+}
+
+/* 채용 정보 */
+.recruit-box {
+  background: var(--bg-primary);
+  padding: 40px;
+  border-radius: var(--radius-lg);
+  text-align: center;
+  box-shadow: var(--shadow-md);
+}
+
+.recruit-box h3 {
+  font-size: var(--font-xl);
+  font-weight: var(--font-weight-bold);
+  color: var(--text-primary);
+  margin-bottom: var(--spacing-md);
+  line-height: var(--leading-tight);
+}
+
+.recruit-box p {
+  font-size: var(--font-base);
+  color: var(--text-secondary);
+  margin-bottom: var(--spacing-lg);
+  line-height: var(--leading-normal);
+}
+
+.recruit-list {
+  list-style: none;
+  padding: 0;
+  margin: var(--spacing-xl) 0;
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: var(--spacing-md);
+}
+
+.recruit-list li {
+  padding: var(--spacing-md);
+  background: var(--bg-secondary);
+  border-radius: var(--radius-md);
+  font-size: var(--font-base);
+  font-weight: var(--font-weight-medium);
+  color: var(--text-primary);
+  line-height: var(--leading-normal);
+}
+
+.recruit-button {
+  background: var(--primary-color);
+  color: var(--color-white);
+  border: none;
+  border-radius: var(--radius-md);
+  padding: 14px var(--spacing-xl);
+  font-size: var(--font-base);
+  font-weight: var(--font-weight-semibold);
+  cursor: pointer;
+  transition: all 0.2s ease;
+  line-height: var(--leading-normal);
+}
+
+.recruit-button:hover {
+  background: var(--primary-hover);
+  transform: translateY(-2px);
+}
+
+/* 회사 정보 */
+.company-info-grid {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: var(--spacing-xl);
+}
+
+.info-item {
+  background: var(--bg-primary);
+  padding: var(--spacing-xl);
+  border-radius: var(--radius-lg);
+  box-shadow: var(--shadow-md);
+}
+
+.info-item h4 {
+  font-size: var(--font-sm);
+  font-weight: var(--font-weight-semibold);
+  color: var(--text-tertiary);
+  margin-bottom: var(--spacing-md);
+  line-height: var(--leading-normal);
+}
+
+.info-item p {
+  font-size: var(--font-base);
+  color: var(--text-primary);
+  font-weight: var(--font-weight-medium);
+  margin: 0;
+  line-height: var(--leading-normal);
+}
+
+/* 반응형 디자인 */
+@media (max-width: 768px) {
+  .company-hero {
+    padding: 60px var(--spacing-lg);
+  }
+
+  .company-hero h1 {
+    font-size: var(--font-3xl);
+  }
+
+  .company-hero p {
+    font-size: var(--font-base);
+  }
+
+  .company-container {
+    padding: 40px var(--spacing-md);
+  }
+
+  .company-section h2 {
+    font-size: var(--font-xl);
+  }
+
+  .values-grid {
+    grid-template-columns: 1fr;
+    gap: var(--spacing-lg);
+  }
+
+  .timeline-year {
+    width: 60px;
+    font-size: var(--font-base);
+  }
+
+  .timeline-item::before {
+    left: 50px;
+  }
+
+  .recruit-list {
+    grid-template-columns: 1fr;
+  }
+
+  .company-info-grid {
+    grid-template-columns: 1fr;
+    gap: var(--spacing-md);
+  }
+}

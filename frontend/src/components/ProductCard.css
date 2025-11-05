@@ -1,0 +1,53 @@
+.product-card {
+  background: var(--color-white);
+  border: 1px solid var(--border-light);
+  border-radius: var(--radius-md);
+  overflow: hidden;
+  transition: all 0.2s ease;
+  cursor: pointer;
+}
+
+.product-card:hover {
+  transform: translateY(-4px);
+  box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+}
+
+.product-card img {
+  width: 100%;
+  display: block;
+}
+
+.product-info {
+  padding: 12px;
+}
+
+.product-info .brand {
+  font-size: var(--font-xs);
+  font-weight: var(--font-weight-normal);
+  color: var(--text-tertiary);
+  margin-bottom: 4px;
+  line-height: var(--leading-normal);
+}
+
+.product-info .name {
+  font-size: var(--font-sm);
+  font-weight: var(--font-weight-normal);
+  margin-bottom: 6px;
+  line-height: var(--leading-normal);
+}
+
+.product-info .price {
+  font-size: var(--font-base);
+  font-weight: var(--font-weight-bold);
+  line-height: var(--leading-normal);
+}
+
+/* ProductThumb 컴포넌트 */
+.product-thumb {
+  cursor: pointer;
+}
+
+.product-thumb img {
+  width: 100%;
+  display: block;
+}
