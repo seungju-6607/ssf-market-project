@@ -16,12 +16,56 @@ export const AuthProvider = ({ children }) => {
   // ✅ 앱 시작/새로고침 시 로그인 사용자 복원
   useEffect(() => {
     try {
-      const saved = localStorage.getItem("loginUser");
-      if (saved) {
-        setUser(JSON.parse(saved));
-      } else {
-        setUser(null);
+      let parsedUser = null;
+
+      // 1) loginUser가 있으면 최우선 사용
+      const savedLoginUser = localStorage.getItem("loginUser");
+      if (savedLoginUser) {
+        try {
+          parsedUser = JSON.parse(savedLoginUser);
+        } catch {
+          parsedUser = null;
+        }
       }
+
+      // 2) loginUser가 없거나 name이 없으면 loginInfo를 참고
+      if (!parsedUser || !parsedUser.name) {
+        const savedLoginInfo = localStorage.getItem("loginInfo");
+        if (savedLoginInfo) {
+          try {
+            const info = JSON.parse(savedLoginInfo);
+
+            // 👇 로그인 응답 구조에 따라 알아서 골라서 매핑
+            const name =
+              info.name ||
+              info.userName ||
+              info.username ||
+              info.memberName ||
+              info.nickname ||
+              "";
+
+            const id =
+              info.id ||
+              info.userId ||
+              info.memberId ||
+              info.loginId ||
+              "";
+
+            const email = info.email || info.userEmail || "";
+
+            parsedUser = {
+              id,
+              name,
+              email,
+              raw: info, // 혹시 나중에 디버깅할 때 쓰라고 원본도 넣어둠
+            };
+          } catch {
+            // loginInfo 파싱 실패 시 무시
+          }
+        }
+      }
+
+      setUser(parsedUser || null);
     } catch {
       setUser(null);
     } finally {

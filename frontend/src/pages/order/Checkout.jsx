@@ -4,20 +4,64 @@ import { useNavigate, useLocation } from "react-router-dom";
 import "./Checkout.css";
 
 /* ===========================
-   1) 안전한 숫자 변환 / 통화 포맷
+   0) 공통 유틸
    =========================== */
+
 const toNumber = (v) =>
   typeof v === "number" ? v : Number(String(v ?? "").replace(/[^\d]/g, "")) || 0;
 
 const formatKRW = (n) => `₩${Number(n || 0).toLocaleString()}`;
 
+// // const readJSON = (key, fallback) => {
+//   try {
+//     const v = JSON.parse(localStorage.getItem(key) || "null");
+//     return v ?? fallback;
+//   } catch {
+//     return fallback;
+//   }
+// };
+
+/**
+ * 어떤 형태의 객체가 오더라도
+ * { product: { id, name, image, price }, size, qty } 로 정규화
+ */
+const normalizeOrderItem = (raw) => {
+  if (!raw) return null;
+
+  const baseProd = raw.product || raw;
+
+  const id =
+    baseProd.id ||
+    raw.id ||
+    baseProd.code ||
+    raw.code ||
+    `p-${Date.now()}-${Math.random().toString(36).slice(2, 7)}`;
+
+  const name = baseProd.name || raw.name || raw.title || "상품명";
+  const image =
+    baseProd.image ||
+    baseProd.img ||
+    raw.image ||
+    raw.img ||
+    baseProd.src ||
+    raw.src ||
+    "";
+  const price = toNumber(
+    baseProd.price != null ? baseProd.price : raw.price != null ? raw.price : 0
+  );
+
+  const size = raw.size || raw.option?.size || "";
+  const qty = Number(raw.qty || 1);
+
+  return {
+    product: { id, name, image, price },
+    size,
+    qty,
+  };
+};
+
 /* ===========================
-   2) 쿠폰 할인 계산 (문자/형식 섞여도 OK)
-   - type: "fixed|flat" → 정액
-           "percent|percentage|rate" → 비율
-   - amount/value/name 에 숫자가 섞여 있어도 toNumber로 추출
-   - rate는 15, "15%", "15 %”… 전부 처리
-   - max/amount cap, min 주문금액도 처리
+   1) 쿠폰 할인 계산
    =========================== */
 const getDiscountByCoupon = (subtotal, rawCoupon) => {
   if (!rawCoupon) return 0;
@@ -32,12 +76,15 @@ const getDiscountByCoupon = (subtotal, rawCoupon) => {
     ctype === "percent" || ctype === "percentage" || ctype === "rate";
 
   if (isPercent) {
-    const rate = Number(rawCoupon.rate) || toNumber(rawCoupon.rate) || 0; // "15%"도 가능
+    const rate =
+      typeof rawCoupon.rate === "number"
+        ? rawCoupon.rate
+        : toNumber(rawCoupon.rate);
     discount = Math.floor((subtotal * rate) / 100);
-    const cap = toNumber(rawCoupon.max) || toNumber(rawCoupon.amount) || 0;
+    const cap =
+      toNumber(rawCoupon.max) || toNumber(rawCoupon.amount) || 0;
     if (cap) discount = Math.min(discount, cap);
   } else {
-    // fixed/flat/그 외 → 정액 처리
     const amt =
       toNumber(rawCoupon.amount) ||
       toNumber(rawCoupon.value) ||
@@ -109,16 +156,16 @@ export default function Checkout() {
   // 주문 상품
   const items = useMemo(() => getCheckoutPayload(location), [location]);
 
-  // 쿠폰 목록: 컨텍스트가 있으면 그걸 쓰고, 없으면 localStorage에서
+  // 쿠폰 목록 (localStorage 사용)
   const [coupons, setCoupons] = useState(() => readJSON("coupons", []));
-  // 선택된 쿠폰
   const [couponId, setCouponId] = useState("");
 
   // 합계
   const subtotal = useMemo(
     () =>
       items.reduce(
-        (sum, it) => sum + toNumber(it.product?.price) * Number(it.qty || 1),
+        (sum, it) =>
+          sum + toNumber(it.product?.price) * Number(it.qty || 1),
         0
       ),
     [items]
@@ -147,41 +194,36 @@ export default function Checkout() {
     () => getDiscountByCoupon(subtotal, selectedCoupon),
     [subtotal, selectedCoupon]
   );
+
   const shipping = 0; // 예시
   const total = Math.max(0, subtotal - discount + shipping);
 
-  // 디버그 로그 (문제 시 콘솔에서 구조 확인)
   useEffect(() => {
+    // 필요하면 콘솔 찍어서 구조 확인
     // console.log("[DEBUG] items:", items);
-    // console.log("[DEBUG] subtotal:", subtotal);
-    // console.log("[DEBUG] coupons:", coupons);
-    // console.log("[DEBUG] selectedCoupon:", selectedCoupon);
-    // console.log("[DEBUG] discount:", discount);
-  }, [items, subtotal, coupons, selectedCoupon, discount]);
+  }, [items]);
 
-  // 결제 버튼 → 결제수단 선택 페이지로 이동(바로 결제 X)
-const goPaymentMethod = () => {
-  // PaySelect가 기대하는 데이터 구조로 전달
-  const payloadData = {
-    items,
-    subtotal,
-    discount,
-    shipping,
-    total,
-    coupon: selectedCoupon ? { ...selectedCoupon, discount } : null,
+  /* === 결제수단 선택 페이지로 이동 === */
+  const goPaymentMethod = () => {
+    const payloadData = {
+      items,
+      subtotal,
+      discount,
+      shipping,
+      total,
+      coupon: selectedCoupon ? { ...selectedCoupon, discount } : null,
+    };
+
+    try {
+      localStorage.setItem("lastCheckout", JSON.stringify(payloadData));
+    } catch (e) {
+      console.error("Failed to save checkout data:", e);
+    }
+
+    navigate("/pay", payloadData);
   };
 
-  // localStorage에도 백업 저장
-  try {
-    localStorage.setItem("lastCheckout", JSON.stringify(payloadData));
-  } catch (e) {
-    console.error("Failed to save checkout data:", e);
-  }
-
-  navigate("/pay", payloadData);
-};
-
-  // 쿠폰 사용 처리(실 결제 성공 후에 처리하는 게 정석; 여기서는 데모용)
+  /* === (옵션) 쿠폰 사용 처리 & 데모용 완결 === */
   const markCouponUsed = (c) => {
     if (!c) return;
     const next = (coupons || []).map((x) =>
@@ -226,6 +268,10 @@ const goPaymentMethod = () => {
                 className="order-thumb"
                 src={it.product?.image}
                 alt={it.product?.name}
+                onError={(e) => {
+                  e.currentTarget.src =
+                    "https://images.unsplash.com/photo-1512436991641-6745cdb1723f?auto=format&fit=crop&w=600&q=80";
+                }}
               />
               <div className="order-info">
                 <div className="order-name">{it.product?.name}</div>
@@ -234,7 +280,9 @@ const goPaymentMethod = () => {
                 </div>
               </div>
               <div className="order-price">
-                {formatKRW(toNumber(it.product?.price) * Number(it.qty || 1))}
+                {formatKRW(
+                  toNumber(it.product?.price) * Number(it.qty || 1)
+                )}
               </div>
             </div>
           ))}
@@ -307,15 +355,12 @@ const goPaymentMethod = () => {
           <b>{formatKRW(total)}</b>
         </div>
 
-        {/* 1) 결제수단 페이지로 이동 (권장) */}
+        {/* 결제수단 선택 페이지로 이동 */}
         <button className="pay-btn" onClick={goPaymentMethod}>
           결제하기
         </button>
 
-        {/* 2) 데모용 즉시 주문 완료(필요 없으면 지워도 됩니다) */}
-        {/* <button className="pay-btn ghost" onClick={placeOrderForDemo}>
-          (데모) 바로 결제 완료 처리
-        </button> */}
+    
       </section>
     </div>
   );

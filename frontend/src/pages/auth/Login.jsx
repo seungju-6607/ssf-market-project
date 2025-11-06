@@ -23,6 +23,14 @@ export default function Login() {
   const idRef = useRef(null);
   const passwordRef = useRef(null);
   const [form, setForm] = useState({ id: "", password: "" });
+  const [error, setError] = useState("");
+
+  // 로그인 후 돌아갈 경로
+  const redirectTo =
+    location.state?.from?.pathname && location.state?.from?.pathname !== "/login"
+      ? location.state.from.pathname
+      : "/";
+
 
   useEffect(() => {
     const statePrefill = location?.state?.prefill;
@@ -98,37 +106,22 @@ export default function Login() {
       ? form.id.split("@")[0]
       : form.id;
 
-    const user =
-      res.user && typeof res.user === "object"
-        ? res.user
-        : {
-          email: form.id.trim(),
-          name: res.name || fallbackName,
-          role: res.role || "user"
-        };
+  //   const user =
+  //     res.user && typeof res.user === "object"
+  //       ? res.user
+  //       : {
+  //           id: res.id || trimmedId,
+  //           email: trimmedId,
+  //           name:
+  //             res.name ||
+  //             (trimmedId.includes("@") ? trimmedId.split("@")[0] : trimmedId),
+  //           role: res.role || "user",
+  //         };
 
-    // ✅ AuthContext의 login 함수 사용
-    const userWithRole = {
-      ...user,
-      role: user.role || res.role || "user"
-    };
-
-    login(userWithRole);
-
-    try {
-      window.dispatchEvent(new Event("auth:changed"));
-    } catch { }
-
-    alert("로그인 성공!");
-
-    if ((user.role || res.role) === "admin") {
-      navigate("/mypage", { replace: true, state: { activeTab: "admin-users" } });
-    } else {
-      navigate("/", { replace: true });
-    }
+  //   afterLogin(user, trimmedId, redirectTo);
   };
 
-  /////////////////////////////////////////////////////////////////////////////////////////
+  ////////////////////////////////////////////////////////////////////////////////
 
   return (
     <div className="auth-container">
@@ -202,6 +195,8 @@ export default function Login() {
                   </svg>
                 </button>
               </div>
+
+              {error && <p className="auth-error">{error}</p>}
             </div>
 
             <div className="login-button-section">
@@ -223,7 +218,7 @@ export default function Login() {
           </div>
         </form>
 
-        {/* 링크 섹션 - 회색 박스 */}
+        {/* 링크 섹션 */}
         <div className="auth-links-box">
           <Link to="/find-id">아이디 찾기</Link>
           <Link to="/find-password">비밀번호 찾기</Link>
@@ -244,7 +239,7 @@ export default function Login() {
         <button
           type="button"
           className="non-member-order-btn"
-          onClick={() => navigate('/orders/guest')}
+          onClick={() => navigate("/orders/guest")}
         >
           비회원 주문 조회
         </button>
