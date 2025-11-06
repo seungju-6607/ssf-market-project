@@ -121,7 +121,10 @@ export default function Header() {
     computeMenuTop();
     window.addEventListener("resize", computeMenuTop);
     window.addEventListener("scroll", computeMenuTop);
-    return () => { window.removeEventListener("resize", computeMenuTop); window.removeEventListener("scroll", computeMenuTop); };
+    return () => {
+      window.removeEventListener("resize", computeMenuTop);
+      window.removeEventListener("scroll", computeMenuTop);
+    };
   }, [bannerVisible, location.pathname]);
 
   /** 인증/네비 핸들러 */
@@ -140,10 +143,10 @@ export default function Header() {
   };
 
   const handleCartClick = (e) => {
-    if (!isLogin) { e.preventDefault(); alert("로그인이 필요합니다."); window.location.href = "/#/login"; }
+    if (!isLogin) { e.preventDefault(); alert("로그인이 필요합니다."); window.location.href = "/login"; }
   };
   const handleMyPageClick = (e) => {
-    if (!isLogin) { e.preventDefault(); alert("로그인이 필요합니다."); window.location.href = "/#/login"; }
+    if (!isLogin) { e.preventDefault(); alert("로그인이 필요합니다."); window.location.href = "/login"; }
   };
 
   /** 검색 */
@@ -156,15 +159,16 @@ export default function Header() {
   const filteredBrands = useMemo(() => {
     if (!searchQuery.trim()) return [];
     const q = searchQuery.toLowerCase();
-    return brandData.filter(
-      (b) =>
-        b.name.toLowerCase().includes(q) ||
-        (b.nameKr && b.nameKr.toLowerCase().includes(q)) ||
-        (b.nameEn && b.nameEn.toLowerCase().includes(q))
-    ).slice(0, 10);
+    return brandData
+      .filter(
+        (b) =>
+          b.name.toLowerCase().includes(q) ||
+          (b.nameKr && b.nameKr.toLowerCase().includes(q)) ||
+          (b.nameEn && b.nameEn.toLowerCase().includes(q))
+      )
+      .slice(0, 10);
   }, [searchQuery]);
 
-  // ✅ 여기 수정: /search/<키워드> 로 이동
   const handleSearch = (keyword) => {
     const raw = (keyword || "").trim();
     if (!raw) return;
@@ -208,10 +212,13 @@ export default function Header() {
           <div className="container">
             <div className="user-menu">
               <Link to="/mypage" onClick={handleMyPageClick}>
-                마이페이지{isLogin && user?.name ? ` (${user.name}님)` : ""}
+                마이페이지
+                {isLogin && user?.name ? ` (${user.name}님)` : ""}
               </Link>
               {isLogin ? (
-                <button onClick={handleLogout} className="logout-btn">로그아웃</button>
+                <button onClick={handleLogout} className="logout-btn">
+                  로그아웃
+                </button>
               ) : (
                 <Link to="/login">로그인</Link>
               )}
@@ -540,7 +547,13 @@ export default function Header() {
           <div className="search-content">
             <div className="container">
               <div className="search-header">
-                <form className="search-form" onSubmit={(e)=>{e.preventDefault(); handleSearch(searchQuery);}}>
+                <form
+                  className="search-form"
+                  onSubmit={(e) => {
+                    e.preventDefault();
+                    handleSearch(searchQuery);
+                  }}
+                >
                   <input
                     type="text"
                     placeholder="검색어를 입력하세요"
