@@ -31,6 +31,7 @@ CREATE TABLE `ssf_user` (
     `role`			VARCHAR(13)		NOT NULL		COMMENT '권한구분코드'
 );
 
+
 /****************************************
 * 작업내용 : 주소 테이블 생성
 * 작성자 : 박도윤
@@ -55,14 +56,101 @@ CREATE TABLE ssf_addr (
     CONSTRAINT fk_ssf_addr_ssf_user FOREIGN KEY(user_key)	references ssf_user(user_key)
 );
 
-desc ssf_user;
-select * from ssf_user;
-select * from ssf_addr;
 
--- INSERT INTO ssf_user (user_key, email, username, userpwd, banned, signout, signin, snsprov, snsid, referralId) 
--- VALUES ( UUID() , "test", "test", "test", "N", "N", now(), "test", "test", "test");
+/****************************************
+* 작업내용 : 상품 카테고리, 상품 테이블 생성
+* 작성자 : 박도윤
+* 수정이력 : 
+	2025-11-06	최초 생성
+* 사용예시 : desc ssf_item;
+****************************************/
+use ssf;
+show tables;
 
-DELETE FROM ssf_user;
+CREATE TABLE ssf_category (
+	category_key		INT		AUTO_INCREMENT		NOT NULL		COMMENT '카테고리고유번호',
+	category_key2		INT							NULL			COMMENT '카테고리고유번호2',
+	category_name		VARCHAR(150)				NOT NULL		COMMENT '카테고리명',
+    PRIMARY KEY (category_key)
+);
+
+CREATE TABLE ssf_item (
+	item_key			INT			AUTO_INCREMENT				NOT NULL		COMMENT '상품고유번호',
+	category_key		INT										NOT NULL		COMMENT '카테고리고유번호',
+	item_name			VARCHAR(150)							NOT NULL		COMMENT '상품명',
+	item_list			JSON									NOT NULL		COMMENT '이미지리스트',
+	item_content		VARCHAR(1000)							NULL			COMMENT '상품상세',
+	item_price			INT										NOT NULL		COMMENT '정가',
+	item_sale			INT										NOT NULL		COMMENT '판매가',
+	item_rdate			DATETIME	DEFAULT CURRENT_TIMESTAMP	NULL			COMMENT '등록일',
+	item_cnt			INT										NOT NULL		COMMENT '재고',
+    item_deleted		VARCHAR(1)	DEFAULT 'N'					NULL			COMMENT '삭제여부',
+    PRIMARY KEY (item_key),
+    CONSTRAINT fk_ssf_item_ssf_category FOREIGN KEY(category_key)	references ssf_category(category_key)
+);
 
 
+/****************************************
+* 작업내용 : 장바구니 테이블 생성
+* 작성자 : 박도윤
+* 수정이력 : 
+	2025-11-07	최초 생성
+* 사용예시 : desc ssf_cart;
+****************************************/
+CREATE TABLE ssf_cart (
+	cart_key			INT				AUTO_INCREMENT				NOT NULL					COMMENT '장바구니고유번호',
+	user_key			VARCHAR(100)								NOT NULL					COMMENT '회원고유번호',
+	item_key			INT											NOT NULL					COMMENT '상품고유번호',
+	cart_qty			INT											NOT NULL		DEFAULT 1	COMMENT '각상품수량',
+	cart_size			VARCHAR(5)									NOT NULL					COMMENT '상품사이즈',
+	cart_rdate			DATETIME	DEFAULT CURRENT_TIMESTAMP		NULL						COMMENT '장바구니 추가날짜',
+    PRIMARY KEY (cart_key),
+    CONSTRAINT fk_ssf_cart_ssf_user FOREIGN KEY(user_key)	references ssf_user(user_key),
+    CONSTRAINT fk_ssf_cart_ssf_item FOREIGN KEY(item_key)	references ssf_item(item_key)
+);
 
+
+/***************************************************************************
+* 작업내용 : 장바구니 리스트 VIEW 생성
+* 작성자 : 박도윤
+* 수정이력 : 
+	2025-11-07	최초 생성
+* 사용예시 : desc view_cartlist;
+*****************************************************************************/
+drop view view_cartlist;
+select * from information_schema.views where table_name='view_cartlist';
+create view view_cartlist
+as
+SELECT
+     c.cart_key,
+     c.user_key,
+     u.username,
+     u.email,
+     i.item_key,
+     i.item_name,
+     i.item_list,
+     i.item_content,
+     i.item_price,
+     i.item_sale,
+     c.cart_qty,
+     c.cart_size,
+     c.cart_rdate,
+     c.cart_qty * i.item_sale AS line_total_sale, -- 장바구니 한줄 할인금액
+     c.cart_qty * i.item_price AS line_total_price, -- 장바구니 한줄 금액
+     t.total_sale_amount,
+     t.total_item_count
+FROM ssf_cart AS c
+INNER JOIN ssf_user AS u ON u.user_key = c.user_key
+INNER JOIN ssf_item AS i ON i.item_key = c.item_key
+LEFT JOIN (
+     SELECT
+         c.user_key,
+         SUM(c.cart_qty * i.item_sale) AS total_sale_amount,
+         SUM(c.cart_qty) AS total_item_count
+     FROM ssf_cart AS c
+     INNER JOIN ssf_item AS i ON i.item_key = c.item_key
+     GROUP BY c.user_key
+) AS t ON t.user_key = c.user_key
+LIMIT 0, 1000;
+
+ desc view_cartlist;

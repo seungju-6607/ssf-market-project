@@ -7,14 +7,6 @@ import "../styles/CategoryPage.css";
 const toNumberPrice = (val) =>
   typeof val === "number" ? val : Number(String(val).replace(/[^\d]/g, "")) || 0;
 
-/** 이미지 후보 경로 생성기 (안전장치)
- * - PUBLIC_URL + encodeURI(원본)
- * - PUBLIC_URL + 원본(비인코딩)
- * - PUBLIC_URL + 파일명 소문자화
- * - 루트(/) + encodeURI(원본)
- * - 루트(/) + 파일명 소문자화
- * - 마지막: placeholder
- */
 const buildImageCandidates = (raw) => {
   const PUBLIC = process.env.PUBLIC_URL || "";
   const withLeadingSlash = raw.startsWith("/") ? raw : `/${raw}`;
@@ -310,7 +302,7 @@ export default function ProductList() {
     sports: { name: "스포츠", nameEn: "SPORTS" },
     life: { name: "라이프", nameEn: "LIFE" },
     luxury: { name: "럭셔리", nameEn: "LUXURY" },
-    "bags-shoes": { name: "백&슈즈", nameEn: "BAGS & SHOES" },
+    shoes: { name: "백&슈즈", nameEn: "BAGS & SHOES" },
     outlet: { name: "아울렛", nameEn: "OUTLET" },
   };
 

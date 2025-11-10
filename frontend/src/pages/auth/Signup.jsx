@@ -5,7 +5,7 @@ import { useDispatch } from 'react-redux';
 import { signupApi } from "../../api/auth";
 import { useAuth } from "../../context/AuthContext";
 import "./Signup.css";
-import { getSignup } from '../../feature/auth/authAPI.js';
+import { getSignup, getIdCheck } from '../../feature/auth/authAPI.js';
 
 export default function Signup() {
   const dispatch = useDispatch();
@@ -60,15 +60,15 @@ export default function Signup() {
   });
 
   // 휴대폰 인증에서 넘어온 경우 번호 및 이름 자동 입력
-  useEffect(() => {
-    if (location.state?.verifiedPhone) {
-      setForm((prev) => ({
-        ...prev,
-        phone: location.state.verifiedPhone,
-        name: location.state.verifiedName || ""
-      }));
-    }
-  }, [location.state]);
+//   useEffect(() => {
+//     if (location.state?.verifiedPhone) {
+//       setForm((prev) => ({
+//         ...prev,
+//         phone: location.state.verifiedPhone,
+//         name: location.state.verifiedName || ""
+//       }));
+//     }
+//   }, [location.state]);
 
   // 마케팅 채널 변경 시 마케팅 동의 상태 자동 업데이트
   useEffect(() => {
@@ -166,21 +166,10 @@ export default function Signup() {
         email: { valid: false, message: "올바른 이메일 형식이 아닙니다." },
       }));
       return;
-    }
-
-    // 이메일 중복 검사
-    const users = JSON.parse(localStorage.getItem("users") || "[]");
-    const isDuplicate = users.some((u) => u.email === value);
-
-    if (isDuplicate) {
-      setValidation((prev) => ({
-        ...prev,
-        email: { valid: false, message: "이미 가입된 이메일입니다." },
-      }));
     } else {
       setValidation((prev) => ({
-        ...prev,
-        email: { valid: true, message: "사용 가능한 이메일입니다." },
+       ...prev,
+       email: { valid: true, message: "사용 가능한 이메일입니다." },
       }));
     }
   };
@@ -286,31 +275,26 @@ export default function Signup() {
       return;
     }
 
-    // signupApi 호출
-    const result = signupApi({
-      email: form.email,
-      password: form.password,
-      name: form.name,
-      phone: form.phone,
-    });
-
-    if (!result.ok) {
-      alert(result.message);
-      return;
-    }
-
     // 신규 회원 웰컴 쿠폰 발급 (AuthContext의 중복 방지 함수 사용)
     issueWelcomeCouponIfNeeded();
 
-    const signResult = await dispatch(getSignup(form));
-    console.log(signResult);
+    const idResult = await dispatch(getIdCheck(form.email));
 
-       if(signResult) {
+    if(!idResult) {
+      const signResult = await dispatch(getSignup(form));
+        if(signResult) {
            alert("회원가입이 완료되었습니다! 🎉");
-               navigate("/login");
-       } else {
+           navigate("/login");
+        } else {
            alert("회원가입에 실패하셨습니다.");
-       }
+        }
+    } else {
+      alert("이미 사용중인 이메일 주소 입니다.");
+      setValidation((prev) => ({
+        ...prev,
+        email: { valid: false, message: "이미 가입된 이메일입니다." },
+      }));
+    }
   };
 
   const allRequired = agreements.age14 && agreements.termsOfUse && agreements.privacy && agreements.membership;
@@ -335,7 +319,7 @@ export default function Signup() {
                   value={form.name}
                   onChange={onChange}
                   placeholder="이름을 입력하세요"
-//                   required
+                  required
                 />
                 {form.name && (
                   <button
@@ -364,7 +348,7 @@ export default function Signup() {
                   value={form.email}
                   onChange={onChange}
                   placeholder="이메일을 입력하세요"
-//                   required
+                  required
                 />
                 {form.email && (
                   <button
@@ -424,7 +408,7 @@ export default function Signup() {
                   value={form.password}
                   onChange={onChange}
                   placeholder="비밀번호를 입력하세요"
-//                   required
+                  required
                 />
                 <button
                   type="button"
@@ -482,7 +466,7 @@ export default function Signup() {
                   placeholder="비밀번호 확인"
                   value={form.passwordCheck}
                   onChange={onChange}
-//                   required
+                  required
                 />
                 <button
                   type="button"

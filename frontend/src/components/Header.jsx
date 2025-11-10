@@ -54,7 +54,7 @@ export default function Header() {
   ];
   const autocompleteKeywords = [
     "카디건","가방","가니","남자 가죽 자켓","여성 카디건","메종키츠네 카디건","남자 카디건",
-    "발렌시아가","로메르 가방","에잇세컨즈 가방","구호","구호플러스","나이키","니트","니트웨어",
+    "발렌시아가","로메르 가방","에잇세컨즈 가방","구호","구호플러스","나이키","니트","니트",
     "단톤","데님","데님팬츠","드레스","띠어리","로고","로퍼","맨투맨","면바지","목도리","무스탕",
     "반팔티","발렌시아가 가방","백팩","뱀부백","부츠","블라우스","빈폴","빈폴레이디스","빈폴키즈",
     "사파리재킷","셔츠","스니커즈","슬랙스","아우터","앵클부츠","야상","에코백","원피스","울코트",
@@ -294,7 +294,7 @@ export default function Header() {
                         <ul>
                           <li><Link to="/women/outer">아우터</Link></li>
                           <li><Link to="/women/jacket">재킷/베스트</Link></li>
-                          <li><Link to="/women/knit">니트웨어</Link></li>
+                          <li><Link to="/women/knit">니트</Link></li>
                           <li><Link to="/women/shirt">셔츠/블라우스</Link></li>
                           <li><Link to="/women/tshirt">티셔츠</Link></li>
                           <li><Link to="/women/onepiece">원피스</Link></li>
@@ -318,7 +318,7 @@ export default function Header() {
                           <li><Link to="/men/suit">정장</Link></li>
                           <li><Link to="/men/jacket">재킷/베스트</Link></li>
                           <li><Link to="/men/shirt">셔츠</Link></li>
-                          <li><Link to="/men/knit">니트웨어</Link></li>
+                          <li><Link to="/men/knit">니트</Link></li>
                           <li><Link to="/men/tshirt">티셔츠</Link></li>
                           <li><Link to="/men/pants">팬츠</Link></li>
                         </ul>
@@ -334,9 +334,7 @@ export default function Header() {
                       <div className="mega-menu-column">
                         <h4>메뉴</h4>
                         <ul>
-                          <li><Link to="/kids">메인</Link></li>
                           <li><Link to="/kids/new">신상품</Link></li>
-                          <li><Link to="/kids/all">전체 상품</Link></li>
                           <li><Link to="/kids/boy">남아</Link></li>
                           <li><Link to="/kids/girl">여아</Link></li>
                           <li><Link to="/kids/baby">베이비</Link></li>
@@ -353,7 +351,6 @@ export default function Header() {
                       <div className="mega-menu-column">
                         <h4>카테고리</h4>
                         <ul>
-                          <li><Link to="/luxury">메인</Link></li>
                           <li><Link to="/luxury/new">신상품</Link></li>
                           <li><Link to="/luxury/women-apparel">여성의류</Link></li>
                           <li><Link to="/luxury/women-acc">여성 패션잡화</Link></li>
@@ -366,22 +363,20 @@ export default function Header() {
                   </li>
 
                   {/* 백&슈즈 */}
-                  <li className={`nav-item ${activeMenu === "bags-shoes" ? "open" : ""}`} onMouseEnter={() => setActiveMenu("bags-shoes")}>
+                  <li className={`nav-item ${activeMenu === "shoes" ? "open" : ""}`} onMouseEnter={() => setActiveMenu("shoes")}>
                     <Link to="/shoes">백&슈즈</Link>
-                    <MegaMenu id="bags-shoes" active={activeMenu} top={menuTopPosition}>
+                    <MegaMenu id="shoes" active={activeMenu} top={menuTopPosition}>
                       <div className="mega-menu-column">
                         <h4>카테고리</h4>
                         <ul>
-                          <li><Link to="/bags-shoes">메인</Link></li>
-                          <li><Link to="/bags-shoes/new">신상품</Link></li>
-                          <li><Link to="/bags-shoes/all">전체 상품</Link></li>
-                          <li><Link to="/bags-shoes/women-bag">여성 가방</Link></li>
-                          <li><Link to="/bags-shoes/women-wallet">여성 지갑</Link></li>
-                          <li><Link to="/bags-shoes/women-shoes">여성 슈즈</Link></li>
-                          <li><Link to="/bags-shoes/men-bag">남성 가방</Link></li>
-                          <li><Link to="/bags-shoes/men-wallet">남성 지갑</Link></li>
-                          <li><Link to="/bags-shoes/men-shoes">남성 슈즈</Link></li>
-                          <li><Link to="/bags-shoes/travel">여행 용품</Link></li>
+                          <li><Link to="/shoes/new">신상품</Link></li>
+                          <li><Link to="/shoes/women-bag">여성 가방</Link></li>
+                          <li><Link to="/shoes/women-wallet">여성 지갑</Link></li>
+                          <li><Link to="/shoes/women-shoes">여성 슈즈</Link></li>
+                          <li><Link to="/shoes/men-bag">남성 가방</Link></li>
+                          <li><Link to="/shoes/men-wallet">남성 지갑</Link></li>
+                          <li><Link to="/shoes/men-shoes">남성 슈즈</Link></li>
+                          <li><Link to="/shoes/travel">여행 용품</Link></li>
                         </ul>
                       </div>
                   
@@ -395,9 +390,7 @@ export default function Header() {
                       <div className="mega-menu-column">
                         <h4>카테고리</h4>
                         <ul>
-                          <li><Link to="/sports">메인</Link></li>
                           <li><Link to="/sports/new">신상품</Link></li>
-                          <li><Link to="/sports/all">전체 상품</Link></li>
                           <li><Link to="/sports/men-apparel">남성의류</Link></li>
                           <li><Link to="/sports/women-apparel">여성의류</Link></li>
                           <li><Link to="/sports/shoes">슈즈</Link></li>
@@ -418,9 +411,7 @@ export default function Header() {
                       <div className="mega-menu-column">
                         <h4>카테고리</h4>
                         <ul>
-                          <li><Link to="/golf">메인</Link></li>
                           <li><Link to="/golf/balls">골프공</Link></li>
-                          <li><Link to="/golf/all">전체 상품</Link></li>
                           <li><Link to="/golf/women-apparel">여성 골프의류</Link></li>
                           <li><Link to="/golf/women-shoes">여성 골프슈즈</Link></li>
                           <li><Link to="/golf/men-apparel">남성 골프의류</Link></li>
@@ -441,17 +432,10 @@ export default function Header() {
                       <div className="mega-menu-column">
                         <h4>카테고리</h4>
                         <ul>
-                          <li><Link to="/beauty">메인</Link></li>
-                          <li><Link to="/beauty/inner">이너뷰티</Link></li>
-                          <li><Link to="/beauty/vegan-clean">비건/클린뷰티</Link></li>
-                          <li><Link to="/beauty/gift">기프트</Link></li>
+                          <li><Link to="/beauty/new">신상품</Link></li>
                           <li><Link to="/beauty/skincare">스킨케어</Link></li>
-                          <li><Link to="/beauty/makeup">메이크업</Link></li>
-                          <li><Link to="/beauty/body">핸드 &amp; 바디케어</Link></li>
-                          <li><Link to="/beauty/hair">헤어케어</Link></li>
-                          <li><Link to="/beauty/mens">맨즈케어</Link></li>
+                          <li><Link to="/beauty/makeup">메이크업</Link></li>          
                           <li><Link to="/beauty/perfume">향수</Link></li>
-                          <li><Link to="/beauty/tools">뷰티소품 &amp; 도구</Link></li>
                         </ul>
                       </div>
                     
@@ -465,7 +449,6 @@ export default function Header() {
                       <div className="mega-menu-column">
                         <h4>카테고리</h4>
                         <ul>
-                          <li><Link to="/life">메인</Link></li>
                           <li><Link to="/life/furniture">가구</Link></li>
                           <li><Link to="/life/lighting">조명</Link></li>
                           <li><Link to="/life/home-deco">홈데코</Link></li>
@@ -492,13 +475,11 @@ export default function Header() {
                       <div className="mega-menu-column">
                         <h4>빠른보기</h4>
                         <ul>
-                          <li><Link to="/outlet/all">전체 상품</Link></li>
-                          <li><Link to="/outlet">메인</Link></li>
                           <li><Link to="/outlet/women">여성</Link></li>
                           <li><Link to="/outlet/men">남성</Link></li>
                           <li><Link to="/outlet/kids">키즈</Link></li>
                           <li><Link to="/outlet/luxury">럭셔리</Link></li>
-                          <li><Link to="/outlet/bags-shoes">백&슈즈</Link></li>
+                          <li><Link to="/outlet/shoes">백&슈즈</Link></li>
                           <li><Link to="/outlet/sports">스포츠</Link></li>
                           <li><Link to="/outlet/golf">골프</Link></li>
                           <li><Link to="/outlet/beauty">뷰티</Link></li>

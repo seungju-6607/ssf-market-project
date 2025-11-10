@@ -49,6 +49,11 @@ public class MemberController {
         this.memberRepository = memberRepository;
     }
 
+    @PostMapping("/idcheck")
+    public boolean idcheck(@RequestBody Member member) {
+        return memberService.idCheck(member.getEmail());
+    }
+
     @PostMapping("/signup")
     public boolean signup(@RequestBody Member member) {
         System.out.println("member 확인 => " + member);

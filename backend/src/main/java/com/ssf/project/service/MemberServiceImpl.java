@@ -21,6 +21,14 @@ public class MemberServiceImpl implements MemberService{    // MemberService mem
     }
 
     @Override
+    public boolean idCheck(String id){
+        boolean result = true;
+        Long count = memberRepository.countById(id);
+        if(count == 0) result = false;
+        return result;
+    };
+
+    @Override
     public int signup (Member member){
         System.out.println("member :: " + member);
         // 패스워드 인코딩

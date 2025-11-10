@@ -16,7 +16,7 @@ export default function AdminOrders() {
     if (!auth || auth.role !== "admin") {
       window.location.href = "/#/login";
     }
-  }, [auth, navigate]);
+  }, [auth, navigate]); 
 
   const refresh = () => setOrders(listOrders());
 

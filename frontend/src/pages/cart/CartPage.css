@@ -50,6 +50,18 @@
   cursor: pointer;
   transition: background 0.2s ease;
   line-height: var(--leading-normal);
+    min-width: 60px;
+    min-height: 36px;
+}
+
+.btn:disabled,
+.btn.disabled {
+  color: var(--text-disabled);
+  opacity: 0.4;
+}
+
+.btn:disabled:hover {
+  background: var(--bg-disabled);
 }
 
 .btn-danger:hover {
@@ -220,6 +232,25 @@
   display: flex;
   justify-content: space-between;
   gap: var(--spacing-sm);
+  width: 100%;
+}
+
+.cart-actions .btn {
+  flex: 0.3;
+  white-space: nowrap;
+}
+
+.cart-actions .pay-btn {
+  flex: 1;
+  margin: 0;
+  height: 45px;
+}
+
+.cart-head .btn-danger {
+  height: 36px;           /* ✅ 전체선택 체크박스 높이에 맞춰 조정 */
+  padding: 21.5px 24px;
+  font-size: var(--font-sm);
+  border-radius: var(--radius-md);
 }
 
 /* 반응형 디자인 */

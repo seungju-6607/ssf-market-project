@@ -7,6 +7,8 @@ import { productKey } from "../hooks/useWishlist";
 import "./Page.css";
 import "../styles/CategoryPage.css";
 
+
+
 // 홈과 동일한 로컬스토리지 키
 const WISHLIST_KEY = "wishlist";
 
@@ -54,7 +56,6 @@ export default function CategoryPage() {
   const [sortBy, setSortBy] = useState("인기상품순(전체)");
   const [products, setProducts] = useState([]);
 
-  // ✅ 홈과 똑같이: wishlist를 상태로 들고, 로컬스토리지에도 저장
   const [wishlist, setWishlist] = useState(() => readWishlist());
   const wishSet = useMemo(() => new Set(wishlist.map((it) => it.id)), [wishlist]);
 
@@ -65,7 +66,6 @@ export default function CategoryPage() {
     setProducts(getProductsByCategory(categoryKey, subcategoryKey) || []);
   }, [pathname, categoryKey, subcategoryKey, categoryData]);
 
-  // ✅ 홈과 동일: 토글 함수 (딱 이거만 같으면 동작도 같음)
  const toggleWishlist = (p, idx) => {
   const id = pidOf(p, idx);
   setWishlist((prev) => {
@@ -85,10 +85,8 @@ export default function CategoryPage() {
       next = [...prev, normalized];
     }
 
-    // ✅ 홈처럼 로컬스토리지 저장
     localStorage.setItem("wishlist", JSON.stringify(next));
 
-    // ✅ 추가: 같은 탭에서도 바로 반영되게 이벤트 발송
     window.dispatchEvent(new Event("storage"));
 
     return next;
