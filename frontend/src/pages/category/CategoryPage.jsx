@@ -1,5 +1,7 @@
 import React from "react";
 import products from "../../data/products";
+import { getProductsByCategory } from "../data/productData.js";
+
 
 function CategoryPage() {
   return (

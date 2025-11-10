@@ -34,8 +34,11 @@ export const NAV = {
 
   luxury: [
     { label: "신상품", to: "/luxury/new" },
-    { label: "여성", to: "/luxury/women" },
-    { label: "남성", to: "/luxury/men" },
+    { label: "여성의류", to: "/luxury/women-apparel" },
+    { label: "여성 패션잡화", to: "/luxury/women-acc" },
+    { label: "남성의류", to: "/luxury/men-apparel" },
+    { label: "남성 패션잡화", to: "/luxury/men-bag-wallet" },
+
   ],
 
   sports: [

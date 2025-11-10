@@ -1,168 +1,126 @@
 // src/pages/cart/CartPage.jsx
-import React, { useEffect, useMemo, useState } from "react";
-import { Link, useNavigate } from "react-router-dom";
 import "./CartPage.css";
+import { Link, useNavigate } from "react-router-dom";
+import { useDispatch, useSelector } from "react-redux";
+import React, { useEffect, useMemo, useState } from "react";
+import { showCart, removeCart } from "../../feature/cart/cartAPI.js";
 
 export default function CartPage() {
+  const dispatch = useDispatch();
   const navigate = useNavigate();
-  const [cart, setCart] = useState([]);
+  const cartList = useSelector((state) => state.cart.cartList || []);
   const [selected, setSelected] = useState({});
 
-  // ✅ 로그인 여부 확인
   useEffect(() => {
     const isLogin = localStorage.getItem("isLogin") === "true";
     if (!isLogin) {
       alert("로그인이 필요합니다.");
       navigate("/login");
-      return;
     }
   }, [navigate]);
 
-  // ✅ 장바구니 불러오기
   useEffect(() => {
-    try {
-      const saved = JSON.parse(localStorage.getItem("cart")) || [];
-      setCart(saved);
-      const initSel = {};
-      saved.forEach((i) => {
-        initSel[i.id] = true;
-      });
-      setSelected(initSel);
-    } catch {
-      setCart([]);
-      setSelected({});
-    }
-  }, []);
+    dispatch(showCart());
+  }, [dispatch]);
 
-  // ✅ 장바구니 저장 (로컬 + 이벤트 발생)
-  const saveCart = (next) => {
-    setCart(next);
-    localStorage.setItem("cart", JSON.stringify(next));
-    window.dispatchEvent(new Event("cartUpdated"));
-  };
+  useEffect(() => {
+    const initSel = {};
+    cartList.forEach((item) => {
+      initSel[item.cartKey] = true;
+    });
+    setSelected(initSel);
+  }, [cartList]);
 
-  // ✅ 단일 체크
-  const toggleOne = (id) =>
-    setSelected((prev) => ({ ...prev, [id]: !prev[id] }));
+  const toggleOne = (cartKey) =>
+    setSelected((prev) => ({ ...prev, [cartKey]: !prev[cartKey] }));
 
-  // ✅ 전체선택
   const allChecked = useMemo(
-    () => cart.length > 0 && cart.every((i) => selected[i.id]),
-    [cart, selected]
+    () => cartList.length > 0 && cartList.every((item) => selected[item.cartKey]),
+    [cartList, selected]
   );
+
   const toggleAll = () => {
     const next = {};
-    cart.forEach((i) => {
-      next[i.id] = !allChecked;
+    cartList.forEach((item) => {
+      next[item.cartKey] = !allChecked;
     });
     setSelected(next);
   };
 
-  // ✅ 가격 파싱 유틸 (₩, , 제거)
-  const parsePrice = (val) => {
-    if (!val) return 0;
-    if (typeof val === "number") return val;
-    return Number(String(val).replace(/[^\d]/g, "")) || 0;
+  const parseImage = (itemList) => {
+    if (!itemList) return "/images/placeholder.png";
+    try {
+      const parsed = JSON.parse(itemList);
+      if (Array.isArray(parsed) && parsed.length > 0) {
+        return parsed[0];
+      }
+    } catch (error) {
+      console.warn("Failed to parse itemList", error);
+    }
+    return "/images/placeholder.png";
   };
 
-  const unitPrice = (p) => parsePrice(p?.price);
-  const linePrice = (i) => unitPrice(i.product) * Number(i.qty || 1);
-
-  // ✅ 수량 변경 함수들
-  const inc = (id) => {
-    const next = cart.map((i) =>
-      i.id === id
-        ? { ...i, qty: Math.min(99, (Number(i.qty) || 1) + 1) }
-        : i
-    );
-    saveCart(next);
+  const unitPrice = (item) => {
+    if (!item) return 0;
+    if (typeof item.itemSale === "number") return item.itemSale;
+    if (typeof item.itemPrice === "number") return item.itemPrice;
+    const price = item.itemSale ?? item.itemPrice;
+    if (!price) return 0;
+    return Number(String(price).replace(/[^\d]/g, "")) || 0;
   };
 
-  const dec = (id) => {
-    const next = cart.map((i) =>
-      i.id === id
-        ? { ...i, qty: Math.max(1, (Number(i.qty) || 1) - 1) }
-        : i
-    );
-    saveCart(next);
+  const linePrice = (item) => {
+    if (!item) return 0;
+    if (typeof item.lineTotalSale === "number") return item.lineTotalSale;
+    if (typeof item.lineTotalPrice === "number") return item.lineTotalPrice;
+    return unitPrice(item) * (item.cartQty || 0);
   };
 
-  const changeQty = (id, v) => {
-    const n = Math.max(1, Math.min(99, Number(v) || 1));
-    const next = cart.map((i) =>
-      i.id === id ? { ...i, qty: n } : i
-    );
-    saveCart(next);
-  };
-
-  // ✅ 삭제
-  const removeOne = (id) => {
-    const next = cart.filter((i) => i.id !== id);
-    saveCart(next);
-    setSelected((prev) => {
-      const p = { ...prev };
-      delete p[id];
-      return p;
-    });
-  };
-
-  const removeSelected = () => {
-    const next = cart.filter((i) => !selected[i.id]);
-    saveCart(next);
-    const ns = {};
-    next.forEach((i) => {
-      ns[i.id] = true;
-    });
-    setSelected(ns);
-  };
-
-  const clearAll = () => {
-    saveCart([]);
-    setSelected({});
-  };
-
-  // ✅ 선택 상품 필터
+  /* 장바구니 아이템 선택 */
   const selectedItems = useMemo(
-    () => cart.filter((i) => selected[i.id]),
-    [cart, selected]
+    () => cartList.filter((item) => selected[item.cartKey]),
+    [cartList, selected]
   );
 
-  // ✅ 총합 계산
   const totalPrice = useMemo(
-    () => selectedItems.reduce((s, i) => s + linePrice(i), 0),
+    () => selectedItems.reduce((sum, item) => sum + linePrice(item), 0),
     [selectedItems]
   );
 
-  // ✅ 결제 페이지 이동
   const proceed = () => {
     if (selectedItems.length === 0) {
       alert("결제할 상품을 선택해주세요.");
       return;
     }
 
-    const payload = selectedItems.map((i) => ({
-      id: i.id,
-      name: i.product?.name || "",
-      image: i.product?.image || i.product?.img || "",
-      price: parsePrice(i.product?.price),
-      qty: Number(i.qty || 1),
-      size: i.size || "",
+    const payload = selectedItems.map((item) => ({
+      id: item.cartKey,
+      name: item.itemName,
+      image: parseImage(item.itemList),
+      price: unitPrice(item),
+      qty: item.cartQty,
+      size: item.cartSize,
     }));
-
-    if (payload.length === 0) {
-      alert("결제할 상품 데이터가 올바르지 않습니다.");
-      return;
-    }
 
     localStorage.setItem("cartCheckout", JSON.stringify(payload));
     navigate("/checkout", { state: { fromCart: true } });
   };
 
+  /* 장바구니 선택 삭제 */
+  const deleteSelectedItems = async () => {
+    if(selectedItems.length === 0) {
+        alert("삭제할 상품을 선택해주세요.");
+        return;
+    }
+    const cartKeys = selectedItems.map(item => item.cartKey);
+    await dispatch(removeCart(cartKeys));
+  }
+
   return (
     <div className="cart-wrap">
       <h1 className="cart-title">장바구니</h1>
 
-      {cart.length === 0 ? (
+      {cartList.length === 0 ? (
         <div className="cart-empty">
           <p>장바구니가 비어 있습니다.</p>
           <Link to="/" className="btn">
@@ -181,64 +139,53 @@ export default function CartPage() {
               <span>전체선택</span>
             </label>
             <div className="cart-head-actions">
-              <button className="btn" onClick={removeSelected}>
+              <button className="btn"
+                      onClick={deleteSelectedItems}
+                      disabled={selectedItems.length === 0}>
                 선택삭제
-              </button>
-              <button className="btn-danger" onClick={clearAll}>
-                전체삭제
               </button>
             </div>
           </div>
 
           <div className="cart-list">
-            {cart.map((i) => {
-              const unit = unitPrice(i.product);
-              const sub = linePrice(i);
-              const imgSrc = i.product?.image || i.product?.img;
+            {cartList.map((item) => {
+              const unit = unitPrice(item);
+              const sub = linePrice(item);
+              const imgSrc = parseImage(item.itemList);
 
               return (
-                <div className="cart-item" key={i.id}>
+                <div className="cart-item" key={item.cartKey}>
                   <label className="chk">
                     <input
                       type="checkbox"
-                      checked={!!selected[i.id]}
-                      onChange={() => toggleOne(i.id)}
+                      checked={!!selected[item.cartKey]}
+                      onChange={() => toggleOne(item.cartKey)}
                     />
                   </label>
 
                   <img
                     className="cart-img"
-                    src={imgSrc || "/images/placeholder.png"}
-                    alt={i.product?.name}
+                    src={imgSrc}
+                    alt={item.itemName}
                   />
 
                   <div className="cart-info">
-                    <div className="cart-name">
-                      {i.product?.name || "상품"}
-                    </div>
-                    <div className="cart-meta">사이즈: {i.size}</div>
+                    <div className="cart-name">{item.itemName}</div>
+                    <div className="cart-meta">사이즈: {item.cartSize}</div>
                     <div className="cart-meta">
                       단가: ₩{unit.toLocaleString()}
                     </div>
                   </div>
 
                   <div className="cart-qty">
-                    <button onClick={() => dec(i.id)}>-</button>
-                    <input
-                      value={i.qty}
-                      onChange={(e) => changeQty(i.id, e.target.value)}
-                    />
-                    <button onClick={() => inc(i.id)}>+</button>
+                    <span className="cart-qty-value">{item.cartQty}</span>
                   </div>
 
                   <div className="cart-sub">
                     ₩{sub.toLocaleString()}
                   </div>
 
-                  <button
-                    className="btn-danger"
-                    onClick={() => removeOne(i.id)}
-                  >
+                  <button className="btn-danger" onClick={() => { dispatch(removeCart(item.cartKey))}}>
                     삭제
                   </button>
                 </div>

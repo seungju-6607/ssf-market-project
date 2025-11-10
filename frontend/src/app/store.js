@@ -1,5 +1,6 @@
 import { configureStore } from '@reduxjs/toolkit'
 import authSlice from '../feature/auth/authSlice.js'
+import cartSlice from '../feature/cart/cartSlice.js'
 
 // 액션 로깅 처리 담당 미들웨어
 const myLoggerMiddleware = (store) => (next) => (action) => {
@@ -24,5 +25,6 @@ const myCartSaveMiddleware = (store) => (next) => (action) => {
 export const store = configureStore({
   reducer: {
     "auth": authSlice,
+    "cart": cartSlice,
   },
 })

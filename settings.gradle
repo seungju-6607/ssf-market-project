@@ -1,3 +1,3 @@
-rootProject.name = 'ecommerce-fullstack-app'
+rootProject.name = 'ssf-market-project'
 include 'backend'  //springboot project
 include 'frontend' //react project

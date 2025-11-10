@@ -41,41 +41,6 @@ import CartPage from "./pages/cart/CartPage.jsx";
 // 카테고리
 import CategoryPage from "./pages/CategoryPage.jsx";
 
-// 골프
-import GolfMain from "./pages/golf/GolfMain.jsx";
-import GolfNew from "./pages/golf/GolfNew.jsx";
-import GolfWomen from "./pages/golf/GolfWomen.jsx";
-import GolfMen from "./pages/golf/GolfMen.jsx";
-
-// 럭셔리
-import LuxuryMain from "./pages/luxury/LuxuryMain.jsx";
-import LuxuryNew from "./pages/luxury/LuxuryNew.jsx";
-import LuxuryWomen from "./pages/luxury/LuxuryWomen.jsx";
-import LuxuryMen from "./pages/luxury/LuxuryMen.jsx";
-
-// 신발
-import ShoesMain from "./pages/shoes/ShoesMain.jsx";
-import ShoesNew from "./pages/shoes/ShoesNew.jsx";
-import ShoesWomen from "./pages/shoes/ShoesWomen.jsx";
-import ShoesMen from "./pages/shoes/ShoesMen.jsx";
-
-// 라이프
-import LifeMain from "./pages/life/LifeMain.jsx";
-import LifeNew from "./pages/life/LifeNew.jsx";
-import LifeFurniture from "./pages/life/LifeFurniture.jsx";
-import LifePet from "./pages/life/LifePet.jsx";
-import LifeCar from "./pages/life/LifeCar.jsx";
-
-// 아울렛
-import OutletMain from "./pages/outlet/OutletMain.jsx";
-import OutletWomen from "./pages/outlet/OutletWomen.jsx";
-import OutletMen from "./pages/outlet/OutletMen.jsx";
-import OutletKids from "./pages/outlet/OutletKids.jsx";
-import OutletLuxury from "./pages/outlet/OutletLuxury.jsx";
-import OutletShoes from "./pages/outlet/OutletShoes.jsx";
-import OutletSports from "./pages/outlet/OutletSports.jsx";
-import OutletGolf from "./pages/outlet/OutletGolf.jsx";
-import OutletLife from "./pages/outlet/OutletLife.jsx";
 
 // 마이페이지
 import MyPage from "./pages/mypage/MyPage.jsx";
@@ -191,44 +156,16 @@ function App() {
         <Route path="/women/:subcategory?" element={<CategoryPage />} />
         <Route path="/men/:subcategory?" element={<CategoryPage />} />
         <Route path="/kids/:subcategory?" element={<CategoryPage />} />
+        <Route path="/luxury/:subcategory?" element={<CategoryPage />} />
+        <Route path="/shoes/:subcategory?" element={<CategoryPage />} />
         <Route path="/sports/:subcategory?" element={<CategoryPage />} />
+        <Route path="/golf/:subcategory?" element={<CategoryPage />} />
         <Route path="/beauty/:subcategory?" element={<CategoryPage />} />
+        <Route path="/life/:subcategory?" element={<CategoryPage />} />
+        <Route path="/outlet/:subcategory?" element={<CategoryPage />} />
+        
+        
 
-        {/* 골프 */}
-        <Route path="/golf" element={<GolfMain />} />
-        <Route path="/golf/new" element={<GolfNew />} />
-        <Route path="/golf/women" element={<GolfWomen />} />
-        <Route path="/golf/men" element={<GolfMen />} />
-
-        {/* 신발 */}
-        <Route path="/shoes" element={<ShoesMain />} />
-        <Route path="/shoes/new" element={<ShoesNew />} />
-        <Route path="/shoes/women" element={<ShoesWomen />} />
-        <Route path="/shoes/men" element={<ShoesMen />} />
-
-        {/* 라이프 */}
-        <Route path="/life" element={<LifeMain />} />
-        <Route path="/life/new" element={<LifeNew />} />
-        <Route path="/life/furniture" element={<LifeFurniture />} />
-        <Route path="/life/pet" element={<LifePet />} />
-        <Route path="/life/car" element={<LifeCar />} />
-
-        {/* 럭셔리 */}
-        <Route path="/luxury" element={<LuxuryMain />} />
-        <Route path="/luxury/new" element={<LuxuryNew />} />
-        <Route path="/luxury/women" element={<LuxuryWomen />} />
-        <Route path="/luxury/men" element={<LuxuryMen />} />
-
-        {/* 아울렛 */}
-        <Route path="/outlet" element={<OutletMain />} />
-        <Route path="/outlet/women" element={<OutletWomen />} />
-        <Route path="/outlet/men" element={<OutletMen />} />
-        <Route path="/outlet/kids" element={<OutletKids />} />
-        <Route path="/outlet/luxury" element={<OutletLuxury />} />
-        <Route path="/outlet/shoes" element={<OutletShoes />} />
-        <Route path="/outlet/sports" element={<OutletSports />} />
-        <Route path="/outlet/golf" element={<OutletGolf />} />
-        <Route path="/outlet/life" element={<OutletLife />} />
 
         {/* 브랜드 */}
         <Route path="/brand/8seconds" element={<Brand8SecondsDetail />} />

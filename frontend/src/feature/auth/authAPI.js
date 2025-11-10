@@ -4,15 +4,19 @@ import axios from '../csrf/axiosSetup.js';
 import { createCsrfToken, refreshCsrfToken } from '../csrf/manageCsrfToken.js';
 import { validateFormCheck, validateSignupFormCheck } from '../../utils/validate.js';
 
+/* email 중복 체크 */
+export const getIdCheck = (email) => async (dispatch) => {
+    const data = { "email" : email };
+    const url = "/member/idcheck";
+    const result = await axiosPost(url, data);
+    return result;
+}
+
 /** Signup */
 export const getSignup = (formData) => async (dispatch) => {
-   let result = null;
-       /**
-           스프링부트 연동 - Post, /member/signup
-       */
-       const url = "http://localhost:8080/member/signup";
-
-       result = await axiosPost(url, formData);
+    let result = null;
+    const url = "/member/signup";
+    result = await axiosPost(url, formData);
     return result;
 }
 
