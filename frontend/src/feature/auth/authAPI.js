@@ -1,11 +1,14 @@
 import { login, setUser, logout } from './authSlice.js';
 import { axiosPost } from '../../utils/dataFetch.js';
 import axios from '../csrf/axiosSetup.js';
+import { getCartCount } from '../../feature/cart/cartAPI.js';
+import { resetCartCount } from '../../feature/cart/cartSlice.js';
 import { createCsrfToken, refreshCsrfToken } from '../csrf/manageCsrfToken.js';
 import { validateFormCheck, validateSignupFormCheck } from '../../utils/validate.js';
 
-/* email 중복 체크 */
+/** email 중복 체크 */
 export const getIdCheck = (email) => async (dispatch) => {
+
     const data = { "email" : email };
     const url = "/member/idcheck";
     const result = await axiosPost(url, data);
@@ -13,12 +16,34 @@ export const getIdCheck = (email) => async (dispatch) => {
 }
 
 /** Signup */
-export const getSignup = (formData) => async (dispatch) => {
+export const getSignup = (formData, logInType) => async (dispatch) => {
+
     let result = null;
-    const url = "/member/signup";
-    result = await axiosPost(url, formData);
+    if(logInType === "ssf"){
+        const url = "/member/signup";
+//        result = await axiosPost(url, formData);
+    } else {
+        const url = "/member/apiSignup";
+        result = await axiosPost(url, formData);
+    }
     return result;
 }
+
+/** apiLogin */
+export const getApiLogin = (email) => async(dispatch) => {
+
+    await refreshCsrfToken();
+    try {
+        const me = await axios.post('/member/me');
+        const data = me.data || {};
+        const role = data.role || 'user';
+        dispatch(setUser({ authenticated: data.authenticated, email: data.email, role }));
+    } catch (e) {
+        dispatch(setUser({ authenticated: false }));
+    }
+    dispatch(login({"userId": email}));
+    return true;
+};
 
 /** Login */
 export const getLogin = (formData, param) => async(dispatch) => {
@@ -43,6 +68,7 @@ export const getLogin = (formData, param) => async(dispatch) => {
                 const data = me.data || {};
                 const role = data.role || 'user';
                 dispatch(setUser({ authenticated: data.authenticated, email: data.email, role }));
+                dispatch(getCartCount(formData.id));
             } catch (e) {
                 dispatch(setUser({ authenticated: false }));
             }
@@ -62,6 +88,7 @@ export const getLogout = () => async(dispatch) => {
 
     if(result) {
             refreshCsrfToken();
+            dispatch(resetCartCount());
             dispatch(setUser({ authenticated: false }));
             dispatch(logout());
         }

@@ -1,5 +1,5 @@
 import "./Header.css";
-import { useDispatch } from 'react-redux';
+import { useDispatch, useSelector } from 'react-redux';
 import { useAuth } from "../context/AuthContext";
 import { getLogout } from "../feature/auth/authAPI.js";
 import { Link, useLocation, useNavigate } from "react-router-dom";
@@ -12,7 +12,7 @@ export default function Header() {
     try { return JSON.parse(localStorage.getItem("loginUser")) || null; } catch { return null; }
   });
 
-  const [cartCount, setCartCount] = useState(0);
+  const cartCount = useSelector((state) => state.cart.cartCount);
   const [wishCount, setWishCount] = useState(0);
 
   const [searchModalOpen, setSearchModalOpen] = useState(false);
@@ -84,9 +84,6 @@ export default function Header() {
 
   /** 카트/위시/로그인 동기화 */
   useEffect(() => {
-    const updateCartCount = () => {
-      try { setCartCount((JSON.parse(localStorage.getItem("cart")) || []).length); } catch { setCartCount(0); }
-    };
     const updateWishCount = () => {
       try { setWishCount((JSON.parse(localStorage.getItem("wishlist")) || []).length); } catch { setWishCount(0); }
     };
@@ -96,16 +93,14 @@ export default function Header() {
     const sync = () => {
       setIsLogin(localStorage.getItem("isLogin") === "true");
       try { setUser(JSON.parse(localStorage.getItem("loginUser")) || null); } catch { setUser(null); }
-      updateCartCount(); updateWishCount();
+      updateWishCount();
     };
-    updateCartCount(); updateWishCount(); loadRecentSearches();
+    updateWishCount(); loadRecentSearches();
     window.addEventListener("storage", sync);
-    window.addEventListener("cartUpdated", updateCartCount);
     window.addEventListener("wishlistUpdated", updateWishCount);
     window.addEventListener("auth:changed", sync);
     return () => {
       window.removeEventListener("storage", sync);
-      window.removeEventListener("cartUpdated", updateCartCount);
       window.removeEventListener("wishlistUpdated", updateWishCount);
       window.removeEventListener("auth:changed", sync);
     };

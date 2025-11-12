@@ -10,7 +10,9 @@
 kakao:
   pay:
     host: https://kapi.kakao.com
-    admin-key: ed1df4b9d47e4cb603d7dbc8e7124cbb # 실제 발급받은 관리자 키
+    admin-key: 1491d009f98bb0a29734d6af39f55a1a # 실제 발급받은 관리자 키
     cid: TC0ONETIME                   #가맹점 코드 (테스트용), 코드작성 ❌
     ready-path: /payment/ready        #카카오페이 호출 주소, 코드작성 ❌
     approve-path: /payment/approve    #카카오페이 인증 주소, 코드작성 ❌
+    client_id: 3871609a495b8fba6fef98dd74679876
+    redirect_uri: http://localhost:8080/callback

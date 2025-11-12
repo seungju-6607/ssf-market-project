@@ -1,7 +1,173 @@
 // src/pages/ProductDetail.jsx
 import React, { useEffect, useMemo, useState } from "react";
 import { Link, useNavigate, useLocation, useParams } from "react-router-dom";
+import { useDispatch } from "react-redux";
 import "./ProductDetail.css";
+import { addCart } from "../feature/cart/cartAPI.js";
+
+const REVIEWS_PER_PAGE = 10; // ✅ 페이지당 리뷰 개수
+
+const randInt = (min, max) =>
+  min + Math.floor(Math.random() * (max - min + 1));
+
+const createSampleReviews = (product) => {
+  const baseName = product?.name || "이 상품";
+
+  const nicknames = [
+    "SSF회원1",
+    "SSF회원2",
+    "패션러버",
+    "옷잘알",
+    "데일리룩러버",
+    "직장인코디러",
+    "캠퍼스룩",
+    "심플이즈베스트",
+    "옷많은사람",
+    "컬러덕후",
+    "핏맛집",
+    "기장중요",
+    "리뷰장인",
+    "쇼핑중독",
+    "편한옷좋아",
+    "꾸안꾸추천",
+    "심쿵룩",
+    "미니멀스타일",
+    "스트릿무드",
+    "포멀러버",
+  ];
+
+  const templates = [
+    `${baseName} 실제로 보니까 사진보다 더 예뻐요. 퀄리티도 좋고 핏도 마음에 듭니다.`,
+    `${baseName} 생각보다 두께감이 있어서 지금 계절에 딱이에요.`,
+    `색감이 진짜 예뻐요. 코디하기도 편하고 매일 입게 될 것 같아요.`,
+    `사이즈 정사이즈로 잘 맞아요. 한 치수 업/다운 고민했는데 그대로 사길 잘했어요.`,
+    `재질이 부드럽고 착용감이 편해서 오래 입어도 괜찮아요.`,
+    `배송도 빠르고 포장도 깔끔하게 와서 기분 좋았어요.`,
+    `가격 대비 퀄리티 좋아요. 자주 손이 갈 것 같은 아이템입니다.`,
+    `기장감이 딱 적당해서 하의랑 매치하기 좋아요.`,
+    `생각보다 얇아서 이너랑 같이 입어야 할 것 같아요.`,
+    `세탁했을 때 변형 없고 구김도 적어서 만족합니다.`,
+    `선물용으로 샀는데 받는 사람이 너무 좋아했어요.`,
+    `핏이 깔끔해서 출근룩으로 자주 입고 있어요.`,
+    `유행 안 탈 디자인이라 오래 입을 수 있을 것 같아요.`,
+    `컬러가 고급스럽고 어디에나 잘 어울립니다.`,
+    `살짝 여유 있는 핏이라 편하고 멋스럽게 떨어져요.`,
+    `사진이랑 거의 똑같고, 실물이 더 예쁜 느낌이에요.`,
+    `한 번 입어보고 바로 다른 색도 장바구니에 넣었어요.`,
+    `봄/가을에 입기 좋은 두께감이에요.`,
+    `안감이 있어서 비침 걱정 없이 입을 수 있습니다.`,
+    `가격만 조금 더 착했으면 완벽했을 것 같아요.`,
+  ];
+
+  const now = Date.now();
+  const count = randInt(30, 50);
+  const reviews = [];
+
+  for (let i = 0; i < count; i++) {
+    const r = Math.random();
+    const rating = r < 0.6 ? 5 : r < 0.9 ? 4 : 3;
+
+    const nickname = nicknames[randInt(0, nicknames.length - 1)];
+    const template = templates[randInt(0, templates.length - 1)];
+
+    const offsetDays = randInt(1, 60);
+    const createdAt = new Date(
+      now - offsetDays * 24 * 60 * 60 * 1000
+    ).toLocaleString();
+
+    reviews.push({
+      id: now - i,
+      rating,
+      username: nickname,
+      content: template,
+      createdAt,
+    });
+  }
+
+  return reviews;
+};
+
+const REVIEWS_PER_PAGE = 10; // ✅ 페이지당 리뷰 개수
+
+const randInt = (min, max) =>
+  min + Math.floor(Math.random() * (max - min + 1));
+
+const createSampleReviews = (product) => {
+  const baseName = product?.name || "이 상품";
+
+  const nicknames = [
+    "SSF회원1",
+    "SSF회원2",
+    "패션러버",
+    "옷잘알",
+    "데일리룩러버",
+    "직장인코디러",
+    "캠퍼스룩",
+    "심플이즈베스트",
+    "옷많은사람",
+    "컬러덕후",
+    "핏맛집",
+    "기장중요",
+    "리뷰장인",
+    "쇼핑중독",
+    "편한옷좋아",
+    "꾸안꾸추천",
+    "심쿵룩",
+    "미니멀스타일",
+    "스트릿무드",
+    "포멀러버",
+  ];
+
+  const templates = [
+    `${baseName} 실제로 보니까 사진보다 더 예뻐요. 퀄리티도 좋고 핏도 마음에 듭니다.`,
+    `${baseName} 생각보다 두께감이 있어서 지금 계절에 딱이에요.`,
+    `색감이 진짜 예뻐요. 코디하기도 편하고 매일 입게 될 것 같아요.`,
+    `사이즈 정사이즈로 잘 맞아요. 한 치수 업/다운 고민했는데 그대로 사길 잘했어요.`,
+    `재질이 부드럽고 착용감이 편해서 오래 입어도 괜찮아요.`,
+    `배송도 빠르고 포장도 깔끔하게 와서 기분 좋았어요.`,
+    `가격 대비 퀄리티 좋아요. 자주 손이 갈 것 같은 아이템입니다.`,
+    `기장감이 딱 적당해서 하의랑 매치하기 좋아요.`,
+    `생각보다 얇아서 이너랑 같이 입어야 할 것 같아요.`,
+    `세탁했을 때 변형 없고 구김도 적어서 만족합니다.`,
+    `선물용으로 샀는데 받는 사람이 너무 좋아했어요.`,
+    `핏이 깔끔해서 출근룩으로 자주 입고 있어요.`,
+    `유행 안 탈 디자인이라 오래 입을 수 있을 것 같아요.`,
+    `컬러가 고급스럽고 어디에나 잘 어울립니다.`,
+    `살짝 여유 있는 핏이라 편하고 멋스럽게 떨어져요.`,
+    `사진이랑 거의 똑같고, 실물이 더 예쁜 느낌이에요.`,
+    `한 번 입어보고 바로 다른 색도 장바구니에 넣었어요.`,
+    `봄/가을에 입기 좋은 두께감이에요.`,
+    `안감이 있어서 비침 걱정 없이 입을 수 있습니다.`,
+    `가격만 조금 더 착했으면 완벽했을 것 같아요.`,
+  ];
+
+  const now = Date.now();
+  const count = randInt(30, 50);
+  const reviews = [];
+
+  for (let i = 0; i < count; i++) {
+    const r = Math.random();
+    const rating = r < 0.6 ? 5 : r < 0.9 ? 4 : 3;
+
+    const nickname = nicknames[randInt(0, nicknames.length - 1)];
+    const template = templates[randInt(0, templates.length - 1)];
+
+    const offsetDays = randInt(1, 60);
+    const createdAt = new Date(
+      now - offsetDays * 24 * 60 * 60 * 1000
+    ).toLocaleString();
+
+    reviews.push({
+      id: now - i,
+      rating,
+      username: nickname,
+      content: template,
+      createdAt,
+    });
+  }
+
+  return reviews;
+};
 
 const REVIEWS_PER_PAGE = 10; // ✅ 페이지당 리뷰 개수
 
@@ -89,7 +255,10 @@ export default function ProductDetail() {
   const navigate = useNavigate();
   const location = useLocation();
   const { id } = useParams();
+  const dispatch = useDispatch();
   const fromState = location.state?.product || null;
+
+  const isLogin = localStorage.getItem("isLogin") === "true";
 
   const [size, setSize] = useState("");
   const [qty, setQty] = useState(1);
@@ -151,44 +320,24 @@ export default function ProductDetail() {
     } catch {}
   };
 
+  
+
+  /* 장바구니에 상품 추가 */
   const addToCart = () => {
-    if (!product) {
-      alert("상품 정보를 찾을 수 없습니다.");
+    const testItemKey = 10001;
+    const testSize = "M";
+
+    if (!isLogin) {
+      alert("로그인 후 이용해 주세요.");
+      navigate("/login");
       return;
     }
-    if (!size) {
-      alert("사이즈를 선택해 주세요.");
-      return;
-    }
-    try {
-      const itemId = `${product.id}-${size}`;
-      const cart = JSON.parse(localStorage.getItem("cart") || "[]");
-      const idx = cart.findIndex((c) => c.id === itemId);
-      if (idx >= 0) {
-        const cur = Number(cart[idx].qty) || 1;
-        const add = Number(qty) || 1;
-        cart[idx].qty = Math.min(99, cur + add);
-      } else {
-        cart.push({
-          id: itemId,
-          product: {
-            id: product.id,
-            name: product.name || "",
-            image: product.image || product.img,
-            price: normalizedPrice,
-          },
-          size,
-          qty: Number(qty) || 1,
-        });
-      }
-      localStorage.setItem("cart", JSON.stringify(cart));
-      window.dispatchEvent(new Event("cartUpdated"));
-      alert("장바구니에 담았습니다.");
-    } catch (e) {
-      console.error(e);
-      alert("장바구니 처리 중 오류가 발생했습니다.");
-    }
+
+    //dispatch(addCart(itemKey, size)); // 실제 사용 
+    dispatch(addCart(testItemKey, testSize)); // 테스트용
   };
+
+
 
   const goCheckout = () => {
     if (!product) {

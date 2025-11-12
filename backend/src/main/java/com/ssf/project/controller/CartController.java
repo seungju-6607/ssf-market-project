@@ -33,5 +33,29 @@ public class CartController {
     public int deleteItem(@RequestBody List<CartItemDto> cartItem) {
         return cartService.deleteItem(cartItem);
     }
+
+    /* 장바구니 아이템 수량 (Header icon */
+    @PostMapping("/count")
+    public CartItemDto count(@RequestBody CartItemDto cartItem) {
+        return cartService.getCount(cartItem);
+    }
+
+    /* 장바구니 아이템 수량 (+/-) */
+    @PostMapping("/updateQty")
+    public int updateQty(@RequestBody CartItemDto cartItem) {
+        return cartService.updateQty(cartItem);
+    }
+
+    /* 장바구니에 담으려는 상품+사이즈가 이미 있는지 체크 */
+   @PostMapping("/checkQty")
+   public CartItemDto checkQty(@RequestBody CartItemDto cartItem) {
+       return cartService.checkQty(cartItem);
+   }
+
+   /* 장바구니에 상품 추가 */
+   @PostMapping("/add")
+   public int add(@RequestBody CartItemDto cartItem) {
+       return cartService.add(cartItem);
+   }
 }
 

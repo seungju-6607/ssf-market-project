@@ -4,13 +4,11 @@ import lombok.Getter;
 import lombok.Setter;
 import java.time.LocalDate;
 import jakarta.persistence.*;
-import lombok.AllArgsConstructor;
 
 
 @Entity
 @Getter
 @Setter
-@AllArgsConstructor
 @Table(name = "ssf_cart")
 public class CartItem {
 
@@ -24,4 +22,5 @@ public class CartItem {
     private String cartSize; //옷 사이즈
     private LocalDate cartRdate;
 
+    public CartItem() {}
 }

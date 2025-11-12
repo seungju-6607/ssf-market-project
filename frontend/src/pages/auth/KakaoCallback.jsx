@@ -1,8 +1,11 @@
 import React, { useEffect } from "react";
 import { useNavigate, useLocation } from "react-router-dom";
+import { useDispatch } from 'react-redux';
 import { kakaoLoginApi } from "../../api/auth";
+import { getIdCheck, getSignup, getApiLogin } from '../../feature/auth/authAPI.js';
 
 export default function KakaoCallback() {
+  const dispatch = useDispatch();
   const navigate = useNavigate();
   const location = useLocation();
 
@@ -34,7 +37,6 @@ export default function KakaoCallback() {
         console.log("\n🟢 [3/7] 카카오 토큰 요청 시작");
         console.log("요청 파라미터:");
         console.log("- client_id:", process.env.REACT_APP_KAKAO_REST_API_KEY);
-        console.log("- client_secret:", process.env.REACT_APP_KAKAO_CLIENT_SECRET);
         console.log("- redirect_uri:", process.env.REACT_APP_KAKAO_REDIRECT_URI);
         console.log("- code:", code);
 
@@ -46,7 +48,6 @@ export default function KakaoCallback() {
           body: new URLSearchParams({
             grant_type: "authorization_code",
             client_id: process.env.REACT_APP_KAKAO_REST_API_KEY,
-            client_secret: process.env.REACT_APP_KAKAO_CLIENT_SECRET,
             redirect_uri: process.env.REACT_APP_KAKAO_REDIRECT_URI,
             code: code
           })
@@ -92,37 +93,30 @@ export default function KakaoCallback() {
             console.log("- 이름:", name);
             console.log("- 이메일:", email);
 
-            // 로그인 처리
-            console.log("\n🟢 [7/7] kakaoLoginApi 호출");
-            const res = kakaoLoginApi({ email, name, id });
-
-            console.log("✅ 로그인 API 응답:", res);
-            console.log("\n📦 localStorage 저장 확인:");
-            console.log("- isLogin:", localStorage.getItem("isLogin"));
-            console.log("- loginUser:", localStorage.getItem("loginUser"));
-            console.log("- auth:", localStorage.getItem("auth"));
-
-            if (res?.ok) {
-              // 이벤트 발생
-              console.log("\n🔔 이벤트 디스패치 시작");
-              try {
-                window.dispatchEvent(new Event("auth:changed"));
-                console.log("✅ auth:changed 이벤트 발생");
-                window.dispatchEvent(new Event("storage"));
-                console.log("✅ storage 이벤트 발생");
-              } catch (e) {
-                console.error("❌ 이벤트 발생 실패:", e);
-              }
-
-              console.log("\n🎉 카카오 로그인 완료! 메인 페이지로 이동");
-              console.log("━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━\n");
-              alert(`${name}님, 환영합니다!`);
-              window.location.href = "/";
-            } else {
-              console.error("❌ 로그인 API 응답 실패");
-              alert("로그인 처리 중 오류가 발생했습니다.");
-              navigate("/login");
+            const param = {
+                  "name" : id,
+                  "email": email,
+                  "snsprov": "kakao"
             }
+
+            // 로그인 처리
+            console.log("\n🟢 [7/7] kakaoLoginApi 회원가입");
+            const success = await dispatch(getApiLogin(email));
+            if (success) {
+              window.dispatchEvent(new Event("auth:changed"));
+            }
+
+            const idResult = await dispatch(getIdCheck(email));
+
+            if(!idResult) {
+              const signResult = await dispatch(getSignup(param, "ssf"));
+               navigate("/");
+            } else {
+              alert("로그인에 성공하였습니다.");
+              navigate("/");
+            }
+
+
           } else {
             console.error("❌ 사용자 ID 없음");
             alert("사용자 정보를 가져올 수 없습니다.");

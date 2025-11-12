@@ -281,15 +281,15 @@ export default function Signup() {
     const idResult = await dispatch(getIdCheck(form.email));
 
     if(!idResult) {
-      const signResult = await dispatch(getSignup(form));
-        if(signResult) {
+      const signResult = await dispatch(getSignup(form, "ssf"));
+        if(signResult != null) {
            alert("회원가입이 완료되었습니다! 🎉");
            navigate("/login");
         } else {
            alert("회원가입에 실패하셨습니다.");
         }
     } else {
-      alert("이미 사용중인 이메일 주소 입니다.");
+      alert("이미 가입된 이메일 주소 입니다.");
       setValidation((prev) => ({
         ...prev,
         email: { valid: false, message: "이미 가입된 이메일입니다." },

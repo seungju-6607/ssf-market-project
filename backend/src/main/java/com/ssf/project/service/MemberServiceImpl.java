@@ -1,7 +1,7 @@
 package com.ssf.project.service;
 
 import com.ssf.project.dto.Member;
-import com.ssf.project.repositoty.MemberRepository;
+import com.ssf.project.repository.MemberRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
@@ -39,7 +39,19 @@ public class MemberServiceImpl implements MemberService{    // MemberService mem
         if (member.getRole() == null || member.getRole().isBlank()) {
             member.setRole("USER");
         }
-        
+        return memberRepository.save(member);
+    };
+
+    @Override
+    public int apiSignup (Member member){
+        System.out.println("member :: " + member);
+        member.setUserpwd("api");
+        member.setUserpwd("kakao");
+
+        //role 미입력 시 USER로 저장장
+        if (member.getRole() == null || member.getRole().isBlank()) {
+            member.setRole("USER");
+        }
         return memberRepository.save(member);
     };
 

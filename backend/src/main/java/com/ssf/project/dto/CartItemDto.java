@@ -15,14 +15,14 @@ public class CartItemDto {
     private LocalDate cartRdate;
 
 
-    /********* 아래 필수 dto 인지 확인 필요 **********/
-    /* cart 아이템 수량체크 */
-    //private Long checkQty;
-
-    /* cart 아이콘 위에 수량 +/- 여부 */
-    //private String type;
+    /* cart 에 담긴 아이템 중복체크 */
+    private Long checkQty;
 
     /* cart 에 담긴 총 수량 */
-    //private int sumQty;
+    private int sumQty;
+
+    /* cart 아이콘 위에 수량 +/- 여부 */
+    private String type;
+
 
 }
