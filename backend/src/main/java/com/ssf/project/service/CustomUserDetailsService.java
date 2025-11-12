@@ -1,7 +1,7 @@
 package com.ssf.project.service;
 
 import com.ssf.project.dto.Member;
-import com.ssf.project.repositoty.MemberRepository;
+import com.ssf.project.repository.MemberRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.userdetails.User;
 import java.util.Arrays;

@@ -1,7 +1,9 @@
 import { createSlice } from '@reduxjs/toolkit';
 
 const initialState = {
+    cartCount: 0,
     cartList: [],
+    totalSaleAmount: 0,
 }
 
 export const cartSlice = createSlice({
@@ -18,12 +20,24 @@ export const cartSlice = createSlice({
         removeCartItem (state, action) {
             const { cartKeys } = action.payload;
             state.cartList = state.cartList.filter(item => !cartKeys.includes(item.cartKey));
+        },
+
+        updateCartCount (state, action) {
+            state.cartCount = action.payload.count;
+        },
+
+        updateTotalSaleAmount (state, action) {
+            state.totalSaleAmount = action.payload.totalSaleAmount;
+        },
+
+        resetCartCount (state) {
+            state.cartCount = 0;
         }
 
     }
 })
 
 // Action creators are generated for each case reducer function
-export const { showCartItem, removeCartItem } = cartSlice.actions
+export const { showCartItem, removeCartItem, updateCartCount, updateTotalSaleAmount, resetCartCount } = cartSlice.actions
 
 export default cartSlice.reducer //store에서 import하는 기준

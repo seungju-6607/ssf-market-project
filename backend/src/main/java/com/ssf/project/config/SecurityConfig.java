@@ -58,7 +58,7 @@ public class SecurityConfig {
                 .formLogin(form -> form.disable())
                 .requestCache(rc -> rc.disable()) //로그인 후 리다이렉트 방지
                 .authorizeHttpRequests(authorize -> authorize
-                        .requestMatchers("/csrf/**", "/member/signup", "/member/login", "/member/logout", "/member/idcheck").permitAll()
+                        .requestMatchers("/csrf/**", "/member/signup", "/member/apiSignup", "/member/login", "/member/logout", "/member/idcheck").permitAll()
                         .anyRequest().authenticated()
                 );
 

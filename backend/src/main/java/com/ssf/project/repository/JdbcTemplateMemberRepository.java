@@ -1,4 +1,4 @@
-package com.ssf.project.repositoty;
+package com.ssf.project.repository;
 
 import com.ssf.project.dto.Member;
 import org.springframework.dao.EmptyResultDataAccessException;
@@ -10,7 +10,7 @@ import javax.sql.DataSource;
 import java.util.Optional;
 
 @Repository
-public class JdbcTemplateMemberRepository implements MemberRepository{
+public class JdbcTemplateMemberRepository implements MemberRepository {
 
     private final JdbcTemplate jdbcTemplate;
 

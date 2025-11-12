@@ -1,4 +1,4 @@
-package com.ssf.project.repositoty;
+package com.ssf.project.repository;
 
 import com.ssf.project.dto.Member;
 

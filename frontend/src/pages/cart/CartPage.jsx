@@ -3,12 +3,13 @@ import "./CartPage.css";
 import { Link, useNavigate } from "react-router-dom";
 import { useDispatch, useSelector } from "react-redux";
 import React, { useEffect, useMemo, useState } from "react";
-import { showCart, removeCart } from "../../feature/cart/cartAPI.js";
+import { showCart, removeCart, updateCartQty } from "../../feature/cart/cartAPI.js";
 
 export default function CartPage() {
   const dispatch = useDispatch();
   const navigate = useNavigate();
   const cartList = useSelector((state) => state.cart.cartList || []);
+  const totalSaleAmount = useSelector((state) => state.cart.totalSaleAmount || 0);
   const [selected, setSelected] = useState({});
 
   useEffect(() => {
@@ -80,11 +81,6 @@ export default function CartPage() {
   const selectedItems = useMemo(
     () => cartList.filter((item) => selected[item.cartKey]),
     [cartList, selected]
-  );
-
-  const totalPrice = useMemo(
-    () => selectedItems.reduce((sum, item) => sum + linePrice(item), 0),
-    [selectedItems]
   );
 
   const proceed = () => {
@@ -178,7 +174,13 @@ export default function CartPage() {
                   </div>
 
                   <div className="cart-qty">
-                    <span className="cart-qty-value">{item.cartQty}</span>
+                    <button type="button" onClick={() => {item.cartQty > 1 && dispatch(updateCartQty(item.cartKey, "-"))}}>
+                      -
+                    </button>
+                    <input type="text" value={item.cartQty} readOnly />
+                    <button type="button" onClick={() => { dispatch(updateCartQty(item.cartKey, "+"))}}>
+                      +
+                    </button>
                   </div>
 
                   <div className="cart-sub">
@@ -196,7 +198,7 @@ export default function CartPage() {
           <div className="cart-summary">
             <div className="cart-sum-row">
               <span>선택 상품 금액</span>
-              <b>₩{totalPrice.toLocaleString()}</b>
+              <b>₩{totalSaleAmount.toLocaleString()}</b>
             </div>
             <div className="cart-actions">
               <Link to="/" className="btn">

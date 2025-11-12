@@ -1,29 +1,22 @@
 package com.ssf.project.controller;
 
 import com.ssf.project.dto.Member;
-import com.ssf.project.repositoty.MemberRepository;
+import com.ssf.project.repository.MemberRepository;
 import com.ssf.project.service.MemberService;
-import com.ssf.project.repositoty.MemberRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import jakarta.servlet.http.*;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
-import org.springframework.security.core.GrantedAuthority;
-import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.web.context.HttpSessionSecurityContextRepository;
 import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 import java.util.Map;
-import java.util.stream.Collectors;
-import java.util.Arrays;
 
 @RestController
 @RequestMapping("/member")
@@ -63,6 +56,18 @@ public class MemberController {
         int rows = memberService.signup(member);
         if(rows == 1) result = true;
         
+        return result;
+    }
+
+    @PostMapping("/apiSignup")
+    public boolean apiSignup(@RequestBody Member member) {
+        System.out.println("member 확인 => " + member);
+        boolean result = false;
+
+        // 서비스 호출
+        int rows = memberService.apiSignup(member);
+        if(rows == 1) result = true;
+
         return result;
     }
 
