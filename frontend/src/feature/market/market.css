@@ -1,0 +1,62 @@
+.mk-container { width:min(1200px, 94%); margin:32px auto; }
+.mk-head { display:flex; align-items:center; justify-content:space-between; margin-bottom:16px; }
+.mk-actions { display:flex; gap:8px; }
+.mk-btn { padding:10px 14px; border:1px solid #ddd; border-radius:10px; background:#fff; cursor:pointer; }
+.mk-btn.primary { background:#111; color:#fff; border-color:#111; }
+.mk-btn.outline { background:#fff; }
+.mk-btn.danger { background:#e5484d; color:#fff; border-color:#e5484d; }
+
+.mk-filters { display:flex; gap:10px; flex-wrap:wrap; margin:12px 0 20px; }
+.mk-filters input[type="text"], .mk-filters input:not([type]), .mk-filters select {
+  border:1px solid #ddd; border-radius:10px; padding:10px 12px;
+}
+.mk-checkbox { display:flex; align-items:center; gap:6px; }
+
+.mk-grid { display:grid; grid-template-columns: repeat(auto-fill, minmax(220px, 1fr)); gap:14px; }
+.mk-empty { padding:48px 0; text-align:center; color:#666; }
+
+.mk-form { display:grid; gap:12px; max-width:720px; }
+.mk-form label { display:grid; gap:6px; }
+.mk-form input, .mk-form textarea, .mk-form select {
+  border:1px solid #ddd; border-radius:10px; padding:10px 12px;
+}
+.mk-previews { display:grid; grid-template-columns: repeat(auto-fill, minmax(120px,1fr)); gap:8px; margin-top:8px; }
+.mk-previews img { width:100%; aspect-ratio:1/1; object-fit:cover; border-radius:10px; border:1px solid #eee; }
+
+.mk-detail { display:grid; grid-template-columns: 1.1fr .9fr; gap:24px; }
+@media (max-width: 980px) { .mk-detail { grid-template-columns: 1fr; } }
+.mk-detail-gallery { display:grid; grid-template-columns: repeat(auto-fill, minmax(200px,1fr)); gap:8px; }
+.mk-detail-gallery img { width:100%; border-radius:12px; border:1px solid #eee; }
+.mk-detail-info .mk-detail-price { font-size:28px; font-weight:700; margin:8px 0 6px; }
+.mk-detail-meta { color:#777; font-size:14px; margin-bottom:16px; }
+.mk-detail-desc { line-height:1.6; white-space:pre-wrap; margin-bottom:16px; }
+.mk-detail-actions { display:flex; gap:8px; flex-wrap:wrap; margin-top:8px; }
+.mk-sold-banner { margin-top:12px; padding:10px 12px; background:#f3f3f3; border-radius:10px; display:inline-block; }
+.mk-inquiry-wrap { border:1px solid #eee; border-radius:12px; padding:12px; display:grid; gap:10px; }
+.mk-inquiry-head { display:flex; align-items:center; justify-content:space-between; }
+.mk-inquiry-guest { display:grid; gap:8px; }
+.mk-inquiry-guest input { border:1px solid #ddd; border-radius:10px; padding:10px 12px; }
+
+.mk-inquiry-thread { max-height: 320px; overflow:auto; display:grid; gap:8px; padding:6px; background:#fafafa; border-radius:10px; border:1px solid #eee; }
+.mk-bubble { max-width: 80%; padding:8px 10px; background:#fff; border:1px solid #eee; border-radius:12px; }
+.mk-bubble.mine { margin-left:auto; background:#111; color:#fff; border-color:#111; }
+.mk-bubble-meta { font-size:12px; color:#777; margin-bottom:4px; }
+.mk-bubble.mine .mk-bubble-meta { color:#cfcfcf; }
+.mk-bubble-text { white-space:pre-wrap; line-height:1.5; }
+
+.mk-inquiry-input { display:flex; gap:8px; }
+.mk-inquiry-input input { flex:1; border:1px solid #ddd; border-radius:10px; padding:10px 12px; }
+
+
+
+.mk-inbox { display:grid; gap:10px; }
+.mk-inbox-row { display:flex; justify-content:space-between; align-items:center; border:1px solid #eee; border-radius:12px; padding:12px; background:#fff; text-decoration:none; color:inherit; }
+.mk-inbox-row:hover { background:#fafafa; }
+.mk-inbox-left { display:grid; gap:4px; }
+.mk-inbox-title { font-weight:700; }
+.mk-inbox-meta { color:#888; font-size:12px; }
+.mk-inbox-right { display:flex; align-items:center; gap:12px; min-width:280px; justify-content:flex-end; }
+.mk-inbox-last { color:#555; font-size:14px; max-width:460px; }
+.mk-inbox-snippet { color:#888; font-size:12px; display:-webkit-box; -webkit-line-clamp:1; -webkit-box-orient:vertical; overflow:hidden; }
+.mk-inbox-count { min-width:28px; height:28px; padding:0 8px; border-radius:999px; background:#111; color:#fff; display:flex; align-items:center; justify-content:center; font-size:12px; }
+

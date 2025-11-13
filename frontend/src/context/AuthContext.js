@@ -1,104 +1,95 @@
-// src/context/AuthContext.jsx
-import React, { createContext, useContext, useEffect, useState } from "react";
+// src/context/AuthContext.js
+import React, { createContext, useContext, useEffect, useMemo, useState } from "react";
 
-/**
- * 로그인 상태 유지 전략
- * - 로그인 성공 시: localStorage("loginUser")에 사용자 객체 저장, "isLogin" = "true"
- * - 앱 시작/새로고침 시: localStorage에서 복원
- * - 로그아웃: localStorage 정리
- */
 const AuthContext = createContext(null);
 
-export const AuthProvider = ({ children }) => {
-  const [user, setUser] = useState(null);      // { id, name, email, ... } 형태 가정
-  const [ready, setReady] = useState(false);   // 복원 완료 여부 (깜박임 방지용)
 
-  // ✅ 앱 시작/새로고침 시 로그인 사용자 복원
-  useEffect(() => {
-    try {
-      let parsedUser = null;
+const USER_KEYS = [
+  "loginUser", "ssf_user", "currentUser", "member", "user", "account", "profile", "loginInfo"
+];
+const PRIMARY_KEY = "loginUser";
 
-      // 1) loginUser가 있으면 최우선 사용
-      const savedLoginUser = localStorage.getItem("loginUser");
-      if (savedLoginUser) {
-        try {
-          parsedUser = JSON.parse(savedLoginUser);
-        } catch {
-          parsedUser = null;
-        }
-      }
+function normalizeUser(any) {
+  if (!any || typeof any !== "object") return null;
+  const id =
+    any.id ?? any.userId ?? any.memberId ?? any.uid ?? any.username ?? any.loginId ?? any.email ?? null;
+  const email = any.email ?? any.userEmail ?? "";
+  const name = any.name ?? any.userName ?? any.nickname ?? (email ? email.split("@")[0] : "USER");
+  return id ? { id, email, name, ...any } : { email, name, ...any }; // id 없어도 일단 유지
+}
 
-      // 2) loginUser가 없거나 name이 없으면 loginInfo를 참고
-      if (!parsedUser || !parsedUser.name) {
-        const savedLoginInfo = localStorage.getItem("loginInfo");
-        if (savedLoginInfo) {
-          try {
-            const info = JSON.parse(savedLoginInfo);
+function safeParse(raw) {
+  try { return JSON.parse(raw); } catch { return null; }
+}
 
-            // 👇 로그인 응답 구조에 따라 알아서 골라서 매핑
-            const name =
-              info.name ||
-              info.userName ||
-              info.username ||
-              info.memberName ||
-              info.nickname ||
-              "";
 
-            const id =
-              info.id ||
-              info.userId ||
-              info.memberId ||
-              info.loginId ||
-              "";
+function loadAndMigrateUser() {
+  const primaryRaw = localStorage.getItem(PRIMARY_KEY);
+  const primary = normalizeUser(safeParse(primaryRaw));
+  if (primary) return primary;
 
-            const email = info.email || info.userEmail || "";
-
-            parsedUser = {
-              id,
-              name,
-              email,
-              raw: info, // 혹시 나중에 디버깅할 때 쓰라고 원본도 넣어둠
-            };
-          } catch {
-            // loginInfo 파싱 실패 시 무시
-          }
-        }
-      }
-
-      setUser(parsedUser || null);
-    } catch {
-      setUser(null);
-    } finally {
-      setReady(true);
+  for (const k of USER_KEYS) {
+    if (k === PRIMARY_KEY) continue;
+    const raw = localStorage.getItem(k);
+    if (!raw) continue;
+    const parsed = normalizeUser(safeParse(raw));
+    if (parsed) {
+      localStorage.setItem(PRIMARY_KEY, JSON.stringify(parsed));
+      // 선택: 옛 키는 정리
+      localStorage.removeItem(k);
+      return parsed;
     }
+  }
+  return null;
+}
+
+export function AuthProvider({ children }) {
+  const [user, setUser] = useState(() => loadAndMigrateUser());
+  const [ready, setReady] = useState(false);
+
+
+  useEffect(() => {
+    setUser(loadAndMigrateUser());
+    setReady(true);
   }, []);
 
-  // ✅ 신규 회원 웰컴 쿠폰 발급 (중복 방지)
-  const issueWelcomeCouponIfNeeded = () => {
-    const savedCoupons = JSON.parse(localStorage.getItem("coupons") || "[]");
-    const hasWelcomeCoupon = savedCoupons.some((c) => c.id === "welcome-10000");
-
-    if (!hasWelcomeCoupon) {
-      const newCoupon = {
-        id: "welcome-10000",
-        name: "신규가입 1만원 할인 쿠폰",
-        amount: 10000,
-        type: "fixed",
-        discount: "₩10,000",
-        used: false,
-        createdAt: new Date().toISOString(),
-      };
-
-      const updatedCoupons = [...savedCoupons, newCoupon];
-      // localStorage.setItem("coupons", JSON.stringify(updatedCoupons));
-    }
+  const login = (nextUser) => {
+    const u = normalizeUser(nextUser);
+    if (!u) return;
+    localStorage.setItem(PRIMARY_KEY, JSON.stringify(u));
+    setUser(u);
+  
+    window.dispatchEvent(new Event("auth:changed"));
   };
 
-  return (
-    <AuthContext.Provider value={{ user, ready, issueWelcomeCouponIfNeeded }}>
-      {children}
-    </AuthContext.Provider>
-  );
-};
+  const logout = () => {
+    localStorage.removeItem(PRIMARY_KEY);
+    setUser(null);
+    window.dispatchEvent(new Event("auth:changed"));
+  };
 
-export const useAuth = () => useContext(AuthContext);
+ 
+  useEffect(() => {
+    const sync = () => setUser(loadAndMigrateUser());
+    window.addEventListener("storage", sync);     
+    window.addEventListener("auth:changed", sync); 
+    return () => {
+      window.removeEventListener("storage", sync);
+      window.removeEventListener("auth:changed", sync);
+    };
+  }, []);
+
+  const value = useMemo(
+    () => ({ user, ready, isAuthenticated: !!user, login, logout }),
+    [user, ready]
+  );
+
+  if (!ready) return <div style={{ textAlign: "center", padding: 40 }}>로딩 중...</div>;
+  return <AuthContext.Provider value={value}>{children}</AuthContext.Provider>;
+}
+
+export function useAuth() {
+  const ctx = useContext(AuthContext);
+  if (!ctx) throw new Error("useAuth must be used within <AuthProvider>");
+  return ctx;
+}

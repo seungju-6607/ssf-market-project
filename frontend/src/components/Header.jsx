@@ -1,19 +1,26 @@
+// src/components/Header.jsx
 import "./Header.css";
-import { useDispatch, useSelector } from 'react-redux';
-import { useAuth } from "../context/AuthContext";
-import { getLogout } from "../feature/auth/authAPI.js";
+import React, { useEffect, useMemo, useRef, useState } from "react";
+import { useDispatch, useSelector } from "react-redux";
 import { Link, useLocation, useNavigate } from "react-router-dom";
-import React, { useEffect, useState, useRef, useMemo } from "react";
+import { useAuth } from "../context/AuthContext.js";
+import { getLogout } from "../feature/auth/authAPI.js";
+import { getCartCount } from "../feature/cart/cartAPI.js";
+import { resetCartCount } from "../feature/cart/cartSlice.js";
 
 export default function Header() {
-  const { user: authUser, logout } = useAuth();
-  const [isLogin, setIsLogin] = useState(localStorage.getItem("isLogin") === "true");
-  const [user, setUser] = useState(() => {
-    try { return JSON.parse(localStorage.getItem("loginUser")) || null; } catch { return null; }
-  });
+  const { user: authUser, isAuthenticated, ready, logout } = useAuth();
+  const dispatch = useDispatch();
+  const navigate = useNavigate();
+  const location = useLocation();
 
   const cartCount = useSelector((state) => state.cart.cartCount);
   const [wishCount, setWishCount] = useState(0);
+  
+  // 장바구니 수량 표시 여부 (null이 아니고 0보다 클 때만)
+  const showCartBadge = useMemo(() => {
+    return cartCount !== null && cartCount > 0;
+  }, [cartCount]);
 
   const [searchModalOpen, setSearchModalOpen] = useState(false);
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
@@ -26,9 +33,6 @@ export default function Header() {
   const [recentSearches, setRecentSearches] = useState([]);
 
   const headerRef = useRef(null);
-  const location = useLocation();
-  const navigate = useNavigate();
-  const dispatch = useDispatch();
 
   /** 공용 MegaMenu 래퍼 */
   const MegaMenu = ({ id, active, top, cols = "2", children }) => (
@@ -82,29 +86,39 @@ export default function Header() {
     { name: "준지", nameEn: "JUUN.J", link: "/brand/junji" },
   ];
 
-  /** 카트/위시/로그인 동기화 */
+  /** 카트/위시/검색 동기화(인증은 컨텍스트로만 처리) */
   useEffect(() => {
     const updateWishCount = () => {
-      try { setWishCount((JSON.parse(localStorage.getItem("wishlist")) || []).length); } catch { setWishCount(0); }
+      try {
+        setWishCount((JSON.parse(localStorage.getItem("wishlist")) || []).length);
+      } catch {
+        setWishCount(0);
+      }
     };
     const loadRecentSearches = () => {
-      try { setRecentSearches(JSON.parse(localStorage.getItem("recentSearches")) || []); } catch { setRecentSearches([]); }
+      try {
+        setRecentSearches(JSON.parse(localStorage.getItem("recentSearches")) || []);
+      } catch {
+        setRecentSearches([]);
+      }
     };
-    const sync = () => {
-      setIsLogin(localStorage.getItem("isLogin") === "true");
-      try { setUser(JSON.parse(localStorage.getItem("loginUser")) || null); } catch { setUser(null); }
-      updateWishCount();
-    };
-    updateWishCount(); loadRecentSearches();
-    window.addEventListener("storage", sync);
+    updateWishCount();
+    loadRecentSearches();
     window.addEventListener("wishlistUpdated", updateWishCount);
-    window.addEventListener("auth:changed", sync);
-    return () => {
-      window.removeEventListener("storage", sync);
-      window.removeEventListener("wishlistUpdated", updateWishCount);
-      window.removeEventListener("auth:changed", sync);
-    };
+    return () => window.removeEventListener("wishlistUpdated", updateWishCount);
   }, []);
+
+  /** 장바구니 수량 초기 로드 및 로그아웃 시 리셋 */
+  useEffect(() => {
+    if (ready) {
+      if (isAuthenticated && authUser?.email) {
+        dispatch(getCartCount(authUser.email));
+      } else {
+        // 로그아웃 상태일 때 장바구니 수량 초기화
+        dispatch(resetCartCount());
+      }
+    }
+  }, [ready, isAuthenticated, authUser?.email, dispatch]);
 
   /** 헤더 bottom 좌표 → 메가메뉴 top */
   useEffect(() => {
@@ -124,24 +138,31 @@ export default function Header() {
 
   /** 인증/네비 핸들러 */
   const handleLogout = async () => {
-
-    //로그아웃 API 호출
-    const succ = await dispatch(getLogout());
-
-    if(succ) {
-      setIsLogin(false);
-//       setUser(null);
-      alert("로그아웃 되었습니다.");
-      navigate("/");
-    }  
-
+    try {
+      await dispatch(getLogout());
+    } catch {
+      // API 실패해도 클라이언트 상태는 정리
+    } finally {
+      dispatch(resetCartCount());
+      logout();
+      alert("로그아웃되었습니다.");
+      navigate("/", { replace: true });
+    }
   };
 
   const handleCartClick = (e) => {
-    if (!isLogin) { e.preventDefault(); alert("로그인이 필요합니다."); window.location.href = "/login"; }
+    if (!isAuthenticated) {
+      e.preventDefault();
+      alert("로그인이 필요합니다.");
+      navigate("/login");
+    }
   };
   const handleMyPageClick = (e) => {
-    if (!isLogin) { e.preventDefault(); alert("로그인이 필요합니다."); window.location.href = "/login"; }
+    if (!isAuthenticated) {
+      e.preventDefault();
+      alert("로그인이 필요합니다.");
+      navigate("/login");
+    }
   };
 
   /** 검색 */
@@ -195,7 +216,13 @@ export default function Header() {
           <div className="container">
             <span>🎉 신규 회원 가입시 10,000원 쿠폰 즉시 지급! </span>
             <Link to="/signup">회원가입 하러 가기 →</Link>
-            <button className="banner-close" onClick={() => setBannerVisible(false)} aria-label="배너 닫기">×</button>
+            <button
+              className="banner-close"
+              onClick={() => setBannerVisible(false)}
+              aria-label="배너 닫기"
+            >
+              ×
+            </button>
           </div>
         </div>
       )}
@@ -208,14 +235,14 @@ export default function Header() {
             <div className="user-menu">
               <Link to="/mypage" onClick={handleMyPageClick}>
                 마이페이지
-                {isLogin && user?.name ? ` (${user.name}님)` : ""}
+                {isAuthenticated && authUser?.name ? ` (${authUser.name}님)` : ""}
               </Link>
-              {isLogin ? (
-                <button onClick={handleLogout} className="logout-btn">
-                  로그아웃
-                </button>
-              ) : (
-                <Link to="/login">로그인</Link>
+              {ready && (
+                isAuthenticated ? (
+                  <button onClick={handleLogout} className="logout-btn">로그아웃</button>
+                ) : (
+                  <Link to="/login">로그인</Link>
+                )
               )}
             </div>
           </div>
@@ -242,16 +269,22 @@ export default function Header() {
                   <Link to="/wishlist" className="wishlist-btn" aria-label="위시리스트">
                     {wishCount > 0 && <span className="cart-count">{wishCount}</span>}
                     <svg width="24" height="24" viewBox="0 0 24 24" fill="none">
-                      <path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" />
+                      <path
+                        d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"
+                        stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"
+                      />
                     </svg>
                   </Link>
 
                   <Link to="/cart" className="cart-btn" aria-label="장바구니" onClick={handleCartClick}>
-                    <span className="cart-count">{cartCount}</span>
+                    {showCartBadge && <span className="cart-count">{cartCount}</span>}
                     <svg width="24" height="24" viewBox="0 0 24 24" fill="none">
                       <path d="M9 22c.553 0 1-.448 1-1s-.447-1-1-1-1 .448-1 1 .447 1 1 1Z" fill="currentColor" />
                       <path d="M20 22c.553 0 1-.448 1-1s-.447-1-1-1-1 .448-1 1 .447 1 1 1Z" fill="currentColor" />
-                      <path d="M1 1h4l2.68 13.39c.09.46.34.874.71 1.168.37.294.83.45 1.3.442h9.72c.47.009.928-.147 1.294-.442.366-.294.616-.708.708-1.168L23 6H6" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" />
+                      <path
+                        d="M1 1h4l2.68 13.39c.09.46.34.874.71 1.168.37.294.83.45 1.3.442h9.72c.47.009.928-.147 1.294-.442.366-.294.616-.708.708-1.168L23 6H6"
+                        stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"
+                      />
                     </svg>
                   </Link>
                 </div>
@@ -297,8 +330,6 @@ export default function Header() {
                           <li><Link to="/women/skirt">스커트</Link></li>
                         </ul>
                       </div>
-                  
-                
                     </MegaMenu>
                   </li>
 
@@ -318,7 +349,6 @@ export default function Header() {
                           <li><Link to="/men/pants">팬츠</Link></li>
                         </ul>
                       </div>
-                     
                     </MegaMenu>
                   </li>
 
@@ -335,7 +365,6 @@ export default function Header() {
                           <li><Link to="/kids/baby">베이비</Link></li>
                         </ul>
                       </div>
-                    
                     </MegaMenu>
                   </li>
 
@@ -353,7 +382,6 @@ export default function Header() {
                           <li><Link to="/luxury/men-bag-wallet">남성 패션잡화</Link></li>
                         </ul>
                       </div>
-                    
                     </MegaMenu>
                   </li>
 
@@ -374,7 +402,6 @@ export default function Header() {
                           <li><Link to="/shoes/travel">여행 용품</Link></li>
                         </ul>
                       </div>
-                  
                     </MegaMenu>
                   </li>
 
@@ -395,7 +422,6 @@ export default function Header() {
                           <li><Link to="/sports/swim">스윔/비치웨어</Link></li>
                         </ul>
                       </div>
-                    
                     </MegaMenu>
                   </li>
 
@@ -416,7 +442,6 @@ export default function Header() {
                           <li><Link to="/golf/acc">골프ACC</Link></li>
                         </ul>
                       </div>
-                     
                     </MegaMenu>
                   </li>
 
@@ -429,11 +454,10 @@ export default function Header() {
                         <ul>
                           <li><Link to="/beauty/new">신상품</Link></li>
                           <li><Link to="/beauty/skincare">스킨케어</Link></li>
-                          <li><Link to="/beauty/makeup">메이크업</Link></li>          
+                          <li><Link to="/beauty/makeup">메이크업</Link></li>
                           <li><Link to="/beauty/perfume">향수</Link></li>
                         </ul>
                       </div>
-                    
                     </MegaMenu>
                   </li>
 
@@ -459,7 +483,6 @@ export default function Header() {
                           <li><Link to="/life/giftcard">상품권</Link></li>
                         </ul>
                       </div>
-                      
                     </MegaMenu>
                   </li>
 
@@ -481,7 +504,6 @@ export default function Header() {
                           <li><Link to="/outlet/life">라이프</Link></li>
                         </ul>
                       </div>
-                    
                     </MegaMenu>
                   </li>
                 </ul>
@@ -494,6 +516,7 @@ export default function Header() {
                   <li><Link to="/ranking">랭킹</Link></li>
                   <li><Link to="/brands">브랜드</Link></li>
                   <li><Link to="/magazine">매거진</Link></li>
+                  <li><Link to="/market">플리마켓</Link></li>
                   <li><Link to="/special" className="nav-link-special">기획전</Link></li>
                   <li><Link to="/event" className="nav-link-special">이벤트</Link></li>
                 </ul>
@@ -539,7 +562,14 @@ export default function Header() {
                     autoFocus
                   />
                   {searchQuery && (
-                    <button type="button" className="clear-input-btn" onClick={() => setSearchQuery("")} aria-label="검색어 지우기">×</button>
+                    <button
+                      type="button"
+                      className="clear-input-btn"
+                      onClick={() => setSearchQuery("")}
+                      aria-label="검색어 지우기"
+                    >
+                      ×
+                    </button>
                   )}
                   <button type="submit" className="search-submit" aria-label="검색">
                     <svg width="24" height="24" viewBox="0 0 24 24" fill="none">
@@ -548,7 +578,16 @@ export default function Header() {
                     </svg>
                   </button>
                 </form>
-                <button className="search-close" onClick={() => { setSearchModalOpen(false); setSearchQuery(""); }} aria-label="닫기">×</button>
+                <button
+                  className="search-close"
+                  onClick={() => {
+                    setSearchModalOpen(false);
+                    setSearchQuery("");
+                  }}
+                  aria-label="닫기"
+                >
+                  ×
+                </button>
               </div>
 
               <div className="search-body">
@@ -559,11 +598,18 @@ export default function Header() {
                         <ul className="autocomplete-list">
                           {filteredKeywords.map((keyword, index) => (
                             <li key={index}>
-                              <button className={`autocomplete-keyword ${index === 0 ? "first" : ""}`} onClick={() => handleSearch(keyword)}>{keyword}</button>
+                              <button
+                                className={`autocomplete-keyword ${index === 0 ? "first" : ""}`}
+                                onClick={() => handleSearch(keyword)}
+                              >
+                                {keyword}
+                              </button>
                             </li>
                           ))}
                         </ul>
-                      ) : <p className="empty-message">검색 결과가 없습니다.</p>}
+                      ) : (
+                        <p className="empty-message">검색 결과가 없습니다.</p>
+                      )}
                     </div>
 
                     <div className="search-section autocomplete-brands">
@@ -572,11 +618,15 @@ export default function Header() {
                         <ul className="brand-list-autocomplete">
                           {filteredBrands.map((brand, index) => (
                             <li key={index}>
-                              <Link to={brand.link} className="brand-item" onClick={() => setSearchModalOpen(false)}>{brand.name}</Link>
+                              <Link to={brand.link} className="brand-item" onClick={() => setSearchModalOpen(false)}>
+                                {brand.name}
+                              </Link>
                             </li>
                           ))}
                         </ul>
-                      ) : <p className="empty-message">검색 결과가 없습니다.</p>}
+                      ) : (
+                        <p className="empty-message">검색 결과가 없습니다.</p>
+                      )}
                     </div>
                   </>
                 ) : (
@@ -591,18 +641,34 @@ export default function Header() {
                             {recentSearches.map((keyword, index) => (
                               <li key={index}>
                                 <button className="search-keyword" onClick={() => handleSearch(keyword)}>{keyword}</button>
-                                <button className="remove-btn" onClick={() => {
-                                  try {
-                                    let recent = JSON.parse(localStorage.getItem("recentSearches")) || [];
-                                    recent = recent.filter((i) => i !== keyword);
-                                    localStorage.setItem("recentSearches", JSON.stringify(recent));
-                                    setRecentSearches(recent);
-                                  } catch {}
-                                }} aria-label="삭제">×</button>
+                                <button
+                                  className="remove-btn"
+                                  onClick={() => {
+                                    try {
+                                      let recent = JSON.parse(localStorage.getItem("recentSearches")) || [];
+                                      recent = recent.filter((i) => i !== keyword);
+                                      localStorage.setItem("recentSearches", JSON.stringify(recent));
+                                      setRecentSearches(recent);
+                                    } catch {}
+                                  }}
+                                  aria-label="삭제"
+                                >
+                                  ×
+                                </button>
                               </li>
                             ))}
                           </ul>
-                          <button className="clear-all-btn" onClick={() => { try { localStorage.removeItem("recentSearches"); setRecentSearches([]); } catch {} }}>전체 삭제</button>
+                          <button
+                            className="clear-all-btn"
+                            onClick={() => {
+                              try {
+                                localStorage.removeItem("recentSearches");
+                                setRecentSearches([]);
+                              } catch {}
+                            }}
+                          >
+                            전체 삭제
+                          </button>
                         </>
                       )}
                     </div>

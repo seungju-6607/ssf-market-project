@@ -30,6 +30,7 @@ public class CartServiceImpl implements CartService {
         return jpaCartRepository.findCartListByEmail(email);
     }
 
+
     @Override
     public int deleteItem(List<CartItemDto> cartItem) {
         List<Integer> cartKeys = cartItem.stream()
@@ -72,26 +73,27 @@ public class CartServiceImpl implements CartService {
        } else {
            cartItem.setCheckQty(0L);
        }
+
        return cartItem;
    }
+
 
    @Override
    public int add(CartItemDto cartItem) {
         String email = cartItem.getEmail();
         String userKey = jpaCartRepository.findUserKeyByEmail(email);
 
-        if (userKey == null) {
-            throw new IllegalArgumentException("사용자 정보를 찾을 수 없습니다. email=" + email);
-        }
-
+        /* 장바구니에 담으려는 상품의 개수 */
         int requestQty = cartItem.getCartQty() > 0 ? cartItem.getCartQty() : 1;
 
+        /* 장바구니에 동일한 상품 존재 하는지 체크 */
         CartCheckQtyDto existing = jpaCartRepository.checkQty(
                 cartItem.getItemKey(),
                 cartItem.getCartSize(),
                 email
         );
 
+        /* 동일한 상품 존재하면, 담으려는 개수만큼 updateQtyPlus 호출 */
         if (existing != null && existing.getCartKey() > 0) {
             for (int i = 0; i < requestQty; i++) {
                 jpaCartRepository.updateQtyPlus(existing.getCartKey());
@@ -99,6 +101,7 @@ public class CartServiceImpl implements CartService {
             return 1;
         }
 
+        /* 동일한 상품이 존재하지 않으면 새로운 객체 */
         CartItem entity = new CartItem();
         entity.setUserKey(userKey);
         entity.setItemKey(cartItem.getItemKey());

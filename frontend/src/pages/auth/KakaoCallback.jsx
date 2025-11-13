@@ -95,27 +95,26 @@ export default function KakaoCallback() {
 
             const param = {
                   "name" : id,
-                  "email": email,
-                  "snsprov": "kakao"
+                  "email" : email,
+                  "snsprov" : "kakao",
+                  "password" : "api"
             }
 
             // 로그인 처리
             console.log("\n🟢 [7/7] kakaoLoginApi 회원가입");
-            const success = await dispatch(getApiLogin(email));
-            if (success) {
-              window.dispatchEvent(new Event("auth:changed"));
-            }
-
             const idResult = await dispatch(getIdCheck(email));
-
-            if(!idResult) {
-              const signResult = await dispatch(getSignup(param, "ssf"));
+            if (!idResult) {
+              const signResult = await dispatch(getSignup(param, "kakao"));
                navigate("/");
             } else {
               alert("로그인에 성공하였습니다.");
               navigate("/");
             }
 
+            const success = await dispatch(getApiLogin(email));
+            if (success) {
+              window.dispatchEvent(new Event("auth:changed"));
+            }
 
           } else {
             console.error("❌ 사용자 ID 없음");

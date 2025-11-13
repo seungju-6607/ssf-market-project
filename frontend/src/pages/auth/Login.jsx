@@ -1,134 +1,98 @@
+// src/pages/auth/Login.jsx
 import "../../styles/Auth.css";
 import { useState, useRef, useEffect } from "react";
-import { useDispatch, useSelector } from 'react-redux';
+import { useDispatch } from "react-redux";
 import { Link, useLocation, useNavigate } from "react-router-dom";
-import { getLogin } from '../../feature/auth/authAPI.js';
-import { loginApi } from "../../api/auth";
+import { getLogin } from "../../feature/auth/authAPI.js";
 import { useAuth } from "../../context/AuthContext";
 import NaverLoginButton from "../../components/auth/NaverLoginButton";
 import KakaoLoginButton from "../../components/auth/KakaoLoginButton";
 
 export default function Login() {
-
-  const location = useLocation(); //??
-  
+  const location = useLocation();
   const navigate = useNavigate();
   const dispatch = useDispatch();
-
   const { login } = useAuth();
+
   const [activeTab, setActiveTab] = useState("member");
   const [rememberMe, setRememberMe] = useState(false);
   const [showPassword, setShowPassword] = useState(false);
-
   const idRef = useRef(null);
   const passwordRef = useRef(null);
   const [form, setForm] = useState({ id: "", password: "" });
   const [error, setError] = useState("");
 
-  // 로그인 후 돌아갈 경로
   const redirectTo =
-    location.state?.from?.pathname && location.state?.from?.pathname !== "/login"
+    location.state?.from?.pathname && location.state.from.pathname !== "/login"
       ? location.state.from.pathname
       : "/";
 
-
   useEffect(() => {
     const statePrefill = location?.state?.prefill;
-    const lsPrefill = (() => {
-      try {
-        return JSON.parse(localStorage.getItem("prefillLogin"));
-      } catch {
-        return null;
-      }
-    })();
-
+    let lsPrefill = null;
+    try { lsPrefill = JSON.parse(localStorage.getItem("prefillLogin")); } catch {}
     const prefill = statePrefill || lsPrefill;
-    if (prefill?.id) setForm(p => ({ ...p, id: prefill.id }));
+    if (prefill?.id) setForm((p) => ({ ...p, id: prefill.id }));
     if (lsPrefill) localStorage.removeItem("prefillLogin");
 
-    // 저장된 아이디 불러오기
     const savedId = localStorage.getItem("savedLoginId");
     if (savedId) {
-      setForm(p => ({ ...p, id: savedId }));
+      setForm((p) => ({ ...p, id: savedId }));
       setRememberMe(true);
     }
   }, [location?.state]);
 
-  const onChange = e => {
+  const onChange = (e) => {
     const { name, value } = e.target;
-    setForm(p => ({ ...p, [name]: value }));
+    setForm((p) => ({ ...p, [name]: value }));
   };
 
-  
-
-  /** 로그인 버튼 이벤트 */
   const onSubmit = async (e) => {
     e.preventDefault();
-    const param = {
-      idRef: idRef,
-      passwordRef: passwordRef
-    }
+    setError("");
 
-    const success = await dispatch(getLogin(form, param));
-
-    if (success) {
-      window.dispatchEvent(new Event("auth:changed"));
-      alert("로그인에 성공하였습니다.");
-      navigate("/");
-
-    } else {
+    const success = await dispatch(getLogin(form, { idRef, passwordRef }));
+    if (!success) {
       alert("로그인에 실패, 확인 후 다시 진행해주세요.");
-      setForm({ id: '', password: '' });
-      idRef.current.focus();
-
-    }
-  }
-
-
-
-  const onSubmit2 = e => {
-    e.preventDefault();
-    const res = loginApi({ email: form.id.trim(), password: form.password });
-
-    if (!res?.ok) {
-      alert(res?.message || "로그인에 실패했습니다.");
+      setForm({ id: "", password: "" });
+      idRef.current?.focus();
       return;
     }
 
-    // 아이디 저장 처리
     if (rememberMe) {
       localStorage.setItem("savedLoginId", form.id.trim());
     } else {
       localStorage.removeItem("savedLoginId");
     }
 
-    const fallbackName = form.id.includes("@")
-      ? form.id.split("@")[0]
-      : form.id;
+    // getLogin이 저장한 사용자 객체 동기화
+    let u = null;
+    try { u = JSON.parse(localStorage.getItem("loginUser") || "null"); } catch {}
+    if (u) {
+      login(u); // AuthContext에 즉시 반영
+    } else {
+      // loginUser가 없더라도 최소 정보로 컨텍스트 업데이트 시도
+      const fallback = {
+        id: form.id.trim(),
+        email: form.id.trim(),
+        name: form.id.includes("@") ? form.id.split("@")[0] : form.id,
+        role: "user",
+      };
+      localStorage.setItem("loginUser", JSON.stringify(fallback));
+      localStorage.setItem("isLogin", "true");
+      login(fallback);
+    }
 
-  //   const user =
-  //     res.user && typeof res.user === "object"
-  //       ? res.user
-  //       : {
-  //           id: res.id || trimmedId,
-  //           email: trimmedId,
-  //           name:
-  //             res.name ||
-  //             (trimmedId.includes("@") ? trimmedId.split("@")[0] : trimmedId),
-  //           role: res.role || "user",
-  //         };
-
-  //   afterLogin(user, trimmedId, redirectTo);
+    try { window.dispatchEvent(new Event("auth:changed")); } catch {}
+    alert("로그인에 성공하였습니다.");
+    navigate(redirectTo);
   };
-
-  ////////////////////////////////////////////////////////////////////////////////
 
   return (
     <div className="auth-container">
       <div className="auth-box">
         <h1 className="auth-title">로그인</h1>
 
-        {/* 탭 네비게이션 */}
         <div className="login-tabs">
           <button
             className={`tab-button ${activeTab === "member" ? "active" : ""}`}
@@ -173,14 +137,7 @@ export default function Login() {
                   onClick={() => setShowPassword(!showPassword)}
                   aria-label={showPassword ? "비밀번호 숨기기" : "비밀번호 보기"}
                 >
-                  <svg
-                    width="20"
-                    height="20"
-                    viewBox="0 0 24 24"
-                    fill="none"
-                    stroke="currentColor"
-                    strokeWidth="2"
-                  >
+                  <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
                     {showPassword ? (
                       <>
                         <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z" />
@@ -200,9 +157,7 @@ export default function Login() {
             </div>
 
             <div className="login-button-section">
-              <button type="submit" className="auth-submit">
-                로그인
-              </button>
+              <button type="submit" className="auth-submit">로그인</button>
             </div>
           </div>
 
@@ -218,14 +173,12 @@ export default function Login() {
           </div>
         </form>
 
-        {/* 링크 섹션 */}
         <div className="auth-links-box">
           <Link to="/find-id">아이디 찾기</Link>
           <Link to="/find-password">비밀번호 찾기</Link>
           <Link to="/signup">회원가입</Link>
         </div>
 
-        {/* SNS 로그인 섹션 */}
         <div className="sns-login-divider">
           <span>SNS 계정으로 로그인</span>
         </div>
@@ -235,7 +188,6 @@ export default function Login() {
           <NaverLoginButton />
         </div>
 
-        {/* 비회원 주문 조회 버튼 (모바일 전용) */}
         <button
           type="button"
           className="non-member-order-btn"

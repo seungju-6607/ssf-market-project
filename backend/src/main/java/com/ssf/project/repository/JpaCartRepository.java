@@ -82,6 +82,8 @@ public interface JpaCartRepository extends JpaRepository<CartItem, Integer> {
            """)
    CartCheckQtyDto checkQty(@Param("itemKey") int itemKey, @Param("size") String size, @Param("email") String email);
 
+
+   /* email로 user_key를 추출하는 쿼리 */
    @Query(value = "select user_key from ssf_user where email = :email limit 1", nativeQuery = true)
    String findUserKeyByEmail(@Param("email") String email);
 

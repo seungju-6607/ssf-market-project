@@ -21,7 +21,7 @@ export const getSignup = (formData, logInType) => async (dispatch) => {
     let result = null;
     if(logInType === "ssf"){
         const url = "/member/signup";
-//        result = await axiosPost(url, formData);
+        result = await axiosPost(url, formData);
     } else {
         const url = "/member/apiSignup";
         result = await axiosPost(url, formData);
@@ -31,6 +31,10 @@ export const getSignup = (formData, logInType) => async (dispatch) => {
 
 /** apiLogin */
 export const getApiLogin = (email) => async(dispatch) => {
+
+    const payload = { email: email, password: "api" };
+    const url = "/member/login";
+    const result = await axiosPost(url, payload);
 
     await refreshCsrfToken();
     try {
