@@ -32,7 +32,7 @@ public class MemberServiceImpl implements MemberService{    // MemberService mem
     public int signup (Member member){
         System.out.println("member :: " + member);
         // 패스워드 인코딩
-        String encodePwd = passwordEncoder.encode(member.getUserpwd()); // UUID 타입으로 생성됨
+        String encodePwd = passwordEncoder.encode(member.getUserpwd());
         member.setUserpwd(encodePwd);
 
         //role 미입력 시 USER로 저장장
@@ -44,9 +44,9 @@ public class MemberServiceImpl implements MemberService{    // MemberService mem
 
     @Override
     public int apiSignup (Member member){
-        System.out.println("member :: " + member);
-        member.setUserpwd("api");
-        member.setUserpwd("kakao");
+        System.out.println("member :: api" + member);
+        String encodePwd = passwordEncoder.encode(member.getUserpwd());
+        member.setUserpwd(encodePwd);
 
         //role 미입력 시 USER로 저장장
         if (member.getRole() == null || member.getRole().isBlank()) {

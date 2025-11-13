@@ -109,7 +109,7 @@
 }
 
 .title {
-  font-size: 28px;
+  font-size: 38px;
   font-weight: 800;
   margin: 12px 0 24px;
 }
@@ -127,15 +127,21 @@
   margin: 6px 0 14px;
 }
 
+.checkout-page .section .section-title {
+    font-size: 18px;
+    font-weight: 700;
+    margin: 1px 0 12px;
+}
+
 .order-items { display: grid; gap: 12px; }
-.order-item { display: flex; gap: 12px; align-items: center; }
+.order-item { display: flex; gap: 12px; align-items: center; padding: 0 20px 0 0; }
 .order-thumb { width: 72px; height: 90px; object-fit: cover; border-radius: 8px; }
 .order-info { flex: 1; }
 .order-name { font-weight: 600; }
 .order-sub { color: #666; font-size: 13px; margin-top: 4px; }
 .order-price { font-weight: 700; }
 
-.no-coupon { color: #666; }
+.no-coupon { color: #666; margin-bottom: 18px;}
 .coupon-select { width: 100%; height: 44px; border-radius: 8px; border: 1px solid #ddd; padding: 0 12px; }
 .coupon-hint { margin-top: 8px; color: #444; }
 
@@ -288,4 +294,313 @@
   color: #777;
   padding: 30px 0;
   font-size: 15px;
+}
+
+
+/* 배송지 정보 */
+.section-header {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  margin-bottom: 14px;
+  position: relative;
+}
+
+.btn-reset {
+  background: #444;
+  color: #fff;
+  border: none;
+  border-radius: 6px;
+  padding: 12px 12px;
+  font-size: 14px;
+  font-weight: 600;
+  cursor: pointer;
+  position: absolute;
+  right: 0;
+}
+
+.btn-reset:hover {
+  opacity: 0.9;
+}
+
+.shipping-form {
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+}
+
+.form-row {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  padding-left: 10px;
+}
+
+.form-row label {
+  text-align: left;
+  flex: 0 0 100px;
+  font-weight: 700;
+  font-size: 14px;
+  color: #111;
+}
+
+.form-row .required {
+  color: #a855f7;
+}
+
+.form-row .input {
+  flex: 1;
+  padding: 10px 12px;
+  border: 1px solid #ddd;
+  border-radius: 8px;
+  font-size: 14px;
+  font-weight: bold;
+  outline: none;
+}
+
+.form-row .input:focus {
+  border-color: #7c3aed;
+  box-shadow: 0 0 0 3px rgba(124, 58, 237, 0.12);
+}
+
+.address-input {
+  display: flex;
+  gap: 8px;
+}
+
+.btn-address {
+  background: #444;
+  color: #fff;
+  border: none;
+  border-radius: 6px;
+  padding: 0 12px;
+  font-size: 14px;
+  font-weight: 600;
+  cursor: pointer;
+  white-space: nowrap;
+}
+.btn-address:hover {
+  background: #555;
+}
+
+/* 결제방법 */
+.payment-section { 
+  margin-top: 24px; 
+}
+
+.payment-header {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  margin-bottom: 16px;
+  position: relative;
+}
+
+.payment-title-center {
+  text-align: center;
+  flex: 1;
+}
+
+.card-benefit-btn {
+  position: absolute;
+  right: 0;
+  background: none;
+  border: none;
+  font-size: 14px;
+  color: #666;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  padding: 4px 8px;
+}
+
+.card-benefit-btn:hover {
+  color: #333;
+}
+
+.question-mark {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 18px;
+  height: 18px;
+  border-radius: 50%;
+  background: #e5e7eb;
+  color: #666;
+  font-size: 12px;
+  font-weight: 600;
+}
+
+.pay-grid {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: 12px;
+  margin-bottom: 16px;
+}
+
+.pay-card {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  width: 100%;
+  min-height: 110px;
+  padding: 12px;
+  border: 1px solid #e5e7eb;
+  border-radius: 10px;
+  background: #fff;
+  cursor: pointer;
+  transition: border-color 0.15s, box-shadow 0.15s, background 0.15s;
+  overflow: hidden;
+}
+
+.pay-card.is-active {
+  border: 2px solid #111827;
+  box-shadow: none;
+  background: #fff;
+}
+
+.pay-banner {
+  position: absolute;
+  top: 0;
+  left: 0;
+  background: #e5e7eb;
+  color: #374151;
+  font-size: 10px;
+  font-weight: 700;
+  padding: 3px 6px;
+  border-radius: 0 0 6px 0;
+  z-index: 1;
+  white-space: nowrap;
+  line-height: 1.2;
+}
+
+.pay-card-content {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  flex: 1;
+  gap: 10px;
+  padding-top: 12px;
+  min-height: 75px;
+}
+
+.pay-icon {
+  font-size: 24px;
+  line-height: 1;
+  margin-bottom: 4px;
+  display: block;
+}
+
+.pay-icon-img {
+  width: 50px;
+  height: 28px;
+  object-fit: contain;
+  display: block;
+}
+
+.pay-icon-img.pay-icon-large {
+  width: 75px;
+  height: 42px;
+}
+
+.pay-label {
+  font-size: 13px;
+  font-weight: 500;
+  color: #111827;
+  text-align: center;
+}
+
+.pay-card-area {
+  margin-top: 20px;
+  padding: 16px;
+  background: #f9fafb;
+  border-radius: 8px;
+  border: 1px solid #e5e7eb;
+}
+
+.pay-row {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 12px;
+}
+
+.pay-label-inline {
+  width: 80px;
+  font-size: 14px;
+  font-weight: 600;
+  color: #374151;
+  flex-shrink: 0;
+}
+
+.pay-select {
+  height: 44px;
+  padding: 0 12px;
+  border: 1px solid #d1d5db;
+  border-radius: 8px;
+  background: #fff;
+  min-width: 160px;
+  font-size: 14px;
+  color: #111827;
+  cursor: pointer;
+}
+
+.pay-select:focus {
+  outline: none;
+  border-color: #7c3aed;
+  box-shadow: 0 0 0 3px rgba(124, 58, 237, 0.1);
+}
+
+.pay-help {
+  margin-top: 12px;
+  font-size: 12px;
+  color: #6b7280;
+  line-height: 1.5;
+}
+
+/* 모바일 반응형 */
+@media (max-width: 768px) {
+  .pay-grid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+  
+  .pay-card {
+    min-height: 90px;
+  }
+  
+  .pay-icon {
+    font-size: 20px;
+  }
+  
+  .pay-icon-img {
+    width: 40px;
+    height: 22px;
+  }
+  
+  .pay-icon-img.pay-icon-large {
+    width: 60px;
+    height: 34px;
+  }
+  
+  .pay-label {
+    font-size: 12px;
+  }
+  
+  .pay-label-inline {
+    width: 100%;
+    margin-bottom: 8px;
+  }
+  
+  .pay-select {
+    flex: 1;
+    min-width: 140px;
+  }
+  
+  .payment-header {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 8px;
+  }
 }

@@ -97,6 +97,14 @@ import BulkOrder from "./pages/help/BulkOrder.jsx";
 // 위시리스트
 import Wishlist from "./pages/wish/Wishlist.jsx";
 
+//플리마켓
+import MarketHome from "./feature/market/MarketHome.jsx";
+import MarketNew from "./feature/market/MarketNew.jsx";
+import MarketDetail from "./feature/market/MarketDetail.jsx";
+import MarketEdit from "./feature/market/MarketEdit.jsx";
+import MarketMy from "./feature/market/MarketMy.jsx";
+import MarketInbox from "./feature/market/MarketInbox.jsx";
+
 function App() {
   const dispatch = useDispatch();
   useEffect(() => {
@@ -208,7 +216,16 @@ function App() {
         {/* 관리자 */}
         <Route path="/admin/orders" element={<PrivateRoute><AdminOrders /></PrivateRoute>} />
         <Route path="/admin" element={<PrivateRoute><AdminDashboard /></PrivateRoute>} />
+
+        {/* 플리마켓*/}
+        <Route path="/market" element={<MarketHome />} />
+        <Route path="/market/new" element={<MarketNew />} />
+        <Route path="/market/my" element={<MarketMy />} />
+        <Route path="/market/:id/edit" element={<MarketEdit />} />
+        <Route path="/market/:id" element={<MarketDetail />} />
+        <Route path="/market/inbox" element={<MarketInbox />} />
       </Routes>
+
 
      
 

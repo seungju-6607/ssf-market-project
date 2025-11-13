@@ -154,3 +154,63 @@ LEFT JOIN (
 LIMIT 0, 1000;
 
  desc view_cartlist;
+ 
+ 
+ /****************************************
+* 작업내용 : 주문, 주문상세 테이블 생성
+* 작성자 : 박도윤
+* 수정이력 : 
+	2025-11-12	최초 생성
+* 사용예시 : desc ssf_order;
+		   desc ssf_order_detail;
+****************************************/
+CREATE TABLE ssf_order (
+	order_key			INT				AUTO_INCREMENT				NOT NULL					COMMENT '주문번호',
+	user_key			VARCHAR(100)								NOT NULL					COMMENT '회원고유번호',
+	order_price			INT											NOT NULL					COMMENT '총결제금액',
+    order_card			VARCHAR(20)									NULL						COMMENT '결제카드회사',
+    order_status		VARCHAR(20)									NULL						COMMENT '주문상태 (S:완료 R:환불)',
+    order_reason		VARCHAR(300)								NULL						COMMENT '환불사유',
+    order_name			VARCHAR(15)									NOT NULL					COMMENT '받는분성명',
+    order_zipcode		VARCHAR(6)									NOT NULL					COMMENT '우편번호',
+    order_addr			VARCHAR(300)								NOT NULL					COMMENT '받는분주소',
+    ordder_addr_detail	VARCHAR(300)								NOT NULL					COMMENT '상세주소',
+    order_tel			VARCHAR(15)									NOT NULL					COMMENT '받는분전화번호',
+	order_req			VARCHAR(100)								NULL						COMMENT '배송시요청사항',
+    order_item_cnt		INT											NULL						COMMENT '주문상품개수',
+    order_item_name		VARCHAR(150)								NULL						COMMENT '대표상품',
+    order_item_img		VARCHAR(600)								NULL						COMMENT '대표이미지',
+    PRIMARY KEY (order_key),
+    CONSTRAINT fk_ssf_order_ssf_user FOREIGN KEY(user_key)	references ssf_user(user_key)
+);
+
+CREATE TABLE ssf_order_detail (
+	order_detail_key 	INT				AUTO_INCREMENT				NOT NULL					COMMENT '주문상세번호',
+	order_key			INT											NOT NULL					COMMENT '주문번호',
+	item_key			INT											NOT NULL					COMMENT '상품고유번호',
+    order_detail_price	INT											NULL						COMMENT '가격',
+    order_detail_cnt	INT				DEFAULT 1					NULL						COMMENT '개수',
+    PRIMARY KEY (order_detail_key),
+    CONSTRAINT fk_ssf_order_detail_ssf_order FOREIGN KEY(order_key)	references ssf_order(order_key),
+    CONSTRAINT fk_ssf_order_detail_ssf_item FOREIGN KEY(item_key)	references ssf_item(item_key)
+);
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

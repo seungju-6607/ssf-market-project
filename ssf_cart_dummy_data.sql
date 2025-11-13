@@ -1,6 +1,8 @@
 select * from ssf_user;
 select * from ssf_category;
 select * from ssf_cart;
+select * from ssf_addr;
+desc ssf_addr;
 show tables;
 
 USE ssf;
@@ -25,6 +27,16 @@ INSERT INTO ssf_item (
 
 INSERT INTO ssf_cart (user_key, item_key, cart_qty, cart_size)
 VALUES
-('9fbdcb7a-7c51-4e09-9c25-0f31b39c6a92', 10001, 1, 'M'),
-('9fbdcb7a-7c51-4e09-9c25-0f31b39c6a92', 10002, 2, 'S'),
-('9fbdcb7a-7c51-4e09-9c25-0f31b39c6a92', 10003, 1, 'FREE');
+('0dd2453b-ba23-11f0-ab67-7085c26d510a', 10001, 1, 'M'),
+('0dd2453b-ba23-11f0-ab67-7085c26d510a', 10002, 2, 'S'),
+('0dd2453b-ba23-11f0-ab67-7085c26d510a', 10003, 1, 'FREE');
+
+INSERT INTO ssf_addr ( user_key, addr_name, addr_zipcode, addr_main, addr_detail, addr_tel, addr_req, addr_def) VALUES
+('0dd2453b-ba23-11f0-ab67-7085c26d510a',
+ '홍길동',
+ '06236',
+ '서울특별시 강남구 테헤란로 123 (역삼동)',
+ '101호',
+ '010-1234-5678',
+ '부재 시 경비실에 맡겨주세요.',
+ 'Y');

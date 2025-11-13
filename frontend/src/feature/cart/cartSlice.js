@@ -1,7 +1,7 @@
 import { createSlice } from '@reduxjs/toolkit';
 
 const initialState = {
-    cartCount: 0,
+    cartCount: null,
     cartList: [],
     totalSaleAmount: 0,
 }
@@ -31,7 +31,7 @@ export const cartSlice = createSlice({
         },
 
         resetCartCount (state) {
-            state.cartCount = 0;
+            state.cartCount = null;
         }
 
     }

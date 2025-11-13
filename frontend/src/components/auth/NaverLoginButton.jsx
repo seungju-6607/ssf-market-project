@@ -36,9 +36,7 @@ export default function NaverLoginButton() {
       loginButton: { color: "green", type: 3, height: 48 }
     });
 
-    console.log("네이버 SDK 초기화 시작");
     naverLogin.init();
-    console.log("네이버 SDK 초기화 완료");
   };
 
   // 네이버 로그인 버튼 클릭 핸들러
@@ -64,6 +62,7 @@ export default function NaverLoginButton() {
       const callbackUrl = encodeURIComponent(process.env.REACT_APP_NAVER_CALLBACK_URL);
       const state = Math.random().toString(36).substr(2, 11);
       const naverAuthUrl = `https://nid.naver.com/oauth2.0/authorize?response_type=token&client_id=${clientId}&redirect_uri=${callbackUrl}&state=${state}`;
+
       console.log("이동할 URL:", naverAuthUrl);
       window.location.href = naverAuthUrl;
     }

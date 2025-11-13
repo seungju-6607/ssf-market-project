@@ -3,40 +3,20 @@ import React, { useEffect, useMemo, useState } from "react";
 import { useNavigate, useLocation } from "react-router-dom";
 import "./Checkout.css";
 
-/* ===========================
-   0) 공통 유틸
-   =========================== */
-
 const toNumber = (v) =>
   typeof v === "number" ? v : Number(String(v ?? "").replace(/[^\d]/g, "")) || 0;
 
 const formatKRW = (n) => `₩${Number(n || 0).toLocaleString()}`;
 
-// // const readJSON = (key, fallback) => {
-//   try {
-//     const v = JSON.parse(localStorage.getItem(key) || "null");
-//     return v ?? fallback;
-//   } catch {
-//     return fallback;
-//   }
-// };
-
-/**
- * 어떤 형태의 객체가 오더라도
- * { product: { id, name, image, price }, size, qty } 로 정규화
- */
 const normalizeOrderItem = (raw) => {
   if (!raw) return null;
-
   const baseProd = raw.product || raw;
-
   const id =
     baseProd.id ||
     raw.id ||
     baseProd.code ||
     raw.code ||
     `p-${Date.now()}-${Math.random().toString(36).slice(2, 7)}`;
-
   const name = baseProd.name || raw.name || raw.title || "상품명";
   const image =
     baseProd.image ||
@@ -49,29 +29,18 @@ const normalizeOrderItem = (raw) => {
   const price = toNumber(
     baseProd.price != null ? baseProd.price : raw.price != null ? raw.price : 0
   );
-
   const size = raw.size || raw.option?.size || "";
   const qty = Number(raw.qty || 1);
-
-  return {
-    product: { id, name, image, price },
-    size,
-    qty,
-  };
+  return { product: { id, name, image, price }, size, qty };
 };
 
-/* ===========================
-   1) 쿠폰 할인 계산
-   =========================== */
 const getDiscountByCoupon = (subtotal, rawCoupon) => {
   if (!rawCoupon) return 0;
   const ctype = String(rawCoupon.type || "").toLowerCase().trim();
-
   const min = toNumber(rawCoupon.min);
   if (subtotal < min) return 0;
 
   let discount = 0;
-
   const isPercent =
     ctype === "percent" || ctype === "percentage" || ctype === "rate";
 
@@ -81,8 +50,7 @@ const getDiscountByCoupon = (subtotal, rawCoupon) => {
         ? rawCoupon.rate
         : toNumber(rawCoupon.rate);
     discount = Math.floor((subtotal * rate) / 100);
-    const cap =
-      toNumber(rawCoupon.max) || toNumber(rawCoupon.amount) || 0;
+    const cap = toNumber(rawCoupon.max) || toNumber(rawCoupon.amount) || 0;
     if (cap) discount = Math.min(discount, cap);
   } else {
     const amt =
@@ -91,13 +59,9 @@ const getDiscountByCoupon = (subtotal, rawCoupon) => {
       toNumber(rawCoupon.name);
     discount = amt;
   }
-
   return Math.max(0, Math.min(discount, subtotal));
 };
 
-/* ===========================
-   3) 보조: 로컬에서 카트/단건 주문 불러오기
-   =========================== */
 const readJSON = (key, fallback) => {
   try {
     const v = JSON.parse(localStorage.getItem(key) || "null");
@@ -108,70 +72,125 @@ const readJSON = (key, fallback) => {
 };
 
 const getCheckoutPayload = (location) => {
-  // 우선순위: (1) location.state.order (2) localStorage.pendingOrder (3) localStorage.cartCheckout (4) cart 전체
   const fromState = location?.state?.order;
-  if (fromState) return [fromState];
+  if (fromState) return [normalizeOrderItem(fromState)].filter(Boolean);
 
   const pendingOrder = readJSON("pendingOrder", null);
-  if (pendingOrder) return [pendingOrder];
+  if (pendingOrder) return [normalizeOrderItem(pendingOrder)].filter(Boolean);
 
   const cartCheckout = readJSON("cartCheckout", null);
   if (Array.isArray(cartCheckout) && cartCheckout.length > 0) {
-    // cartCheckout 구조: [{ id, name, image, price, qty, size }]
-    // product 객체로 래핑
-    return cartCheckout.map((i) => ({
-      product: {
-        id: i.id,
-        name: i.name || "",
-        image: i.image || "",
-        price: toNumber(i.price),
-      },
-      size: i.size || "",
-      qty: Number(i.qty || 1),
-    }));
+    return cartCheckout
+      .map((i) =>
+        normalizeOrderItem({
+          product: {
+            id: i.id,
+            name: i.name || "",
+            image: i.image || "",
+            price: toNumber(i.price),
+          },
+          size: i.size || "",
+          qty: Number(i.qty || 1),
+        })
+      )
+      .filter(Boolean);
   }
 
-  // cart에서 전부 가져오기 (마지막 fallback)
   const cart = readJSON("cart", []);
-  // cart 구조: [{ id, product:{id,name,image,price}, size, qty }]
-  return cart.map((i) => ({
-    product: {
-      id: i.product?.id,
-      name: i.product?.name || "",
-      image: i.product?.image || i.product?.img || "",
-      price: toNumber(i.product?.price),
-    },
-    size: i.size || "",
-    qty: Number(i.qty || 1),
-  }));
+  return cart
+    .map((i) =>
+      normalizeOrderItem({
+        product: {
+          id: i.product?.id,
+          name: i.product?.name || "",
+          image: i.product?.image || i.product?.img || "",
+          price: toNumber(i.product?.price),
+        },
+        size: i.size || "",
+        qty: Number(i.qty || 1),
+      })
+    )
+    .filter(Boolean);
 };
 
-/* ===========================
-   4) Checkout Component
-   =========================== */
+// 결제 아이콘 컴포넌트
+const PaymentIcon = ({ method }) => {
+  const { key, label, icon } = method;
+  const isImg = icon?.startsWith("/");
+  const cls = `pay-icon-img${["toss", "naver", "kakao"].includes(key) ? " pay-icon-large" : ""}`;
+
+  return isImg
+    ? <img src={icon} alt={label} className={cls} />
+    : <span className="pay-icon" aria-hidden>{icon}</span>;
+};
+
+
 export default function Checkout() {
   const navigate = useNavigate();
   const location = useLocation();
 
-  // 주문 상품
   const items = useMemo(() => getCheckoutPayload(location), [location]);
 
-  // 쿠폰 목록 (localStorage 사용)
   const [coupons, setCoupons] = useState(() => readJSON("coupons", []));
   const [couponId, setCouponId] = useState("");
+
+  // 결제 방법 목록 (JSON 파일에서 로드)
+  const [paymentData, setPaymentData] = useState({ methods: [], cardBrands: [], installments: [] });
+
+  // 배송 정보
+  const [name, setName] = useState("");
+  const [phone, setPhone] = useState("");
+  const [email, setEmail] = useState("");
+  const [postcode, setPostcode] = useState("");
+  const [address, setAddress] = useState("");
+  const [addressDetail, setAddressDetail] = useState("");
+  const [memo, setMemo] = useState("");
+
+  // 결제 방법 상태
+  const [payMethod, setPayMethod] = useState("card");
+  const [cardBrand, setCardBrand] = useState("");
+  const [installment, setInstallment] = useState("일시불");
+
+  // paymentMethods.json 파일에서 결제 방법 목록 로드
+  useEffect(() => {
+    fetch("/paymentMethods.json")
+      .then((res) => res.json())
+      .then((data) => setPaymentData(data));
+  }, []);
+
+  const { methods: paymentMethods, cardBrands, installments } = paymentData;
+
+  // 주소찾기 팝업이 열리는 상태
+  const [isPostcodeOpen, setIsPostcodeOpen] = useState(false);
+
+  // 새로입력 버튼 클릭시 기존 정보 초기화
+  const handleNewAddress =  () => {
+      setName("");
+      setPhone("");
+      setEmail("");
+      setPostcode("");
+      setAddress("");
+      setAddressDetail("");
+      setMemo("");
+  }
+
+  // 주소찾기 버튼 클릭 시 (카카오 우편번호 API 연동 자리)
+  const openPostcode = () => {
+    alert("주소찾기 기능은 추후 구현 예정입니다.");
+    setIsPostcodeOpen(true);
+  };
+
 
   // 합계
   const subtotal = useMemo(
     () =>
       items.reduce(
-        (sum, it) =>
-          sum + toNumber(it.product?.price) * Number(it.qty || 1),
+        (sum, it) => sum + toNumber(it.product?.price) * Number(it.qty || 1),
         0
       ),
     [items]
   );
 
-  // 사용 가능한 쿠폰 필터
   const availableCoupons = useMemo(() => {
     const now = Date.now();
     return (coupons || []).filter((c) => {
@@ -184,7 +203,6 @@ export default function Checkout() {
     });
   }, [coupons]);
 
-  // 선택 쿠폰
   const selectedCoupon = useMemo(
     () => availableCoupons.find((c) => String(c.id) === String(couponId)),
     [availableCoupons, couponId]
@@ -195,15 +213,13 @@ export default function Checkout() {
     [subtotal, selectedCoupon]
   );
 
-  const shipping = 0; // 예시
+  const shipping = 0;
   const total = Math.max(0, subtotal - discount + shipping);
 
   useEffect(() => {
-    // 필요하면 콘솔 찍어서 구조 확인
     // console.log("[DEBUG] items:", items);
   }, [items]);
 
-  /* === 결제수단 선택 페이지로 이동 === */
   const goPaymentMethod = () => {
     const payloadData = {
       items,
@@ -220,10 +236,10 @@ export default function Checkout() {
       console.error("Failed to save checkout data:", e);
     }
 
-    navigate("/pay", payloadData);
+    // ★ v6/v7 올바른 방식: 두 번째 인자는 { state: ... }
+    navigate("/pay", { state: payloadData });
   };
 
-  /* === (옵션) 쿠폰 사용 처리 & 데모용 완결 === */
   const markCouponUsed = (c) => {
     if (!c) return;
     const next = (coupons || []).map((x) =>
@@ -235,38 +251,40 @@ export default function Checkout() {
     localStorage.setItem("coupons", JSON.stringify(next));
   };
 
-  // 주문 완료 처리 (PaymentSuccess 페이지 등에서 호출하는 게 일반적)
   const placeOrderForDemo = () => {
     markCouponUsed(selectedCoupon);
-    // 장바구니 비우기 (선택 결제였다면 cartCheckout만 비우는 것이 좋음)
     localStorage.removeItem("cartCheckout");
     localStorage.removeItem("pendingOrder");
     alert(`결제가 완료되었습니다!\n총 ${items.length}개 상품\n결제 금액: ${formatKRW(total)}`);
-    navigate("/order/success");
+    navigate("/order/success", { replace: true });
   };
 
   if (!items || items.length === 0) {
     return (
       <div className="checkout-page">
-        <h2 className="title">주문 결제</h2>
+        <h2 className="title">주문/결제</h2>
         <p className="empty-info">선택된 상품이 없습니다. 장바구니로 이동해 주세요.</p>
       </div>
     );
   }
 
+
+
   return (
     <div className="checkout-page">
-      <h2 className="title">주문 결제</h2>
+      <h2 className="title">주문/결제</h2>
 
-      {/* 주문 상품 */}
       <section className="section">
-        <h3 className="section-title">📦 주문 상품</h3>
+        <h3 className="section-title">상품정보</h3>
         <div className="order-items">
           {items.map((it, idx) => (
             <div className="order-item" key={idx}>
               <img
                 className="order-thumb"
-                src={it.product?.image}
+                src={
+                  it.product?.image ||
+                  "https://images.unsplash.com/photo-1512436991641-6745cdb1723f?auto=format&fit=crop&w=600&q=80"
+                }
                 alt={it.product?.name}
                 onError={(e) => {
                   e.currentTarget.src =
@@ -280,18 +298,15 @@ export default function Checkout() {
                 </div>
               </div>
               <div className="order-price">
-                {formatKRW(
-                  toNumber(it.product?.price) * Number(it.qty || 1)
-                )}
+                {formatKRW(toNumber(it.product?.price) * Number(it.qty || 1))}
               </div>
             </div>
           ))}
         </div>
       </section>
 
-      {/* 쿠폰 선택 */}
       <section className="section">
-        <h3 className="section-title">🎟 쿠폰 선택</h3>
+        <h3 className="section-title">쿠폰 선택</h3>
         {availableCoupons.length === 0 ? (
           <p className="no-coupon">사용 가능한 쿠폰이 없습니다.</p>
         ) : (
@@ -305,10 +320,7 @@ export default function Checkout() {
               {availableCoupons.map((c) => {
                 const ctype = String(c.type || "").toLowerCase().trim();
                 const isPercent =
-                  ctype === "percent" ||
-                  ctype === "percentage" ||
-                  ctype === "rate";
-
+                  ctype === "percent" || ctype === "percentage" || ctype === "rate";
                 let label = "";
                 if (isPercent) {
                   const rate = Number(c.rate) || toNumber(c.rate) || 0;
@@ -328,13 +340,158 @@ export default function Checkout() {
                 );
               })}
             </select>
-
             <p className="coupon-hint">
               적용 할인 예상: <b>{formatKRW(discount)}</b>
             </p>
           </>
         )}
       </section>
+
+      {/* 배송지 정보 */}
+      <section className="section shipping-section">
+        <div className="section-header">
+          <h3 className="section-title">배송지 정보</h3>
+          <button className="btn-reset" onClick={handleNewAddress}>새로입력</button>
+        </div>
+
+        <div className="shipping-form">
+          <div className="form-row">
+            <label>이름 <span className="required">*</span></label>
+            <input
+              type="text"
+              className="input"
+              value={name}
+              onChange={(e) => setName(e.target.value)}
+              placeholder="받는 분 이름"
+            />
+          </div>
+
+          <div className="form-row">
+            <label>휴대폰 <span className="required">*</span></label>
+            <input
+              type="text"
+              className="input"
+              value={phone}
+              onChange={(e) => setPhone(e.target.value)}
+              placeholder="예: 010-1234-5678"
+            />
+          </div>
+
+          <div className="form-row">
+            <label>이메일 주소 <span className="required">*</span></label>
+            <input
+              type="email"
+              className="input"
+              value={email}
+              onChange={(e) => setEmail(e.target.value)}
+              placeholder="example@email.com"
+            />
+          </div>
+
+          <div className="form-row">
+            <label>배송주소 <span className="required">*</span></label>
+            <div className="address-input">
+              <input
+                type="text"
+                className="input"
+                value={postcode}
+                onChange={(e) => setPostcode(e.target.value)}
+                placeholder="우편번호"
+              />
+              <button className="btn-address" onClick={openPostcode}>주소찾기</button>
+            </div>
+            <input
+              type="text"
+              className="input"
+              value={address}
+              onChange={(e) => setAddress(e.target.value)}
+              placeholder="기본 주소"
+            />
+          </div>
+          <div className="form-row">
+            <label></label> {/* 빈 라벨로 정렬 유지 */}
+            <input
+              type="text"
+              className="input"
+              value={addressDetail}
+              onChange={(e) => setAddressDetail(e.target.value)}
+              placeholder="상세 주소"
+            />
+          </div>
+
+          <div className="form-row">
+            <label>배송 메시지</label>
+            <input
+              type="text"
+              className="input"
+              value={memo}
+              onChange={(e) => setMemo(e.target.value)}
+              placeholder="배송 메시지를 입력해주세요"
+            />
+          </div>
+        </div>
+      </section>
+      
+
+      {/* 결제 방법 */}
+      <section className="section payment-section">
+        <div className="payment-header">
+          <h3 className="section-title payment-title-center">결제수단</h3>
+          <button className="card-benefit-btn" type="button">
+            카드혜택 <span className="question-mark">?</span>
+          </button>
+        </div>
+
+        <div className="pay-grid">
+          {paymentMethods.map((m) => (
+            <button
+              type="button"
+              key={m.key}
+              className={`pay-card ${payMethod === m.key ? "is-active" : ""}`}
+              onClick={() => setPayMethod(m.key)}
+              aria-pressed={payMethod === m.key}
+            >
+              {m.banner && <div className="pay-banner">{m.banner}</div>}
+              <div className="pay-card-content">
+                <PaymentIcon method={m} />
+                <span className="pay-label">{m.label}</span>
+              </div>
+            </button>
+          ))}
+        </div>
+
+        {payMethod === "card" && (
+          <div className="pay-card-area">
+            <div className="pay-row">
+              <label className="pay-label-inline">신용카드</label>
+              <select
+                className="pay-select"
+                value={cardBrand}
+                onChange={(e) => setCardBrand(e.target.value)}
+              >
+                {cardBrands.map((b) => (
+                  <option key={b} value={b === "카드선택" ? "" : b}>
+                    {b}
+                  </option>
+                ))}
+              </select>
+
+              <select
+                className="pay-select"
+                value={installment}
+                onChange={(e) => setInstallment(e.target.value)}
+              >
+                {installments.map((m) => (
+                  <option key={m} value={m}>{m}</option>
+                ))}
+              </select>
+            </div>
+
+            <p className="pay-help">* 무이자/부분무이자 여부는 결제 단계에서 카드사 정책에 따라 안내됩니다.</p>
+          </div>
+        )}
+      </section>
+
 
       {/* 합계 */}
       <section className="section">
@@ -355,12 +512,11 @@ export default function Checkout() {
           <b>{formatKRW(total)}</b>
         </div>
 
-        {/* 결제수단 선택 페이지로 이동 */}
         <button className="pay-btn" onClick={goPaymentMethod}>
           결제하기
         </button>
 
-    
+        
       </section>
     </div>
   );
