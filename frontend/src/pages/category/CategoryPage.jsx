@@ -1,5 +1,5 @@
 import React from "react";
-import products from "../../data/products";
+import products from "../../data/products.js";
 import { getProductsByCategory } from "../data/productData.js";
 
 

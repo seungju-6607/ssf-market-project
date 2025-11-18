@@ -16,19 +16,19 @@ drop table ssf_user;
 	2025-10-28	최초 생성
 * 사용예시 : desc ssf_user;
 ****************************************/
-CREATE TABLE `ssf_user` (
-	`user_key`		VARCHAR(100)	primary key		COMMENT '회원고유번호',
-	`email`			VARCHAR(50)		NOT NULL		COMMENT '이메일',
-	`username`		VARCHAR(20)		NOT NULL		COMMENT '이름',
-	`userpwd`		VARCHAR(100)	NOT NULL		COMMENT '비밀번호',
-	`banned`		VARCHAR(1)		NULL			COMMENT '정지여부',
-	`signout`		VARCHAR(1)		NULL			COMMENT '회원탈퇴여부',
-	`signin`		DATETIME		NOT NULL		COMMENT '가입날짜',
-	`snsprov`		VARCHAR(100)	NULL			COMMENT 'SNS제공자종류',
-	`snsid`			VARCHAR(100)	NULL			COMMENT '사용자SNS고유ID',
-	`referralId`	VARCHAR(100)	NULL			COMMENT '추천인ID',
-    `phone`			VARCHAR(13)		NULL			COMMENT '휴대전화번호',
-    `role`			VARCHAR(13)		NOT NULL		COMMENT '권한구분코드'
+CREATE TABLE ssf_user (
+	user_key		VARCHAR(100)	primary key		COMMENT '회원고유번호',
+	email			VARCHAR(50)		NOT NULL		COMMENT '이메일',
+	username		VARCHAR(20)		NOT NULL		COMMENT '이름',
+	userpwd			VARCHAR(100)	NOT NULL		COMMENT '비밀번호',
+	banned			VARCHAR(1)		NULL			COMMENT '정지여부',
+	signout			VARCHAR(1)		NULL			COMMENT '회원탈퇴여부',
+	signin			DATETIME		NOT NULL		COMMENT '가입날짜',
+	snsprov			VARCHAR(100)	NULL			COMMENT 'SNS제공자종류',
+	snsid			VARCHAR(100)	NULL			COMMENT '사용자SNS고유ID',
+	referralId		VARCHAR(100)	NULL			COMMENT '추천인ID',
+    phone			VARCHAR(13)		NULL			COMMENT '휴대전화번호',
+    role			VARCHAR(13)		NOT NULL		COMMENT '권한구분코드'
 );
 
 
@@ -195,10 +195,31 @@ CREATE TABLE ssf_order_detail (
     CONSTRAINT fk_ssf_order_detail_ssf_item FOREIGN KEY(item_key)	references ssf_item(item_key)
 );
 
+/****************************************
+* 작업내용 : flea_market 테이블 생성
+* 작성자 : 김소현
+* 수정이력 : 
+	2025-11-17	최초 생성
+* 사용예시 : desc flea_market;
+****************************************/
+CREATE TABLE flea_market (
+	flea_key		INT				AUTO_INCREMENT			NOT NULL		COMMENT '판매글번호',
+	user_key		VARCHAR(100)							NOT NULL		COMMENT '회원고유번호',
+    flea_name		VARCHAR(15)								NOT NULL		COMMENT '판매자성명',
+    flea_email		VARCHAR(15)								NULL			COMMENT '판매자이메일',
+    flea_title		VARCHAR(150)							NOT NULL		COMMENT '판매글제목',
+	flea_price		INT										NOT NULL		COMMENT '플리마켓가격',
+	flea_category	VARCHAR(100)							NOT NULL		COMMENT '판매글카테고리',
+	flea_content	VARCHAR(1000)							NULL			COMMENT '판매글설명',
+    flea_list		JSON									NULL			COMMENT '이미지리스트',
+	flea_sale		VARCHAR(1) 		DEFAULT 'N'				NOT NULL		COMMENT '판매여부',
+    PRIMARY KEY (flea_key),
+    CONSTRAINT fk_flea_market_ssf_user FOREIGN KEY(user_key)	references ssf_user(user_key)
+);
 
-
-
-
+use ssf;
+show tables;
+desc flea_market;
 
 
 

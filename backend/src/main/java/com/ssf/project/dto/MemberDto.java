@@ -4,7 +4,7 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 import lombok.Data;
 
 @Data
-public class Member {
+public class MemberDto {
 
     private String userKey;     // 회원고유번호
 

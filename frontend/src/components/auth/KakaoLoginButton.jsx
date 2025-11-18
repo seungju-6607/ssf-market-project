@@ -20,12 +20,11 @@ export default function KakaoLoginButton() {
 
     const restApiKey = process.env.REACT_APP_KAKAO_REST_API_KEY;
     const redirectUri = encodeURIComponent(process.env.REACT_APP_KAKAO_REDIRECT_URI);
-     console.log("redirectUri URL:", process.env.REACT_APP_KAKAO_REDIRECT_URI);
+    console.log("redirectUri URL:", process.env.REACT_APP_KAKAO_REDIRECT_URI);
 
-    // scope 파라미터: profile_nickname만 요청 (이메일 제외)
     const kakaoAuthUrl = `https://kauth.kakao.com/oauth/authorize?client_id=${restApiKey}&redirect_uri=${redirectUri}&response_type=code`;
 
-   console.log("카카오 인증 URL:", kakaoAuthUrl);
+    console.log("카카오 인증 URL:", kakaoAuthUrl);
     window.location.href = kakaoAuthUrl;
 
   };

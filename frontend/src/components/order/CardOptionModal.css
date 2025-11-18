@@ -1,0 +1,115 @@
+/* 모달 전체 배경 */
+.modal-backdrop {
+    position: fixed;
+    inset: 0;
+    background: rgba(0, 0, 0, 0.45);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    z-index: 999;
+  }
+  
+  /* 모달 카드 */
+  .card-benefit-modal {
+    width: 420px;
+    max-height: 80vh;
+    background: #fff;
+    border-radius: 8px;
+    box-shadow: 0 8px 30px rgba(0, 0, 0, 0.18);
+    display: flex;
+    flex-direction: column;
+  }
+  
+  /* 헤더 */
+  .cbm-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 18px 20px;
+    border-bottom: 1px solid #e5e7eb;
+  }
+  
+  .cbm-title {
+    font-size: 18px;
+    font-weight: 400;
+  }
+  
+  .cbm-close {
+    border: none;
+    background: transparent;
+    font-size: 18px;
+    cursor: pointer;
+  }
+  
+  /* 바디 */
+  .cbm-body {
+    padding: 16px 20px 20px;
+    overflow-y: auto;
+  }
+  
+  .cbm-subtitle {
+    font-size: 14px;
+    font-weight: 400;
+    margin-bottom: 10px;
+  }
+  
+  /* 카드 리스트 */
+  .cbm-list {
+    border-top: 1px solid #f3f4f6;
+    border-bottom: 1px solid #f3f4f6;
+    max-height: 320px;
+    overflow-y: auto;
+  }
+  
+  .cbm-row {
+    display: flex;
+    justify-content: space-between;
+    padding: 12px 20px;
+    border-bottom: 1px solid #f3f4f6;
+    font-family: 'Noto Sans KR', sans-serif;
+  }
+  
+  .cbm-row:last-child {
+    border-bottom: none;
+  }
+  
+  .cbm-row-left {
+    font-size: 14px;
+    font-weight: 400;
+  }
+  
+  .cbm-row-right {
+    text-align: right;
+  }
+  
+  .cbm-row-max {
+    font-size: 14px;
+  }
+  
+  .cbm-row-range {
+    font-size: 12px;
+    color: #9ca3af;
+  }
+  
+  /* 안내문 */
+  .cbm-notice {
+    margin-top: 16px;
+    font-size: 12px;
+    color: #4b5563;
+    text-align: left;
+  }
+  
+  .cbm-notice-title {
+    font-weight: 400;
+    margin-bottom: 8px;
+  }
+  
+  .cbm-notice-list {
+    padding-left: 0;
+    margin: 0;
+  }
+  
+  .cbm-notice-list li {
+    margin-bottom: 4px;
+  }
+  

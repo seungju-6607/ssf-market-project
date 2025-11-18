@@ -175,7 +175,7 @@ export default function CategoryPage() {
               return (
                 <div
                   className="product-card"
-                  key={id}
+//                   key={id}
                   onClick={() => goToProductDetail(p, idx)}
                 >
                   <div className="thumb">

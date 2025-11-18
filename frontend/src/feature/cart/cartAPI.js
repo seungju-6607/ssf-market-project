@@ -45,10 +45,20 @@ export const removeCart = (cartKeys) => async(dispatch) => {
 
 /* 장바구니 아이템 수량 (Header icon) */
 export const getCartCount = (email) => async(dispatch) => {
-    const url = "/cart/count";
-    const data = {"email": email};
-    const jsonData = await axiosPost(url, data);
-    dispatch(updateCartCount({"count": jsonData.sumQty}));
+    // 이메일이 없거나 요청 실패 시 0으로
+    if (!email) {
+        dispatch(updateCartCount({ "count": 0 }));
+        return;
+    }
+    try {
+        const url = "/cart/count";
+        const data = {"email": email};
+        const jsonData = await axiosPost(url, data);
+        const sumQty = jsonData && typeof jsonData.sumQty === "number" ? jsonData.sumQty : 0;
+        dispatch(updateCartCount({"count": sumQty}));
+    } catch (error) {
+        dispatch(updateCartCount({ "count": 0 }));
+    }
 }
 
 

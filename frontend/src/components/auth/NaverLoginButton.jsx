@@ -1,46 +1,14 @@
-/**
- * 네이버 로그인 버튼 컴포넌트
- *
- * 역할:
- * - 네이버 LoginWithNaverId SDK 초기화
- * - 네이버 로그인 버튼 렌더링 및 클릭 처리
- *
- * 사용법:
- * <NaverLoginButton />
- */
-
 import React, { useEffect } from "react";
+import { initNaverLogin } from "../../utils/naverLogin.js";
 
 export default function NaverLoginButton() {
   useEffect(() => {
-    initNaverLogin();
+    initNaverLogin().then(() => {
+    }).catch(err => console.error(err));
   }, []);
 
-  // 네이버 SDK 초기화 함수
-  const initNaverLogin = () => {
-    if (!window.naver) {
-      console.log("네이버 SDK 아직 로드 안됨");
-      return;
-    }
-
-    const naverIdLoginDiv = document.getElementById("naverIdLogin");
-    if (!naverIdLoginDiv) {
-      console.error("naverIdLogin 요소를 찾을 수 없음");
-      return;
-    }
-
-    const naverLogin = new window.naver.LoginWithNaverId({
-      clientId: process.env.REACT_APP_NAVER_CLIENT_ID,
-      callbackUrl: process.env.REACT_APP_NAVER_CALLBACK_URL,
-      isPopup: false,
-      loginButton: { color: "green", type: 3, height: 48 }
-    });
-
-    naverLogin.init();
-  };
-
   // 네이버 로그인 버튼 클릭 핸들러
-  const handleNaverLogin = () => {
+  const handleNaverLogin = async () => {
     console.log("네이버 로그인 버튼 클릭됨");
 
     if (!window.naver) {
@@ -48,7 +16,7 @@ export default function NaverLoginButton() {
       return;
     }
 
-    // 네이버 SDK가 생성한 로그인 버튼 클릭 트리거
+    // SDK에서 생성된 로그인 버튼을 클릭하는 방법
     const naverLoginButton = document.getElementById("naverIdLogin_loginButton");
     console.log("네이버 SDK 버튼:", naverLoginButton);
 
@@ -56,8 +24,7 @@ export default function NaverLoginButton() {
       console.log("SDK 버튼 클릭");
       naverLoginButton.click();
     } else {
-      console.log("SDK 버튼 없음, 직접 URL 이동");
-      // 버튼이 없으면 직접 네이버 로그인 페이지로 이동
+      // SDK 버튼이 없으면 직접 URL로 이동
       const clientId = process.env.REACT_APP_NAVER_CLIENT_ID;
       const callbackUrl = encodeURIComponent(process.env.REACT_APP_NAVER_CALLBACK_URL);
       const state = Math.random().toString(36).substr(2, 11);
@@ -70,11 +37,16 @@ export default function NaverLoginButton() {
 
   return (
     <>
-      {/* 네이버 SDK가 로그인 버튼을 렌더링할 컨테이너 */}
+      {/* 네이버 SDK가 로그인 버튼을 렌더링할 컨테이너 (React 관리 X, 숨김 처리) */}
       <div id="naverIdLogin" style={{ display: "none" }}></div>
 
-      {/* 실제 사용자에게 보이는 커스텀 버튼 */}
-      <button type="button" className="sns-btn sns-naver" onClick={handleNaverLogin}>
+      {/* React에서 관리하는 실제 커스텀 로그인 버튼 */}
+      <button
+        type="button"
+        className="sns-btn sns-naver"
+        onClick={handleNaverLogin}
+        style={{ display: "inline-flex", alignItems: "center" }}
+      >
         <div className="sns-icon-box">
           <span className="sns-icon">N</span>
         </div>
