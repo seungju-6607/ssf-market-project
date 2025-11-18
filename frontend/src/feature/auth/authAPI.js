@@ -42,6 +42,7 @@ export const getApiLogin = (email) => async(dispatch) => {
         const data = me.data || {};
         const role = data.role || 'user';
         dispatch(setUser({ authenticated: data.authenticated, email: data.email, role }));
+        dispatch(getCartCount(email));
     } catch (e) {
         dispatch(setUser({ authenticated: false }));
     }

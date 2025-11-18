@@ -7,6 +7,7 @@ import { useAuth } from "../context/AuthContext.js";
 import { getLogout } from "../feature/auth/authAPI.js";
 import { getCartCount } from "../feature/cart/cartAPI.js";
 import { resetCartCount } from "../feature/cart/cartSlice.js";
+import { logoutNaver, initNaverLogin, getNaverLogin } from "../utils/naverLogin.js";
 
 export default function Header() {
   const { user: authUser, isAuthenticated, ready, logout } = useAuth();
@@ -145,6 +146,22 @@ export default function Header() {
     } finally {
       dispatch(resetCartCount());
       logout();
+      // 네이버 로그아웃 인스턴스 준비 대기
+      const waitNaverLogout = async () => {
+        let naverLogin = getNaverLogin();
+        if (!naverLogin) {
+          try {
+            naverLogin = await initNaverLogin(); // SDK 초기화 및 인스턴스 반환
+          } catch (err) {
+            console.warn("네이버 SDK 초기화 실패:", err);
+            return;
+          }
+        }
+        if (naverLogin) {
+          logoutNaver(); // utils에 정의된 로그아웃 함수
+        }
+      };
+      await waitNaverLogout();
       alert("로그아웃되었습니다.");
       navigate("/", { replace: true });
     }
@@ -230,6 +247,8 @@ export default function Header() {
       {/* Header */}
       <header className="header" ref={headerRef}>
         {/* user strip */}
+        {/* 네이버 SDK가 로그인 버튼을 렌더링할 컨테이너 (React 관리 X, 숨김 처리) */}
+        <div id="naverIdLogin" style={{ display: "none" }} />
         <div className="user-menu-wrapper">
           <div className="container">
             <div className="user-menu">

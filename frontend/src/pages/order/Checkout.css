@@ -300,10 +300,17 @@
 /* 배송지 정보 */
 .section-header {
   display: flex;
-  justify-content: center;
+  justify-content: space-between;
   align-items: center;
+  flex-wrap: wrap;
+  gap: 10px;
   margin-bottom: 14px;
-  position: relative;
+}
+
+.btn-group {
+  display: flex;
+  gap: 8px;
+  flex-wrap: wrap;
 }
 
 .btn-reset {
@@ -315,12 +322,25 @@
   font-size: 14px;
   font-weight: 600;
   cursor: pointer;
-  position: absolute;
-  right: 0;
 }
 
 .btn-reset:hover {
   opacity: 0.9;
+}
+
+.btn-select {
+  background: #fff;
+  color: #444;
+  border: 1px solid #ddd;
+  border-radius: 6px;
+  padding: 12px 12px;
+  font-size: 14px;
+  font-weight: 600;
+  cursor: pointer;
+}
+
+.btn-select:hover {
+  background: #f5f5f5;
 }
 
 .shipping-form {
@@ -339,7 +359,7 @@
 .form-row label {
   text-align: left;
   flex: 0 0 100px;
-  font-weight: 700;
+  font-weight: 400;
   font-size: 14px;
   color: #111;
 }
@@ -354,9 +374,18 @@
   border: 1px solid #ddd;
   border-radius: 8px;
   font-size: 14px;
-  font-weight: bold;
+  font-weight: 300;
   outline: none;
+  font-family: "Noto Sans KR", "Pretendard", sans-serif;
 }
+.shipping-form input,
+.shipping-form select,
+.shipping-form textarea {
+  font-family: "Noto Sans KR", "Pretendard", sans-serif;
+  font-weight: 300;
+  letter-spacing: 0;
+}
+
 
 .form-row .input:focus {
   border-color: #7c3aed;
@@ -366,6 +395,32 @@
 .address-input {
   display: flex;
   gap: 8px;
+}
+
+.checkbox-row {
+  align-items: flex-start;
+}
+
+.checkbox-default {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 14px;
+  color: #374151;
+  cursor: pointer;
+  user-select: none;
+  white-space: nowrap;
+}
+
+.checkbox-default span {
+  white-space: nowrap;
+}
+
+.checkbox-default input {
+  width: 18px;
+  height: 18px;
+  margin: 0;
+  accent-color: #7c3aed;
 }
 
 .btn-address {
@@ -412,7 +467,7 @@
   display: flex;
   align-items: center;
   gap: 4px;
-  padding: 4px 8px;
+  padding-bottom: 8px;
 }
 
 .card-benefit-btn:hover {
@@ -547,6 +602,18 @@
   cursor: pointer;
 }
 
+.coupon-select,
+.pay-select {
+  -webkit-appearance: none;
+  -moz-appearance: none;
+  appearance: none;
+  padding-right: 36px;
+  background-image: url("data:image/svg+xml,%3Csvg width='12' height='8' viewBox='0 0 12 8' xmlns='http://www.w3.org/2000/svg'%3E%3Cpath d='M1.41.59 6 5.17l4.59-4.58L12 1 6 7 0 1z' fill='%23666'/%3E%3C/svg%3E");
+  background-repeat: no-repeat;
+  background-position: right 12px center;
+  background-size: 12px 8px;
+}
+
 .pay-select:focus {
   outline: none;
   border-color: #7c3aed;
@@ -603,4 +670,225 @@
     align-items: flex-start;
     gap: 8px;
   }
+}
+
+/* 배송지 선택 모달 */
+.modal-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: rgba(0, 0, 0, 0.5);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 1000;
+  animation: fadeIn 0.2s ease;
+}
+
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+
+.modal-content {
+  background: #fff;
+  border-radius: 12px;
+  box-shadow: 0 2px 14px rgba(0, 0, 0, 0.05);
+  max-width: 600px;
+  width: 90%;
+  max-height: 80vh;
+  overflow-y: auto;
+  animation: slideUp 0.3s ease;
+}
+
+@keyframes slideUp {
+  from {
+    transform: translateY(20px);
+    opacity: 0;
+  }
+  to {
+    transform: translateY(0);
+    opacity: 1;
+  }
+}
+
+.address-modal {
+  padding: 24px;
+}
+
+.modal-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 20px;
+  padding-bottom: 16px;
+  border-bottom: 1px solid #eee;
+}
+
+.modal-title {
+  font-size: 20px;
+  font-weight: 700;
+  margin: 0;
+}
+
+.modal-close {
+  background: none;
+  border: none;
+  font-size: 28px;
+  color: #666;
+  cursor: pointer;
+  line-height: 1;
+  padding: 0;
+  width: 32px;
+  height: 32px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 4px;
+  transition: background 0.2s;
+}
+
+.modal-close:hover {
+  background: #f5f5f5;
+}
+
+.address-list {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.empty-address {
+  text-align: center;
+  color: #666;
+  padding: 40px 0;
+  font-size: 14px;
+}
+
+.address-card {
+  position: relative;
+  width: 100%;
+  padding: 16px;
+  border: 1px solid #e5e7eb;
+  border-radius: 10px;
+  background: #fff;
+  cursor: pointer;
+  transition: border-color 0.15s, box-shadow 0.15s, background 0.15s;
+  overflow: hidden;
+  font-family: "Noto Sans KR", "Pretendard", sans-serif;
+}
+
+.address-card * {
+  font-family: inherit;
+  font-weight: 400;
+}
+
+.address-delete-btn {
+  position: absolute;
+  top: 12px;
+  right: 12px;
+  background: none;
+  border: none;
+  color: #9ca3af;
+  font-size: 12px;
+  cursor: pointer;
+  padding: 4px 8px;
+  z-index: 10;
+  transition: color 0.2s;
+}
+
+.address-delete-btn:hover {
+  color: #ef4444;
+}
+
+.address-card:hover {
+  border-color: #d1d5db;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+}
+
+.address-card.is-active {
+  border: 2px solid #111827;
+  box-shadow: none;
+  background: #fff;
+}
+
+.address-card-content {
+  display: block;
+}
+
+.address-card-header {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  flex-wrap: wrap;
+  padding-right: 48px;
+}
+
+.address-name-wrapper {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.address-radio {
+  width: 18px;
+  height: 18px;
+  cursor: pointer;
+  accent-color: #7c3aed;
+}
+
+.address-name {
+  font-size: 16px;
+  font-weight: 500;
+  color: #111827;
+}
+
+.address-default-badge {
+  background: #fff;
+  color: #7c3aed;
+  font-size: 11px;
+  font-weight: 500;
+  padding: 4px 10px;
+  border-radius: 4px;
+  border: 1px solid #7c3aed;
+  white-space: nowrap;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.address-card-body {
+  margin-top: 8px;
+  margin-left: 20px;
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  text-align: left;
+}
+
+.address-phone {
+  font-size: 14px;
+  color: #6b7280;
+  margin: 0;
+}
+
+.address-full {
+  font-size: 14px;
+  color: #374151;
+  margin: 0;
+  line-height: 1.5;
+  word-break: keep-all;
+}
+
+.address-memo {
+  font-size: 13px;
+  color: #6b7280;
+  margin: 0;
+  font-style: normal;
 }

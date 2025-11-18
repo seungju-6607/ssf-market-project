@@ -1,6 +1,6 @@
 package com.ssf.project.repository;
 
-import com.ssf.project.dto.Member;
+import com.ssf.project.dto.MemberDto;
 import org.springframework.dao.EmptyResultDataAccessException;
 import org.springframework.jdbc.core.BeanPropertyRowMapper;
 import org.springframework.jdbc.core.JdbcTemplate;
@@ -28,7 +28,7 @@ public class JdbcTemplateMemberRepository implements MemberRepository {
     }
 
     @Override
-    public int save(Member member) {
+    public int save(MemberDto member) {
         // jdbcTemplate객체를 이용하여 DB의 member 테이블에 insert
         String sql = """
                 INSERT INTO ssf_user (user_key, email, username, userpwd, banned, signout, signin, snsprov, snsid, referralId, phone, role)
@@ -53,8 +53,8 @@ public class JdbcTemplateMemberRepository implements MemberRepository {
     public String findById(String id) {
 
         String sql = "select ifnull(MAX(userpwd), null) as userpwd from ssf_user where email = ?";
-        Member member = jdbcTemplate.queryForObject(sql,
-                        new BeanPropertyRowMapper<>(Member.class), id);
+        MemberDto member = jdbcTemplate.queryForObject(sql,
+                        new BeanPropertyRowMapper<>(MemberDto.class), id);
 
         return member.getUserpwd();
     }
@@ -63,14 +63,14 @@ public class JdbcTemplateMemberRepository implements MemberRepository {
      * Spring-Security의 AuthenticationProvider 객체에 의해 UserDetailsService 호출
      */
     @Override
-    public Optional<Member> findByMember(String id) {
+    public Optional<MemberDto> findByMember(String id) {
         String sql = "select ifnull(MAX(email), null) as email, " +
                 " ifnull(MAX(userpwd), null) as userpwd, " +
                 " ifnull(MAX(role), null) as role " +
                 " from ssf_user where email = ?";
         try {
 
-            Member member = jdbcTemplate.queryForObject(sql, new BeanPropertyRowMapper<>(Member.class), id);
+            MemberDto member = jdbcTemplate.queryForObject(sql, new BeanPropertyRowMapper<>(MemberDto.class), id);
             return Optional.ofNullable(member);
 
         } catch (EmptyResultDataAccessException e) {

@@ -1,6 +1,7 @@
 package com.ssf.project.controller;
 
-import com.ssf.project.dto.Member;
+import com.ssf.project.dto.MemberDto;
+import com.ssf.project.dto.MemberAddrDto;
 import com.ssf.project.repository.MemberRepository;
 import com.ssf.project.service.MemberService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -16,6 +17,7 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
+import java.util.List;
 import java.util.Map;
 
 @RestController
@@ -43,12 +45,12 @@ public class MemberController {
     }
 
     @PostMapping("/idcheck")
-    public boolean idcheck(@RequestBody Member member) {
+    public boolean idcheck(@RequestBody MemberDto member) {
         return memberService.idCheck(member.getEmail());
     }
 
     @PostMapping("/signup")
-    public boolean signup(@RequestBody Member member) {
+    public boolean signup(@RequestBody MemberDto member) {
         System.out.println("member 확인 => " + member);
         boolean result = false;
         
@@ -60,7 +62,7 @@ public class MemberController {
     }
 
     @PostMapping("/apiSignup")
-    public boolean apiSignup(@RequestBody Member member) {
+    public boolean apiSignup(@RequestBody MemberDto member) {
         System.out.println("member 확인 => " + member);
         boolean result = false;
 
@@ -75,7 +77,7 @@ public class MemberController {
      * Spring-Security 라이브러리를 이용한 로그인 진행 :
      */
     @PostMapping("/login")
-    public ResponseEntity<?> login(@RequestBody Member member,
+    public ResponseEntity<?> login(@RequestBody MemberDto member,
                                    HttpServletRequest request,
                                    HttpServletResponse response) {
 
@@ -165,8 +167,8 @@ public class MemberController {
         String email = auth.getName();
 
         var memberOpt = memberRepository.findByMember(email);
-        String username = memberOpt.map(Member::getUsername).orElse("");
-        String rawRole = memberOpt.map(Member::getRole).orElse("");
+        String username = memberOpt.map(MemberDto::getUsername).orElse("");
+        String rawRole = memberOpt.map(MemberDto::getRole).orElse("");
         if (rawRole == null || rawRole.isBlank()) rawRole = "user";
         String role = rawRole.trim().toLowerCase();
 
@@ -176,5 +178,34 @@ public class MemberController {
                 "username", username,
                 "role", role
         ));
+    }
+
+
+    /**
+     * 사용자 기본 배송지 조회
+     */
+    @PostMapping("/addr")
+    public MemberAddrDto addr(@RequestBody Map<String, String> request) {
+        String email = request.get("email");
+        return memberService.findAddrByUserEmail(email);
+    }
+
+    /**
+     * 사용자 배송지 정보 목록 조회 - email 문자열을 전달하므로 Map<String, String> 사용
+     */
+   @PostMapping("/addrList")
+   public List<MemberAddrDto> addrList(@RequestBody Map<String, String> request) {
+        String email = request.get("email");
+        return memberService.findAddrListByUserEmail(email);
+   }
+
+    /**
+     * 배송지 삭제 - addrKey가 integer 타입 (다른 타입일 수 있으므로 Object 사용)
+     */
+    @PostMapping("/addrDelete")
+    public ResponseEntity<Map<String, String>> addrDelete(@RequestBody Map<String, Object> request) {
+        Integer addrKey = Integer.valueOf(request.get("addrKey").toString());
+        memberService.deleteAddress(addrKey);
+        return ResponseEntity.ok(Map.of("success", "true", "message", "배송지가 삭제되었습니다."));
     }
 }

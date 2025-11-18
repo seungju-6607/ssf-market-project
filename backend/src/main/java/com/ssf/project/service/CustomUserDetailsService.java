@@ -1,6 +1,6 @@
 package com.ssf.project.service;
 
-import com.ssf.project.dto.Member;
+import com.ssf.project.dto.MemberDto;
 import com.ssf.project.repository.MemberRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.userdetails.User;
@@ -22,7 +22,7 @@ public class CustomUserDetailsService implements UserDetailsService {
     @Override //DB 연동
     public UserDetails loadUserByUsername(String email) throws UsernameNotFoundException {
 
-        Member member = memberRepository.findByMember(email)
+        MemberDto member = memberRepository.findByMember(email)
                 .orElseThrow(() -> new UsernameNotFoundException("not found: " + email));
 
         String rawRole = member.getRole();

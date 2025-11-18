@@ -1,8 +1,8 @@
 select * from ssf_user;
 select * from ssf_category;
 select * from ssf_cart;
+select * from ssf_item;
 select * from ssf_addr;
-desc ssf_addr;
 show tables;
 
 USE ssf;
@@ -24,6 +24,12 @@ INSERT INTO ssf_item (
 (10003, 1, '(우먼)라이트 시어쉘 패딩 점퍼 - 3 COLOR',
  '["https://img.ssfshop.com/cmd/LB_500x660/src/https://img.ssfshop.com/goods/ORBR/25/10/01/GPXU25100131524_0_THNAIL_ORGINL_20251002132713597.jpg"]',
  'SUARE WOMEN 라이트 패딩 점퍼', 98910, 89000, 30);
+
+INSERT INTO ssf_item (item_key, category_key, item_name, item_price, item_sale, item_list, item_content, item_cnt)
+VALUES (10004, 1, 'SUNLOVE 구스다운', 298000, 199000, '["/images/sunlove.jpg"]', '테스트 상품', 30);
+
+INSERT INTO ssf_cart (user_key, item_key, cart_qty, cart_size, cart_rdate)
+VALUES ('9fbdcb7a-7c51-4e09-9c25-0f31b39c6a92', 10001, 1, 'M', NOW());
 
 INSERT INTO ssf_cart (user_key, item_key, cart_qty, cart_size)
 VALUES

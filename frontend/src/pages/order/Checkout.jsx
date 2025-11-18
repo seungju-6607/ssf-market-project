@@ -1,7 +1,11 @@
 // src/pages/order/Checkout.jsx
-import React, { useEffect, useMemo, useState } from "react";
+import React, { useEffect, useMemo, useState, useCallback } from "react";
 import { useNavigate, useLocation } from "react-router-dom";
 import "./Checkout.css";
+import { useDispatch, useSelector } from "react-redux";
+import { fetchDefaultAddress, fetchAddressList, deleteAddress } from "../../feature/order/orderAPI.js";
+import { openKakaoPostCode } from "../../utils/postCode.js";
+import CardOptionModal from "../../components/order/CardOptionModal.jsx";
 
 const toNumber = (v) =>
   typeof v === "number" ? v : Number(String(v ?? "").replace(/[^\d]/g, "")) || 0;
@@ -128,13 +132,21 @@ const PaymentIcon = ({ method }) => {
 export default function Checkout() {
   const navigate = useNavigate();
   const location = useLocation();
+  const dispatch = useDispatch();
+  const defaultAddress = useSelector(state => state.order.defaultAddress);
+  const addressList = useSelector(state => state.order.addressList);
 
   const items = useMemo(() => getCheckoutPayload(location), [location]);
+  
+  // 로그인 사용자 정보
+  const loginUser = useMemo(() => {
+    return JSON.parse(localStorage.getItem("loginUser") || "{}");
+  }, []);
 
   const [coupons, setCoupons] = useState(() => readJSON("coupons", []));
   const [couponId, setCouponId] = useState("");
 
-  // 결제 방법 목록 (JSON 파일에서 로드)
+  // 결제 방법 목록
   const [paymentData, setPaymentData] = useState({ methods: [], cardBrands: [], installments: [] });
 
   // 배송 정보
@@ -145,6 +157,7 @@ export default function Checkout() {
   const [address, setAddress] = useState("");
   const [addressDetail, setAddressDetail] = useState("");
   const [memo, setMemo] = useState("");
+  const [saveAsDefault, setSaveAsDefault] = useState(false);
 
   // 결제 방법 상태
   const [payMethod, setPayMethod] = useState("card");
@@ -158,13 +171,46 @@ export default function Checkout() {
       .then((data) => setPaymentData(data));
   }, []);
 
+  // 기본 배송지 조회
+  useEffect(() => {
+    dispatch(fetchDefaultAddress());
+  }, [dispatch]);
+
+  // 배송지 정보를 폼에 채우는 함수
+  const fillAddressForm = useCallback((address) => {
+    if (!address) return;
+    
+    setName(address.addrName || "");
+    setPhone(address.addrTel || "");
+    setEmail(loginUser.email || "");
+    setPostcode(address.addrZipcode || "");
+    setAddress(address.addrMain || "");
+    setAddressDetail(address.addrDetail || "");
+    setMemo(address.addrReq || "");
+    setSaveAsDefault(address.addrDef === "Y");
+  }, [loginUser.email]);
+
+  // 기본 배송지 데이터를 폼에 채우기
+  useEffect(() => {
+    if (defaultAddress) {
+      fillAddressForm(defaultAddress);
+    }
+  }, [defaultAddress, fillAddressForm]);
+
   const { methods: paymentMethods, cardBrands, installments } = paymentData;
 
-  // 주소찾기 팝업이 열리는 상태
+  // 주소찾기 팝업 상태
   const [isPostcodeOpen, setIsPostcodeOpen] = useState(false);
+  
+  // 배송지 선택 모달 상태
+  const [isAddressModalOpen, setIsAddressModalOpen] = useState(false);
+  const [selectedAddressIndex, setSelectedAddressIndex] = useState(null);
+
+  // 카드 옵션 모달 상태
+  const [isCardOptionModalOpen, setIsCardOptionModalOpen] = useState(false);
 
   // 새로입력 버튼 클릭시 기존 정보 초기화
-  const handleNewAddress =  () => {
+  const handleNewAddress = () => {
       setName("");
       setPhone("");
       setEmail("");
@@ -172,14 +218,48 @@ export default function Checkout() {
       setAddress("");
       setAddressDetail("");
       setMemo("");
+      setSaveAsDefault(false);
   }
 
-  // 주소찾기 버튼 클릭 시 (카카오 우편번호 API 연동 자리)
-  const openPostcode = () => {
-    alert("주소찾기 기능은 추후 구현 예정입니다.");
-    setIsPostcodeOpen(true);
+  // 배송지 선택 버튼 클릭
+  const handleSelectAddress = async () => {
+    await dispatch(fetchAddressList());
+    setIsAddressModalOpen(true);
   };
 
+  // 배송지 선택
+  const handleAddressClick = (address, index) => {
+    setSelectedAddressIndex(index);
+    fillAddressForm(address);
+    
+    // 배송지 선택 모달창 닫음
+    setTimeout(() => {
+      setIsAddressModalOpen(false);
+      setSelectedAddressIndex(null);
+    }, 200);
+  };
+
+  // 배송지 삭제
+  const handleDeleteAddress = async (addrKey) => {
+    if (!window.confirm("정말 이 배송지를 삭제하시겠습니까?")) {
+      return;
+    }
+
+    try {
+      await dispatch(deleteAddress(addrKey));
+      // 삭제 후 목록 새로고침
+      await dispatch(fetchAddressList());
+    } catch (error) {
+      console.error("배송지 삭제 실패:", error);
+    }
+  };
+
+  // 주소찾기 버튼 클릭 시 (카카오 우편번호 API 연동)
+  const handleOpenPostcode = (data) => {
+    setPostcode(data.zonecode);
+    setAddress(data.jibunAddress);
+    setIsPostcodeOpen(true);
+  };
 
   // 합계
   const subtotal = useMemo(
@@ -351,7 +431,10 @@ export default function Checkout() {
       <section className="section shipping-section">
         <div className="section-header">
           <h3 className="section-title">배송지 정보</h3>
-          <button className="btn-reset" onClick={handleNewAddress}>새로입력</button>
+          <div className="btn-group">
+            <button className="btn-select" onClick={handleSelectAddress}>배송지 선택</button>
+            <button className="btn-reset" onClick={handleNewAddress}>새로입력</button>
+          </div>
         </div>
 
         <div className="shipping-form">
@@ -398,7 +481,7 @@ export default function Checkout() {
                 onChange={(e) => setPostcode(e.target.value)}
                 placeholder="우편번호"
               />
-              <button className="btn-address" onClick={openPostcode}>주소찾기</button>
+              <button className="btn-address" onClick={() => openKakaoPostCode(handleOpenPostcode)}>주소찾기</button>
             </div>
             <input
               type="text"
@@ -429,6 +512,17 @@ export default function Checkout() {
               placeholder="배송 메시지를 입력해주세요"
             />
           </div>
+          <div className="form-row checkbox-row">
+            <label></label>
+            <label className="checkbox-default">
+              <input
+                type="checkbox"
+                checked={saveAsDefault}
+                onChange={(e) => setSaveAsDefault(e.target.checked)}
+              />
+              <span>이 주소를 기본 배송지로 저장할게요</span>
+            </label>
+          </div>
         </div>
       </section>
       
@@ -437,9 +531,12 @@ export default function Checkout() {
       <section className="section payment-section">
         <div className="payment-header">
           <h3 className="section-title payment-title-center">결제수단</h3>
-          <button className="card-benefit-btn" type="button">
+          <button className="card-benefit-btn" type="button" onClick={() => setIsCardOptionModalOpen(true)}>
             카드혜택 <span className="question-mark">?</span>
           </button>
+          {isCardOptionModalOpen && (
+            <CardOptionModal open={isCardOptionModalOpen} onClose={() => setIsCardOptionModalOpen(false)} />
+          )}
         </div>
 
         <div className="pay-grid">
@@ -518,6 +615,66 @@ export default function Checkout() {
 
         
       </section>
+
+      {/* 배송지 선택 모달 */}
+      {isAddressModalOpen && (
+        <div className="modal-overlay" onClick={() => setIsAddressModalOpen(false)}>
+          <div className="modal-content address-modal" onClick={(e) => e.stopPropagation()}>
+            <div className="modal-header">
+              <h3 className="modal-title">배송지 선택</h3>
+              <button className="modal-close" onClick={() => setIsAddressModalOpen(false)}>×</button>
+            </div>
+            <div className="address-list">
+              {addressList.length === 0 ? (
+                <p className="empty-address">저장된 배송지가 없습니다.</p>
+              ) : (
+                addressList.map((address, index) => (
+                  <div
+                    key={address.addrKey || index}
+                    className={`address-card ${selectedAddressIndex === index ? 'is-active' : ''}`}
+                  >
+                    <button 
+                      className="address-delete-btn"
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        handleDeleteAddress(address.addrKey);
+                      }}
+                    >
+                      삭제
+                    </button>
+                    <div className="address-card-content" onClick={() => handleAddressClick(address, index)}>
+                      <div className="address-card-header">
+                        <div className="address-name-wrapper">
+                          <input
+                            type="radio"
+                            name="address-select"
+                            checked={selectedAddressIndex === index}
+                            onChange={() => handleAddressClick(address, index)}
+                            className="address-radio"
+                          />
+                          <span className="address-name">{address.addrName || "이름 없음"}</span>
+                        </div>
+                        {address.addrDef === 'Y' && (
+                          <span className="address-default-badge">기본배송지</span>
+                        )}
+                      </div>
+                      <div className="address-card-body">
+                        <p className="address-phone">{address.addrTel || ""}</p>
+                        <p className="address-full">
+                          ({address.addrZipcode || ""}) {address.addrMain || ""} {address.addrDetail || ""}
+                        </p>
+                        {address.addrReq && (
+                          <p className="address-memo">배송 메시지: {address.addrReq}</p>
+                        )}
+                      </div>
+                    </div>
+                  </div>
+                ))
+              )}
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 }
