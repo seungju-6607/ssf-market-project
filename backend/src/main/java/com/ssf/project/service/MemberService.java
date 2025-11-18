@@ -1,6 +1,6 @@
 package com.ssf.project.service;
 
-import com.ssf.project.dto.Member;
+import com.ssf.project.dto.MemberDto;
 import com.ssf.project.dto.MemberAddrDto;
 
 import java.util.List;
