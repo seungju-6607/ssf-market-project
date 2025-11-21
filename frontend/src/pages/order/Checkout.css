@@ -489,7 +489,7 @@
 
 .pay-grid {
   display: grid;
-  grid-template-columns: repeat(4, minmax(0, 1fr));
+  grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
   gap: 12px;
   margin-bottom: 16px;
 }
@@ -513,6 +513,12 @@
   border: 2px solid #111827;
   box-shadow: none;
   background: #fff;
+}
+
+.pay-card.is-disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+  border-style: dashed;
 }
 
 .pay-banner {
@@ -565,6 +571,15 @@
   font-weight: 500;
   color: #111827;
   text-align: center;
+}
+
+.pay-card.is-disabled .pay-label {
+  color: #6b7280;
+}
+
+.pay-coming-note {
+  font-size: 12px;
+  color: #9ca3af;
 }
 
 .pay-card-area {

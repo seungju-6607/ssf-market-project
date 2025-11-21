@@ -1,5 +1,5 @@
 import React, { useMemo, useState } from "react";
-import { Link, useNavigate } from "react-router-dom";
+import { Link } from "react-router-dom";
 import "./brand8seconds.css";
 import { buyNow } from "../../utils/buynow";
 
@@ -59,16 +59,14 @@ const lookbook = [
 const SIZES = ["XS", "S", "M", "L", "XL"];
 
 export default function Brand8SecondsDetail() {
-  const navigate = useNavigate();
-
   const total = useMemo(
     () => sampleProducts.reduce((a, c) => a + (c.price || 0), 0),
     []
   );
 
   // 카드별 사이즈 선택 UI 오픈/선택 상태
-  const [openSku, setOpenSku] = useState(null);        // 열려있는 상품 id
-  const [pickedSize, setPickedSize] = useState({});    // { [sku]: "M" }
+  const [openSku, setOpenSku] = useState(null); // 열려있는 상품 id
+  const [pickedSize, setPickedSize] = useState({}); // { [sku]: "M" }
 
   const openPicker = (sku) => {
     setOpenSku((prev) => (prev === sku ? null : sku));
@@ -80,19 +78,18 @@ export default function Brand8SecondsDetail() {
 
   const onBuy = (p) => {
     const size = pickedSize[p.id];
-    if (!size) return; // 방어
+    if (!size) return; 
 
-    // buyNow(상품, 수량, navigate, 옵션)
     buyNow(
       {
         id: p.id,
         name: p.name,
+        brand: "8SECONDS",
         price: p.price,
-        image: p.image,
+        image: p.image, 
+        size, 
       },
-      1,
-      navigate,
-      { size }
+      1
     );
   };
 
@@ -225,7 +222,9 @@ export default function Brand8SecondsDetail() {
                       </div>
 
                       {!curSize && (
-                        <div className="sizebox-warn">사이즈를 선택해주세요</div>
+                        <div className="sizebox-warn">
+                          사이즈를 선택해주세요
+                        </div>
                       )}
                     </div>
                   )}

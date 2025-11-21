@@ -100,8 +100,9 @@ export default function PaymentGateway() {
       }
 
       // 3) 장바구니/임시 주문 청소
-      localStorage.removeItem("pendingOrder");
       localStorage.removeItem("cartCheckout");
+      localStorage.removeItem("directCheckout");
+      localStorage.removeItem("orderSource");
       localStorage.removeItem("lastPayment");
 
       // 장바구니 비우기 (헤더 카운트 갱신 이벤트 발송)

@@ -59,17 +59,6 @@ export default function Signup() {
     minLength: false,
   });
 
-  // 휴대폰 인증에서 넘어온 경우 번호 및 이름 자동 입력
-//   useEffect(() => {
-//     if (location.state?.verifiedPhone) {
-//       setForm((prev) => ({
-//         ...prev,
-//         phone: location.state.verifiedPhone,
-//         name: location.state.verifiedName || ""
-//       }));
-//     }
-//   }, [location.state]);
-
   // 마케팅 채널 변경 시 마케팅 동의 상태 자동 업데이트
   useEffect(() => {
     const allChannelsChecked = marketingChannels.sms && marketingChannels.email && marketingChannels.dm && marketingChannels.tm;
@@ -276,24 +265,34 @@ export default function Signup() {
     }
 
     // 신규 회원 웰컴 쿠폰 발급 (AuthContext의 중복 방지 함수 사용)
-    issueWelcomeCouponIfNeeded();
+    //issueWelcomeCouponIfNeeded();
 
-    const idResult = await dispatch(getIdCheck(form.email));
+    try {
+      const idResult = await dispatch(getIdCheck(form.email));
 
-    if(!idResult) {
-      const signResult = await dispatch(getSignup(form, "ssf"));
-        if(signResult != null) {
-           alert("회원가입이 완료되었습니다! 🎉");
-           navigate("/login");
-        } else {
-           alert("회원가입에 실패하셨습니다.");
+      if (!idResult) {
+        try {
+          const signResult = await dispatch(getSignup(form, "ssf"));
+          if (signResult) {
+            alert("회원가입이 완료되었습니다! 🎉");
+            navigate("/login");
+          } else {
+            alert("회원가입에 실패하셨습니다.");
+          }
+        } catch (signupErr) {
+          console.error("회원가입 에러:", signupErr);
+          alert("회원가입 중 오류가 발생했습니다.");
         }
-    } else {
-      alert("이미 가입된 이메일 주소 입니다.");
-      setValidation((prev) => ({
-        ...prev,
-        email: { valid: false, message: "이미 가입된 이메일입니다." },
-      }));
+      } else {
+        alert("이미 가입된 이메일 주소 입니다.");
+        setValidation((prev) => ({
+          ...prev,
+          email: { valid: false, message: "이미 가입된 이메일입니다." },
+        }));
+      }
+    } catch (idErr) {
+      console.error("ID 체크 에러:", idErr);
+      alert("아이디 확인 중 오류가 발생했습니다.");
     }
   };
 

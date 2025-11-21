@@ -6,6 +6,7 @@ import { useDispatch, useSelector } from "react-redux";
 import { fetchDefaultAddress, fetchAddressList, deleteAddress } from "../../feature/order/orderAPI.js";
 import { openKakaoPostCode } from "../../utils/postCode.js";
 import CardOptionModal from "../../components/order/CardOptionModal.jsx";
+import { getPayment } from "../../feature/payment/paymentAPI.js";
 
 const toNumber = (v) =>
   typeof v === "number" ? v : Number(String(v ?? "").replace(/[^\d]/g, "")) || 0;
@@ -79,8 +80,15 @@ const getCheckoutPayload = (location) => {
   const fromState = location?.state?.order;
   if (fromState) return [normalizeOrderItem(fromState)].filter(Boolean);
 
-  const pendingOrder = readJSON("pendingOrder", null);
-  if (pendingOrder) return [normalizeOrderItem(pendingOrder)].filter(Boolean);
+  const orderSource = localStorage.getItem("orderSource");
+  if (orderSource === "direct") {
+    const directCheckout = readJSON("directCheckout", null);
+    if (Array.isArray(directCheckout) && directCheckout.length > 0) {
+      return directCheckout
+        .map((item) => normalizeOrderItem(item))
+        .filter(Boolean);
+    }
+  }
 
   const cartCheckout = readJSON("cartCheckout", null);
   if (Array.isArray(cartCheckout) && cartCheckout.length > 0) {
@@ -160,7 +168,7 @@ export default function Checkout() {
   const [saveAsDefault, setSaveAsDefault] = useState(false);
 
   // 결제 방법 상태
-  const [payMethod, setPayMethod] = useState("card");
+  const [payMethod, setPayMethod] = useState("kakao");
   const [cardBrand, setCardBrand] = useState("");
   const [installment, setInstallment] = useState("일시불");
 
@@ -198,6 +206,25 @@ export default function Checkout() {
   }, [defaultAddress, fillAddressForm]);
 
   const { methods: paymentMethods, cardBrands, installments } = paymentData;
+  const kakaoMethod = useMemo(
+    () => paymentMethods.find((m) => m.key === "kakao"),
+    [paymentMethods]
+  );
+  const paymentCards = useMemo(() => {
+    const cards = [];
+    if (kakaoMethod) {
+      cards.push(kakaoMethod);
+    }
+    cards.push({
+      key: "comingsoon",
+      label: "준비 중입니다",
+      icon: "⏳",
+      banner: null,
+      disabled: true,
+      description: "다른 결제수단 준비중입니다",
+    });
+    return cards;
+  }, [kakaoMethod]);
 
   // 주소찾기 팝업 상태
   const [isPostcodeOpen, setIsPostcodeOpen] = useState(false);
@@ -297,8 +324,30 @@ export default function Checkout() {
   const total = Math.max(0, subtotal - discount + shipping);
 
   useEffect(() => {
-    // console.log("[DEBUG] items:", items);
+//     console.log("[DEBUG] items:", items);
   }, [items]);
+
+
+  //결제 정보 저장
+  const [paymentInfo, setPaymentInfo] = useState({
+    "shippingFee": shipping,
+    "discountAmount": discount,
+    "totalAmount": total
+  });
+
+  const handlePayment = async() => {
+       const receiver = {
+         name: name,
+         phone: phone,
+         zipcode: postcode,
+         address1: address,
+         address2: addressDetail,
+         memo: memo
+       };
+
+       const orderSource = localStorage.getItem("orderSource") || "cart";
+       const result = await getPayment(receiver, paymentInfo, items, total, orderSource);
+  }
 
   const goPaymentMethod = () => {
     const payloadData = {
@@ -309,6 +358,20 @@ export default function Checkout() {
       total,
       coupon: selectedCoupon ? { ...selectedCoupon, discount } : null,
     };
+
+    // 구조 고민민
+//     const buildPayload = useCallback(
+//       () => ({
+//         items: compactItems,
+//         subtotal,
+//         discount,
+//         shipping,
+//         total,
+//         coupon: selectedCoupon ? { ...selectedCoupon, discount } : null,
+//       }),
+//       [compactItems, subtotal, discount, shipping, total, selectedCoupon]
+//     );
+//
 
     try {
       localStorage.setItem("lastCheckout", JSON.stringify(payloadData));
@@ -334,7 +397,8 @@ export default function Checkout() {
   const placeOrderForDemo = () => {
     markCouponUsed(selectedCoupon);
     localStorage.removeItem("cartCheckout");
-    localStorage.removeItem("pendingOrder");
+    localStorage.removeItem("directCheckout");
+    localStorage.removeItem("orderSource");
     alert(`결제가 완료되었습니다!\n총 ${items.length}개 상품\n결제 금액: ${formatKRW(total)}`);
     navigate("/order/success", { replace: true });
   };
@@ -540,21 +604,31 @@ export default function Checkout() {
         </div>
 
         <div className="pay-grid">
-          {paymentMethods.map((m) => (
-            <button
-              type="button"
-              key={m.key}
-              className={`pay-card ${payMethod === m.key ? "is-active" : ""}`}
-              onClick={() => setPayMethod(m.key)}
-              aria-pressed={payMethod === m.key}
-            >
-              {m.banner && <div className="pay-banner">{m.banner}</div>}
-              <div className="pay-card-content">
-                <PaymentIcon method={m} />
-                <span className="pay-label">{m.label}</span>
-              </div>
-            </button>
-          ))}
+          {paymentCards.map((m) => {
+            const isActive = payMethod === m.key;
+            const isDisabled = m.disabled;
+            return (
+              <button
+                type="button"
+                key={m.key}
+                className={`pay-card ${isActive ? "is-active" : ""} ${
+                  isDisabled ? "is-disabled" : ""
+                }`}
+                onClick={() => !isDisabled && setPayMethod(m.key)}
+                aria-pressed={isActive}
+                disabled={isDisabled}
+              >
+                {m.banner && <div className="pay-banner">{m.banner}</div>}
+                <div className="pay-card-content">
+                  <PaymentIcon method={m} />
+                  <span className="pay-label">{m.label}</span>
+                  {isDisabled && (
+                    <span className="pay-coming-note">{m.description}</span>
+                  )}
+                </div>
+              </button>
+            );
+          })}
         </div>
 
         {payMethod === "card" && (
@@ -609,7 +683,7 @@ export default function Checkout() {
           <b>{formatKRW(total)}</b>
         </div>
 
-        <button className="pay-btn" onClick={goPaymentMethod}>
+        <button className="pay-btn" onClick={handlePayment}>
           결제하기
         </button>
 

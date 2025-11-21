@@ -3,6 +3,8 @@ select * from ssf_category;
 select * from ssf_cart;
 select * from ssf_item;
 select * from ssf_addr;
+select * from ssf_order;
+select * from ssf_order_detail;
 show tables;
 
 USE ssf;

@@ -12,6 +12,8 @@ import Footer from "./components/Footer.jsx";
 
 import Home from "./pages/home/Home.jsx";
 import Menu from "./pages/menu/Menu.jsx";
+import Ranking from "./pages/Ranking.jsx";
+
 
 import Login from "./pages/auth/Login.jsx";
 import Signup from "./pages/auth/Signup.jsx";
@@ -118,6 +120,8 @@ function App() {
         {/* 홈/메뉴 */}
         <Route path="/" element={<Home />} />
         <Route path="/menu" element={<Menu />} />
+        <Route path="/ranking" element={<Ranking />} />
+
 
         {/* 로그인/회원가입 */}
         <Route path="/login" element={<Login />} />
@@ -136,7 +140,7 @@ function App() {
         <Route path="/checkout" element={<PrivateRoute><Checkout /></PrivateRoute>} />
         <Route path="/order/success" element={<OrderSuccess />} />
         <Route path="/mypage/orders" element={<PrivateRoute><MyOrders /></PrivateRoute>} />
-        <Route path="/pay/confirm" element={<PrivateRoute><PayConfirm /></PrivateRoute>} />
+        <Route path="/payConfirm" element={<PrivateRoute><PayConfirm /></PrivateRoute>} />
         <Route path="/pay" element={<PrivateRoute><PaySelect /></PrivateRoute>} />
 
         {/* 고객센터/회사/정책 */}
