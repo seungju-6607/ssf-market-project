@@ -1,9 +1,11 @@
 import { createAsyncThunk, createSlice } from "@reduxjs/toolkit";
-import { marketAPI } from "./marketAPI.js";
+import { marketAPI, getCreatePost, fetchListingsAPI } from "./marketAPI.js";
+import { axiosPost } from '../../utils/dataFetch.js';
 
 export const fetchListings = createAsyncThunk(
   "market/fetchListings",
-  async (params) => await marketAPI.list(params || {})
+//  async (params) => await marketAPI.list(params || {})
+  async (params) => await fetchListingsAPI(params || {})  // API 호출 후 데이터 반환
 );
 
 export const fetchOne = createAsyncThunk(
@@ -17,7 +19,11 @@ export const fetchOne = createAsyncThunk(
 
 export const createListing = createAsyncThunk(
   "market/createListing",
-  async (payload) => await marketAPI.create(payload)
+//  async (payload) => await marketAPI.create(payload)
+  async (payload) => {
+    const res = await axiosPost("/market/add", payload);
+    return res; // 서버에서 반환한 새 게시글
+  }
 );
 
 export const updateListing = createAsyncThunk(
@@ -43,7 +49,11 @@ const marketSlice = createSlice({
      .addCase(fetchListings.rejected, (s, a) => { s.loading = false; s.error = a.error?.message || "목록 실패"; });
 
     b.addCase(fetchOne.pending, (s) => { s.loading = true; s.error = null; })
-     .addCase(fetchOne.fulfilled, (s, a) => { s.loading = false; s.current = a.payload; })
+     .addCase(fetchOne.fulfilled, (s, a) => {
+        s.loading = false;
+        s.current = a.payload;
+        console.log("Updated items:", s.items);
+     })
      .addCase(fetchOne.rejected, (s, a) => { s.loading = false; s.error = a.error?.message || "상세 실패"; });
 
     b.addCase(createListing.fulfilled, (s, a) => { s.items.unshift(a.payload); });

@@ -166,6 +166,7 @@ LIMIT 0, 1000;
 ****************************************/
 CREATE TABLE ssf_order (
 	order_key			INT				AUTO_INCREMENT				NOT NULL					COMMENT '주문번호',
+    order_uuid			VARCHAR(50)									NOT NULL					COMMENT '주문UUID',
 	user_key			VARCHAR(100)								NOT NULL					COMMENT '회원고유번호',
 	order_price			INT											NOT NULL					COMMENT '총결제금액',
     order_card			VARCHAR(20)									NULL						COMMENT '결제카드회사',
@@ -174,26 +175,37 @@ CREATE TABLE ssf_order (
     order_name			VARCHAR(15)									NOT NULL					COMMENT '받는분성명',
     order_zipcode		VARCHAR(6)									NOT NULL					COMMENT '우편번호',
     order_addr			VARCHAR(300)								NOT NULL					COMMENT '받는분주소',
-    ordder_addr_detail	VARCHAR(300)								NOT NULL					COMMENT '상세주소',
+    order_addr_detail	VARCHAR(300)								NOT NULL					COMMENT '상세주소',
     order_tel			VARCHAR(15)									NOT NULL					COMMENT '받는분전화번호',
 	order_req			VARCHAR(100)								NULL						COMMENT '배송시요청사항',
-    order_item_cnt		INT											NULL						COMMENT '주문상품개수',
-    order_item_name		VARCHAR(150)								NULL						COMMENT '대표상품',
-    order_item_img		VARCHAR(600)								NULL						COMMENT '대표이미지',
     PRIMARY KEY (order_key),
-    CONSTRAINT fk_ssf_order_ssf_user FOREIGN KEY(user_key)	references ssf_user(user_key)
+    CONSTRAINT fk_ssf_order_ssf_user FOREIGN KEY(user_key)	references ssf_user(user_key),
+    UNIQUE (order_uuid)
 );
+
+-- varchar라 index 필요
+CREATE INDEX idx_order_uuid ON ssf_order(order_uuid);
 
 CREATE TABLE ssf_order_detail (
 	order_detail_key 	INT				AUTO_INCREMENT				NOT NULL					COMMENT '주문상세번호',
-	order_key			INT											NOT NULL					COMMENT '주문번호',
+	order_uuid			VARCHAR(50)									NOT NULL					COMMENT '주문UUID',
 	item_key			INT											NOT NULL					COMMENT '상품고유번호',
     order_detail_price	INT											NULL						COMMENT '가격',
     order_detail_cnt	INT				DEFAULT 1					NULL						COMMENT '개수',
     PRIMARY KEY (order_detail_key),
-    CONSTRAINT fk_ssf_order_detail_ssf_order FOREIGN KEY(order_key)	references ssf_order(order_key),
+    CONSTRAINT fk_ssf_order_detail_ssf_order FOREIGN KEY(order_uuid) references ssf_order(order_uuid),
     CONSTRAINT fk_ssf_order_detail_ssf_item FOREIGN KEY(item_key)	references ssf_item(item_key)
 );
+
+ -- ALTER TABLE ssf_order
+ -- CHANGE COLUMN ordder_addr_detail order_addr_detail VARCHAR(300) NOT NULL;
+ 
+-- ALTER TABLE ssf_order_detail 
+-- ADD COLUMN order_uuid VARCHAR(50) NOT NULL COMMENT '주문UUID';
+
+drop table ssf_order;
+drop table ssf_order_detail;
+
 
 /****************************************
 * 작업내용 : flea_market 테이블 생성
@@ -206,13 +218,15 @@ CREATE TABLE flea_market (
 	flea_key		INT				AUTO_INCREMENT			NOT NULL		COMMENT '판매글번호',
 	user_key		VARCHAR(100)							NOT NULL		COMMENT '회원고유번호',
     flea_name		VARCHAR(15)								NOT NULL		COMMENT '판매자성명',
-    flea_email		VARCHAR(15)								NULL			COMMENT '판매자이메일',
+    flea_email		VARCHAR(50)								NULL			COMMENT '판매자이메일',
+    flea_id			VARCHAR(50)								NOT NULL		COMMENT '판매자회원id',
     flea_title		VARCHAR(150)							NOT NULL		COMMENT '판매글제목',
 	flea_price		INT										NOT NULL		COMMENT '플리마켓가격',
 	flea_category	VARCHAR(100)							NOT NULL		COMMENT '판매글카테고리',
 	flea_content	VARCHAR(1000)							NULL			COMMENT '판매글설명',
-    flea_list		JSON									NULL			COMMENT '이미지리스트',
-	flea_sale		VARCHAR(1) 		DEFAULT 'N'				NOT NULL		COMMENT '판매여부',
+    flea_list		VARCHAR(1000)							NULL			COMMENT '이미지리스트',
+	flea_sale		VARCHAR(1) 		DEFAULT 'N'				NULL			COMMENT '판매여부',
+    flea_rdate		DATETIME	DEFAULT CURRENT_TIMESTAMP	NULL			COMMENT '판매글등록/수정날짜',
     PRIMARY KEY (flea_key),
     CONSTRAINT fk_flea_market_ssf_user FOREIGN KEY(user_key)	references ssf_user(user_key)
 );
@@ -220,6 +234,7 @@ CREATE TABLE flea_market (
 use ssf;
 show tables;
 desc flea_market;
+drop table flea_market;
 
 
 

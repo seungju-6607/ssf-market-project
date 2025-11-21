@@ -99,6 +99,8 @@ export default function CartPage() {
     }));
 
     localStorage.setItem("cartCheckout", JSON.stringify(payload));
+    localStorage.setItem("orderSource", "cart");
+    localStorage.removeItem("directCheckout");
     navigate("/checkout", { state: { fromCart: true } });
   };
 

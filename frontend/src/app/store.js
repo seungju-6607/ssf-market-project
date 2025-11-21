@@ -3,6 +3,7 @@ import authSlice from '../feature/auth/authSlice.js'
 import cartSlice from '../feature/cart/cartSlice.js'
 import marketReducer from "../feature/market/marketSlice.js";
 import orderSlice from '../feature/order/orderSlice.js';
+import paymentSlice from '../feature/payment/paymentSlice.js';
 
 // 액션 로깅 처리 담당 미들웨어
 const myLoggerMiddleware = (store) => (next) => (action) => {
@@ -30,5 +31,6 @@ export const store = configureStore({
     "cart": cartSlice,
     market: marketReducer,
     "order": orderSlice,
+    "payment": paymentSlice,
   },
 })

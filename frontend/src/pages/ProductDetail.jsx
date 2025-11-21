@@ -103,6 +103,7 @@ export default function ProductDetail() {
   const [size, setSize] = useState("");
   const [qty, setQty] = useState(1);
   const [isWished, setIsWished] = useState(false);
+  const DIRECT_ITEM_KEY = 10001; // TODO: API 연동 시 치환 예정
 
   const [ratingInfo, setRatingInfo] = useState({ average: 0, count: 0 });
   const [reviews, setReviews] = useState([]);
@@ -164,8 +165,10 @@ export default function ProductDetail() {
 
   /* 장바구니에 상품 추가 */
   const addToCart = () => {
-    const testItemKey = 10001;
-    const testSize = "M";
+    if (!product) {
+      alert("상품 정보를 찾을 수 없습니다.");
+      return;
+    }
 
     if (!isLogin) {
       alert("로그인 후 이용해 주세요.");
@@ -173,8 +176,12 @@ export default function ProductDetail() {
       return;
     }
 
-    //dispatch(addCart(itemKey, size)); // 실제 사용 
-    dispatch(addCart(testItemKey, testSize)); // 테스트용
+    if (!size) {
+      alert("사이즈를 선택해 주세요.");
+      return;
+    }
+
+    dispatch(addCart(DIRECT_ITEM_KEY, size));
   };
 
 
@@ -191,7 +198,8 @@ export default function ProductDetail() {
 
     const payload = {
       product: {
-        id: product.id,
+        id: DIRECT_ITEM_KEY,
+        code: product.id,
         name: product.name || "",
         image: product.image || product.img,
         price: normalizedPrice,
@@ -200,7 +208,9 @@ export default function ProductDetail() {
       qty: Number(qty),
     };
 
-    localStorage.setItem("pendingOrder", JSON.stringify(payload));
+    localStorage.setItem("directCheckout", JSON.stringify([payload]));
+    localStorage.setItem("orderSource", "direct");
+    localStorage.removeItem("cartCheckout");
     localStorage.setItem("lastProduct", JSON.stringify(product));
 
     navigate("/checkout", { state: { order: payload } });
@@ -432,7 +442,7 @@ export default function ProductDetail() {
                 장바구니 담기
               </button>
               <button onClick={goCheckout} className="checkout-button">
-                주문하기
+                바로 결제
               </button>
             </div>
 

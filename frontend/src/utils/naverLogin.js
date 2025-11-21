@@ -48,7 +48,6 @@ export const logoutNaver = () => {
   }
 
   // naverLoginInstance.logout() 은 SDK에 따라 팝업 혹은 쿠키 세션 제거 방식
-  console.log("window.naver && window.naver.LoginWithNaverId => ", window.naver && window.naver.LoginWithNaverId);
   if (window.naver && window.naver.LoginWithNaverId) {
     naverLoginInstance.logout();
 
@@ -56,7 +55,6 @@ export const logoutNaver = () => {
     localStorage.removeItem("naver_access_token");
     localStorage.removeItem("naver_state_token");
 
-    console.log("네이버 로그아웃 완료");
   } else {
     console.warn("네이버 SDK가 로드되지 않아 로그아웃할 수 없습니다.");
   }
