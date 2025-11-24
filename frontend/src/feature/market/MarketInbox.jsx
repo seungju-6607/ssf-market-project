@@ -22,22 +22,23 @@ export default function MarketInbox() {
 
   useEffect(() => {
     if (!items || items.length === 0) dispatch(fetchListings({}));
-  }, [dispatch]); 
+  }, [dispatch]);
 
   const myListings = useMemo(() => {
     if (!isAuthenticated) return [];
     const me = user.id || user.email;
-    return (items || []).filter((x) => x.sellerId === me);
-  }, [items, isAuthenticated, user]);
+    return (items || []).filter((x) => x.fleaId === me)
+  }, [items, isAuthenticated, user.id, user.email]);
 
   useEffect(() => {
     (async () => {
       if (!isAuthenticated) return;
       const me = user.id || user.email;
-      const data = await messageAPI.listBySeller(me, { listingId: filterListingId || undefined });
+      const data = await messageAPI.listBySeller(me, { fleaKey : filterListingId || undefined });
+       console.log("data : ", data);
       setRows(data);
     })();
-  }, [isAuthenticated, user, filterListingId]);
+  }, [isAuthenticated, user.id, user.email, filterListingId]);
 
   if (!isAuthenticated) {
     return <div className="mk-container"><div className="mk-empty">로그인이 필요합니다.</div></div>;
@@ -61,18 +62,20 @@ export default function MarketInbox() {
         <div className="mk-empty">받은 문의가 없습니다.</div>
       ) : (
         <div className="mk-inbox">
-          {rows.map((row) => {
-            const item = myListings.find((x) => x.id === row.listingId);
+          {rows.map((row, idx) => {
+            console.log("row : ", row);
+            const item = myListings.find((x) => x.fleaKey === row.fleaKey);
+            console.log("item : ", item);
             return (
-              <Link key={row.key} to={`/market/${row.listingId}`} className="mk-inbox-row">
+              <Link key={idx} to={`/market/${row.fleaKey}`} className="mk-inbox-row">
                 <div className="mk-inbox-left">
-                  <div className="mk-inbox-title">{item?.title || row.listingId}</div>
+                  <div className="mk-inbox-title">{item?.fleaTitle || row.fleaKey}</div>
                   <div className="mk-inbox-meta">{new Date(row.last.createdAt).toLocaleString()}</div>
                 </div>
                 <div className="mk-inbox-right">
                   <div className="mk-inbox-last">
-                    <b>{row.last.senderName}</b>
-                    <div className="mk-inbox-snippet">{row.last.text}</div>
+                    <b>{row.senderName}</b>
+                    <div className="mk-inbox-snippet">{row.last.inquiryMsg}</div>
                   </div>
                   <div className="mk-inbox-count">{row.count}</div>
                 </div>

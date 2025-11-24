@@ -1,38 +1,56 @@
 // src/pages/order/MyOrders.jsx
-import React, { useEffect, useMemo, useState } from "react";
+import React, { useEffect, useMemo } from "react";
 import { Link, useNavigate } from "react-router-dom";
+import { useDispatch, useSelector } from "react-redux";
+import { fetchOrderHistory } from "../../feature/order/orderAPI.js";
 import "./MyOrders.css";
 
 const formatKRW = (n) => `₩${Number(n || 0).toLocaleString()}`;
 
 export default function MyOrders() {
   const navigate = useNavigate();
-  const [orders, setOrders] = useState(() => {
-    try { return JSON.parse(localStorage.getItem("orders")) || []; } catch { return []; }
-  });
+  const dispatch = useDispatch();
+  const orderHistory = useSelector((state) => state.order.orderHistory);
   const user = useMemo(() => {
     try { return JSON.parse(localStorage.getItem("loginUser")) || null; } catch { return null; }
   }, []);
 
+
   useEffect(() => {
-    try { setOrders(JSON.parse(localStorage.getItem("orders")) || []); }
-    catch { setOrders([]); }
-  }, []);
+    if (user?.email) {
+      dispatch(fetchOrderHistory());
+    }
+  }, [dispatch, user?.email]);
 
-  const mine = useMemo(() => {
-    if (!user?.email) return [];
-    return orders.filter((o) => (o.buyer?.email || "") === user.email);
-  }, [orders, user]);
+  // 날짜값을 YYYY.MM.DD 형식의 문자열로 바꿔줌
+  const formatDate = (dateValue) => {
 
-  const formatDate = (msOrIso) => {
-    if (!msOrIso) return "-";
-    const d = typeof msOrIso === "number" ? new Date(msOrIso) : new Date(msOrIso);
+    if (!dateValue) return "-";
+    let d = new Date(dateValue);
+    if (isNaN(d.getTime())) return "-";
+
     const y = d.getFullYear();
     const m = String(d.getMonth() + 1).padStart(2, "0");
     const day = String(d.getDate()).padStart(2, "0");
-    const hh = String(d.getHours()).padStart(2, "0");
-    const mm = String(d.getMinutes()).padStart(2, "0");
-    return `${y}-${m}-${day} ${hh}:${mm}`;
+
+    return `${y}.${m}.${day}`;
+  };
+
+  //imgList가 ["URL 문자열"] 형태여도 하나의 String으로 인식하기 때문에 파싱필요.
+  const extractThumb = (itemList) => {
+    if (!itemList) return null;
+    try {
+      const parsed = typeof itemList === "string" ? JSON.parse(itemList) : itemList;
+      if (Array.isArray(parsed) && parsed.length > 0) {
+
+        const first = parsed[0];
+        if (typeof first === "string") return first;
+
+      }
+    } catch (err) {
+      console.error("이미지 파싱 실패", err);
+    }
+    return null;
   };
 
   if (!user) {
@@ -49,50 +67,72 @@ export default function MyOrders() {
     <div className="my-orders-container">
       <h1 className="my-orders-title">주문내역</h1>
 
-      {mine.length === 0 ? (
+      {!orderHistory || orderHistory.length === 0 ? (
         <div className="empty-orders-container">
           <div>주문 내역이 없습니다.</div>
           <Link to="/" className="continue-shopping-link">쇼핑 계속하기</Link>
         </div>
-      ) : (
+        ) : (
         <div className="orders-list">
-          {mine.map((o) => (
-            <div key={o.id} className="order-item">
-              <div className="order-header">
-                <div className="order-id">주문번호 {o.id}</div>
-                <div className="order-date">{formatDate(o.createdAt)}</div>
-              </div>
 
-              <div className="order-body">
-                <div className="order-product">
-                  <img
-                    src={o.product?.image || o.product?.img || "/images/noimg.png"}
-                    alt={o.product?.name || "상품"}
-                    className="order-product-image"
-                    onError={(e)=>{e.currentTarget.src="/images/noimg.png"}}
-                  />
-                  <div className="order-info">
-                    <div className="order-name">{o.product?.name || "-"}</div>
-                    <div className="order-meta">
-                      <span>옵션: {o.option?.size || "-"}</span>
-                      <span style={{ marginLeft: 10 }}>수량: {o.qty || 1}개</span>
-                    </div>
-                  </div>
+          {/* 첫번째 그룹 반복 - UUID 기준 */}
+          {orderHistory.map((orderItems, orderIdx) => {
+            const firstItem = orderItems[0]; // 주문 정보는 첫 번째 아이템에서 가져오기
+            return (
+              <div key={firstItem.orderId} className="my-orders-item-group">
+                <div className="my-orders-date-label">
+                  {formatDate(firstItem.orderedAt)}
                 </div>
 
-                <div className="order-total">{formatKRW(o.total)}</div>
-              </div>
+                {/* 두번째 그룹 반복 - 위에서 가져온 orderItems 요소를 다시한번 map 돌린다. */}
+                {orderItems.map((o, idx) => {
+                  const thumb = extractThumb(o.itemList);
+                  return (
+                    <div key={`${o.orderId}-${idx}`} className="my-orders-item">
+                      <div className="my-orders-body">
+                        <div className="my-orders-product-image-wrapper">
+                          {thumb ? (
+                            <img
+                              src={thumb}
+                              alt={o.itemName || "상품"}
+                              className="my-orders-product-image"
+                              onError={(e) => {
+                                e.currentTarget.src = `${process.env.PUBLIC_URL}/images/placeholder.png`;
+                              }}
+                            />
+                          ) : (
+                            <div className="my-orders-product-image placeholder">
+                              <span>이미지 없음</span>
+                            </div>
+                          )}
+                        </div>
 
-              <div className="order-footer">
-                <span className="order-status">{o.status}</span>
-                {o.product?.id && (
-                  <Link to={`/product/${o.product.id}`} className="view-product-link">상품보기</Link>
-                )}
+                        <div className="my-orders-product-info">
+                          <div className="my-orders-product-name">{o.itemName || "-"}</div>
+                          <div className="my-orders-option">
+                            {o.itemSize && <span>사이즈: {o.itemSize}</span>}
+                            {o.itemSize && o.itemQty && <span>  </span>}
+                            {o.itemQty && <span>수량: {o.itemQty}</span>}
+                          </div>
+                        </div>
+
+                        <div className="my-orders-price-wrapper">
+                          <span className="my-orders-price">{formatKRW(o.itemPrice)}</span>
+                        </div>
+
+                        <div className="my-orders-status-wrapper">
+                          <span className="my-orders-status">결제완료</span>
+                        </div>
+                      </div>
+                    </div>
+                  );
+                })}
               </div>
-            </div>
-          ))}
+            );
+          })}
         </div>
-      )}
+        )
+      }
     </div>
-  );
+  )
 }

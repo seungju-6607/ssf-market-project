@@ -1,10 +1,9 @@
 package com.ssf.project.service;
 
-import com.ssf.project.dto.CartItemDto;
-import com.ssf.project.dto.CartListResponseDto;
-import com.ssf.project.dto.FleamarketDto;
-import com.ssf.project.dto.FleamarketListResponseDto;
+import com.ssf.project.dto.*;
+import com.ssf.project.entity.CartItem;
 import com.ssf.project.entity.Fleamarket;
+import com.ssf.project.entity.Message;
 import com.ssf.project.repository.JpaFleamarketRepository;
 import com.ssf.project.repository.JpaCartRepository;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -28,16 +27,40 @@ public class FleamarketServiceImpl implements FleamarketService{
     }
 
     @Override
+    public List<FleamarketMsgDto> findMsgByBuyer(FleamarketMsgDto fleamarketMsgDto) {
+        return jpaFleamarketRepository.findMsgByBuyer(fleamarketMsgDto.getFleaKey(),
+                                                    fleamarketMsgDto.getBuyerId(),
+                                                    fleamarketMsgDto.getSellerId());
+    }
+
+    @Override
+    public List<FleamarketMsgDto> findMsgBySeller(FleamarketMsgDto fleamarketMsgDto) {
+        return jpaFleamarketRepository.findMsgBySeller(fleamarketMsgDto.getFleaKey(),
+                                                    fleamarketMsgDto.getBuyerId(),
+                                                    fleamarketMsgDto.getSellerId());
+    }
+
+    @Override
     public List<FleamarketListResponseDto> findAllList() {
         return jpaFleamarketRepository.findAllList();
     }
 
+    @Override
+    public List<FleamarketListResponseDto> findFilterList(FleamarketDto fleamarketDto) {
+        return jpaFleamarketRepository.findFilterList(fleamarketDto.getFleaSale(),
+                                                    fleamarketDto.getFleaCategory(),
+                                                    fleamarketDto.getFilterWord());
+    }
+
+    @Override
+    public List<FleamarketListResponseDto> getByFleaKey(FleamarketDto fleamarketDto) {
+        return jpaFleamarketRepository.getByFleaKey(fleamarketDto.getFleaKey());
+    }
 
     @Override
     public int add(FleamarketDto fleamarketDto) {
         String email = fleamarketDto.getFleaId();
         String userKey = jpaCartRepository.findUserKeyByEmail(email);
-        System.out.println("fleamarketDto.getFleaList() --> " + fleamarketDto.getFleaList());
         Fleamarket entity = new Fleamarket();
         entity.setUserKey(userKey);
         entity.setFleaSale("N");
@@ -56,5 +79,16 @@ public class FleamarketServiceImpl implements FleamarketService{
         return saved != null ? 1 : 0;
     }
 
+    @Override
+    public int add(FleamarketMsgDto fleamarketMsgDto) {
+        int rows = jpaFleamarketRepository.msgBuySave(
+                fleamarketMsgDto.getFleaKey(),
+                fleamarketMsgDto.getBuyerId(),
+                fleamarketMsgDto.getSellerId(),
+                fleamarketMsgDto.getSenderId(),
+                fleamarketMsgDto.getSenderName(),
+                fleamarketMsgDto.getInquiryMsg());
+        return rows;
+    }
 
 }

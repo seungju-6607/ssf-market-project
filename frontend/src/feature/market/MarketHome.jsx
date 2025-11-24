@@ -57,7 +57,9 @@ export default function MarketHome() {
         <div className="mk-empty">불러오는 중…</div>
       ) : items.length ? (
         <div className="mk-grid">
-          {items.map((it) => <ListingCard key={it.fleaKey} item={it} />)}
+          {items.map((item) => (
+            <ListingCard key={item.fleaKey} item={item} />
+          ))}
         </div>
       ) : (
         <div className="mk-empty">게시글이 없습니다.</div>

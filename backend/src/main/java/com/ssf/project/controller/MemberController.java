@@ -1,9 +1,11 @@
 package com.ssf.project.controller;
 
-import com.ssf.project.dto.MemberDto;
 import com.ssf.project.dto.MemberAddrDto;
+import com.ssf.project.dto.MemberDto;
+import com.ssf.project.dto.OrderHistoryDto;
 import com.ssf.project.repository.MemberRepository;
 import com.ssf.project.service.MemberService;
+import com.ssf.project.service.OrderService;
 import org.springframework.beans.factory.annotation.Autowired;
 import jakarta.servlet.http.*;
 import org.springframework.http.ResponseEntity;
@@ -12,10 +14,7 @@ import org.springframework.security.authentication.UsernamePasswordAuthenticatio
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.web.context.HttpSessionSecurityContextRepository;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 import java.util.Map;
@@ -28,6 +27,7 @@ public class MemberController {
     private final AuthenticationManager authenticationManager;
     private final HttpSessionSecurityContextRepository contextRepository;
     private final MemberRepository memberRepository;
+    private final OrderService orderService;
 
     // 서비스 객체 가져오기
     private final MemberService memberService;
@@ -37,11 +37,13 @@ public class MemberController {
     public MemberController(MemberService memberService,
                             AuthenticationManager authenticationManager,
                             HttpSessionSecurityContextRepository contextRepository,
-                            MemberRepository memberRepository) {
+                            MemberRepository memberRepository,
+                            OrderService orderService) {
         this.memberService = memberService;
         this.authenticationManager = authenticationManager;
         this.contextRepository = contextRepository;
         this.memberRepository = memberRepository;
+        this.orderService = orderService;
     }
 
     @PostMapping("/idcheck")
@@ -207,5 +209,19 @@ public class MemberController {
         Integer addrKey = Integer.valueOf(request.get("addrKey").toString());
         memberService.deleteAddress(addrKey);
         return ResponseEntity.ok(Map.of("success", "true", "message", "배송지가 삭제되었습니다."));
+    }
+
+    /**
+     * 배송지 저장
+     */
+    @PostMapping("/saveAddr")
+    public int saveAddr(@RequestBody MemberAddrDto memberAddrDto) {
+        return memberService.saveAddr(memberAddrDto);
+    }
+
+    @PostMapping("/orderhistory")
+    public List<List<OrderHistoryDto>> orderHistory(@RequestBody Map<String, String> request) {
+        String email = request.get("email");
+        return orderService.findOrderHistory(email);
     }
 }

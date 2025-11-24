@@ -1,5 +1,5 @@
 import { createAsyncThunk, createSlice } from "@reduxjs/toolkit";
-import { marketAPI, getCreatePost, fetchListingsAPI } from "./marketAPI.js";
+import { marketAPI, getCreatePost, fetchListingsAPI, getByFleaKey } from "./marketAPI.js";
 import { axiosPost } from '../../utils/dataFetch.js';
 
 export const fetchListings = createAsyncThunk(
@@ -10,10 +10,11 @@ export const fetchListings = createAsyncThunk(
 
 export const fetchOne = createAsyncThunk(
   "market/fetchOne",
-  async (id) => {
-    const item = await marketAPI.get(id);
+  async (fleaKey) => {
+//    const item = await marketAPI.get(fleaKey);
+    const item = await getByFleaKey(fleaKey);
     if (!item) throw new Error("NOT_FOUND");
-    return item;
+    return Array.isArray(item) ? item[0] : item;
   }
 );
 
@@ -52,7 +53,7 @@ const marketSlice = createSlice({
      .addCase(fetchOne.fulfilled, (s, a) => {
         s.loading = false;
         s.current = a.payload;
-        console.log("Updated items:", s.items);
+//        console.log("Updated items:", s);
      })
      .addCase(fetchOne.rejected, (s, a) => { s.loading = false; s.error = a.error?.message || "상세 실패"; });
 

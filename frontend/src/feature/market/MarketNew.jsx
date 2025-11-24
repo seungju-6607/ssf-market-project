@@ -2,32 +2,10 @@
 import React, { useState, useEffect, useRef } from "react";
 import { useDispatch } from "react-redux";
 import { createListing } from "./marketSlice.js";
-import { getCreatePost } from "./marketAPI.js";
 import "./market.css";
 import { useNavigate } from "react-router-dom";
 import { useMarketAuth } from "./authBridge.js";
-import { saveImageToIndexedDB, getImageFromIndexedDB, deleteImageFromIndexedDB } from "../../utils/imageUtils.js";
-
-// const toBase64 = (file) =>
-//   new Promise((res, rej) => {
-//     const fr = new FileReader();
-//     fr.onload = () => res(String(fr.result));
-//     fr.onerror = rej;
-//     fr.readAsDataURL(file);
-//   });
-
-// Base64 변환 (PNG, JPG, GIF 등)
-const toBase64 = (file) =>
-  new Promise((resolve, reject) => {
-    if (!(file instanceof File)) return reject(new Error("File 타입이 아닙니다."));
-    const reader = new FileReader();
-    reader.onload = () => {
-      if (typeof reader.result === "string") resolve(reader.result);
-      else reject(new Error("Base64 변환 실패"));
-    };
-    reader.onerror = () => reject(new Error("파일 읽기 실패"));
-    reader.readAsDataURL(file);
-  });
+import { fileToBase64, uploadImagesToServer } from "../../utils/imageUtils.js";
 
 const isEmail = (v) => /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(String(v || "").trim());
 const toNumber = (v) =>
@@ -45,60 +23,26 @@ export default function MarketNew() {
   const [description, setDescription] = useState("");
   const [images, setImages] = useState([]);
   const [imagePreviews, setImagePreviews] = useState([]); // base64 형식 이미지 미리보기 배열
+  const [selectedFiles, setSelectedFiles] = useState([]); // 실제 File 객체
   const [sellerName, setSellerName] = useState(user?.name || "");
   const [sellerEmail, setSellerEmail] = useState(user?.email || "");
   const [submitting, setSubmitting] = useState(false);
 
-  // 파일 선택 후 base64로 변환해서 IndexedDB에 저장
   const onFiles = async (files) => {
-    setImagePreviews([]); // 미리보기 초기화
+    const list = [...files].slice(0, 6 - selectedFiles.length); // 최대 6장
+    if (!list.length) return;
 
-    try {
-      const list = [...files].slice(0, 6 - images.length);
-      const keys = await Promise.all(
-        list.map(async (file) => {
-          const base64 = await toBase64(file);
-          const key = Date.now() + Math.random().toString(36).slice(2); // 고유 키 생성
-          await saveImageToIndexedDB(key, base64); // IndexedDB에 이미지 저장
-          return key; // key 반환
-        })
-      );
-      setImages(keys); // 새로 선택한 파일만 저장
-    } catch (error) {
-      alert("이미지 파일을 불러오지 못했습니다. 다시 시도해주세요.");
-    }
+    setSelectedFiles((prev) => [...prev, ...list]);
+
+    const previews = await Promise.all(list.map(fileToBase64));
+    setImagePreviews((prev) => [...prev, ...previews]);
   };
 
-  useEffect(() => {
-    const fetchPreviews = async () => {
-      if (!images.length) {
-        setImagePreviews([]);
-        return;
-      }
-      try {
-        const previews = await Promise.all(
-          images.map(async (key) => {
-            const base64 = await getImageFromIndexedDB(key);
-            return base64 || ""; // null이면 빈 문자열로
-          })
-        );
-        setImagePreviews(previews);
-      } catch (err) {
-        console.error("이미지 불러오기 실패", err);
-        setImagePreviews([]);
-      }
-    };
-    fetchPreviews();
-  }, [images]);
-
   // 이미지 삭제
-  const onDeleteImage = async (key) => {
-    try {
-      await deleteImageFromIndexedDB(key);
-      setImages((prev) => prev.filter((k) => k !== key));
-    } catch (err) {
-      console.error("이미지 삭제 실패", err);
-    }
+  const onDeleteImage = (index) => {
+    setSelectedFiles((prev) => prev.filter((_, i) => i !== index));
+    setImagePreviews((prev) => prev.filter((_, i) => i !== index));
+    setImages((prev) => prev.filter((_, i) => i !== index));
   };
 
   const onSubmit = async (e) => {
@@ -122,30 +66,35 @@ export default function MarketNew() {
       }
     }
 
-    const payload = {
-      title: titleTrim,
-      price: priceNum,
-      category,
-      description,
-      images: JSON.stringify(images),
-      sellerId: (user?.id || user?.email) ?? `guest:${Date.now()}`,
-      sellerName: sellerName.trim() || user?.name || (user?.email ? user.email.split("@")[0] : "USER"),
-      sellerEmail: (sellerEmail || user?.email || "").trim(),
-      createdAt: new Date().toISOString(),
-      status: "FOR_SALE",
-    };
+    setSubmitting(true);
 
     try {
-      const postResult = await dispatch(createListing(payload)).unwrap();
-      if (postResult == 1)
-      setSubmitting(true);
+      // 이미지 서버 업로드
+      const uploadedKeys = await uploadImagesToServer(selectedFiles);
+      setImages(uploadedKeys);
+
+      const payload = {
+        title: titleTrim,
+        price: priceNum,
+        category,
+        description,
+        images: JSON.stringify(uploadedKeys),
+        sellerId: user?.id ?? `guest:${Date.now()}`,
+        sellerName: sellerName.trim() || user?.name || (user?.email ? user.email.split("@")[0] : "USER"),
+        sellerEmail: (sellerEmail || user?.email || "").trim(),
+        createdAt: new Date().toISOString(),
+        status: "FOR_SALE",
+      };
+
+      await dispatch(createListing(payload)).unwrap();
       alert("정상적으로 등록되었습니다.");
       navigate("/market");
-    } catch (postErr) {
+    } catch (err) {
+      console.error("판매글 등록 에러:", err);
+      alert("등록 중 오류가 발생했습니다.");
       setSubmitting(false);
-      console.error("판매글 등록 에러:", postErr);
-      alert("판매글 등록 중 오류가 발생했습니다.");
     }
+
   };
 
   return (
@@ -220,19 +169,13 @@ export default function MarketNew() {
           )}
         </div>
 
-        {/* 이미지 파일 선택 */}
         <label>
           이미지(최대 6장)
           <div className="mk-file-input-wrapper">
             <button
               type="button"
               className="mk-file-input-button"
-              onClick={() => {
-                // 클릭 시 기존 이미지 초기화
-                setImagePreviews([]);
-                setImages([]);
-                fileInputRef.current.click();
-              }}
+              onClick={() => fileInputRef.current.click()}
             >
               파일 선택
             </button>
@@ -244,22 +187,25 @@ export default function MarketNew() {
               className="mk-file-input"
               onChange={(e) => {
                 onFiles(e.target.files);
-                e.target.value = ""; // 같은 파일 재선택 시 이벤트 발생
+                e.target.value = "";
               }}
             />
           </div>
         </label>
 
-        {/* 이미지 미리보기 */}
         {imagePreviews.length > 0 && (
           <div className="mk-previews">
             {imagePreviews.map((src, i) => (
-             <div key={i} className="mk-preview-item">
-               <img className="mk-preview-img" src={src || ""} alt={`img-${i}`} />
-               <button type="button" className="mk-preview-delete" onClick={() => onDeleteImage(images[i])}>
-                 ×
-               </button>
-             </div>
+              <div key={i} className="mk-preview-item">
+                <img className="mk-preview-img" src={src} alt={`img-${i}`} />
+                <button
+                  type="button"
+                  className="mk-preview-delete"
+                  onClick={() => onDeleteImage(i)}
+                >
+                  ×
+                </button>
+              </div>
             ))}
           </div>
         )}

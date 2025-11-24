@@ -12,7 +12,8 @@ export const getPayment = async (receiver, paymentInfo, cartList, total, orderSo
         ? safeList.map(item => ({
             itemKey: item.product.id,
             itemPrice: parseInt(item.product.price),
-            itemQty: parseInt(item.qty || 1)
+            itemQty: parseInt(item.qty || 1),
+            itemSize: item.size || ""
         }))
         : [];
     const firstItemName = safeList[0]?.product?.name || "주문상품";

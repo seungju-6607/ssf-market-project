@@ -18,12 +18,12 @@ public interface JpaOrderRepository extends JpaRepository<Order, Integer> {
             insert into ssf_order (
                   order_uuid, user_key, order_price, order_status, order_name,
                  order_zipcode, order_addr, order_addr_detail, order_tel,
-                 order_req
+                 order_req, order_date
             )
             select
                 :#{#order.order_code}, u.user_key, :#{#order.order_price}, :#{#order.order_status}, :#{#order.order_name},
                  :#{#order.order_zipcode}, :#{#order.order_addr}, :#{#order.order_addr_detail}, :#{#order.order_tel},
-                 :#{#order.order_req}
+                 :#{#order.order_req}, NOW()
             from ssf_user u
             where u.email = :email
             """, nativeQuery = true)
@@ -33,9 +33,9 @@ public interface JpaOrderRepository extends JpaRepository<Order, Integer> {
     @Modifying
     @Query(value = """
             insert into ssf_order_detail (
-                order_uuid, item_key, order_detail_price, order_detail_cnt
+                order_uuid, item_key, order_detail_price, order_detail_cnt, order_detail_size
             )
-            select :orderUUID, c.item_key, i.item_sale, c.cart_qty
+            select :orderUUID, c.item_key, i.item_sale, c.cart_qty, c.cart_size
             from ssf_cart c
             inner join ssf_item i on i.item_key = c.item_key
             inner join ssf_order o on o.user_key = c.user_key
@@ -46,14 +46,15 @@ public interface JpaOrderRepository extends JpaRepository<Order, Integer> {
     @Modifying
     @Query(value = """
             insert into ssf_order_detail (
-                order_uuid, item_key, order_detail_price, order_detail_cnt
+                order_uuid, item_key, order_detail_price, order_detail_cnt, order_detail_size
             )
-            values (:orderUUID, :itemKey, :price, :qty)
+            values (:orderUUID, :itemKey, :price, :qty, :size)
             """, nativeQuery = true)
     int saveOrderDetailDirect(@Param("orderUUID") String orderUUID,
                               @Param("itemKey") Integer itemKey,
                               @Param("price") Integer price,
-                              @Param("qty") Integer qty);
+                              @Param("qty") Integer qty,
+                              @Param("size") String size);
 
     @Query(value = """
                     select
@@ -84,4 +85,24 @@ public interface JpaOrderRepository extends JpaRepository<Order, Integer> {
                              d.order_detail_cnt
                     """, nativeQuery = true)
     List<OrderListResponseDto> findOrderListByOrderId(@Param("orderId") String orderId);
+
+    @Query(value = """
+            select
+                o.order_uuid  AS orderId,
+                o.order_price AS totalPrice,
+                o.order_date AS orderedAt,
+                i.item_name AS itemName,
+                d.order_detail_cnt AS itemQty,
+                i.item_sale AS itemPrice,
+                i.item_list AS itemList,
+                d.order_detail_size AS itemSize
+            from ssf_order o
+            join ssf_order_detail d on o.order_uuid = d.order_uuid
+            join ssf_item i on d.item_key = i.item_key
+            where o.user_key = (
+                select u.user_key from ssf_user u where u.email = :email
+            )
+            order by o.order_key desc
+            """, nativeQuery = true)
+    List<Object[]> findOrderHistory(@Param("email") String email);
 }

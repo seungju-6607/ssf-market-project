@@ -1,4 +1,4 @@
-import { setDefaultAddress, setAddressList } from './orderSlice.js';
+import { setDefaultAddress, setAddressList, setOrderHistory } from './orderSlice.js';
 import { axiosPost } from '../../utils/dataFetch.js';
 
 /** 기본 배송지 조회 */
@@ -42,6 +42,41 @@ export const deleteAddress = (addrKey) => async (dispatch) => {
     } catch (error) {
         console.error("배송지 삭제 실패:", error);
         throw error;
+    }
+}
+
+/** 배송지 저장 */
+export const saveAddress = (formData = {}) => async () => {
+    const { email } = JSON.parse(localStorage.getItem("loginUser") || "{}");
+
+    const payload = {
+        ...formData,
+        email,
+    };
+
+    try {
+        const url = "/member/saveAddr";
+        const data = await axiosPost(url, payload);
+        return data;
+    } catch (error) {
+        console.error("배송지 저장 실패: ", error);
+        return [];
+    }
+}
+
+/** 주문 내역 조회 */
+export const fetchOrderHistory = () => async (dispatch) => {
+    const loginUser = JSON.parse(localStorage.getItem("loginUser") || "{}");
+    const { email } = loginUser;
+    
+    try {
+        const data = await axiosPost("/member/orderhistory", { email });
+        dispatch(setOrderHistory(data));
+        return data;
+    } catch (error) {
+        console.error("주문 내역 조회 실패:", error);
+        dispatch(setOrderHistory([]));
+        return [];
     }
 }
 

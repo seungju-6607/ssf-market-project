@@ -1,0 +1,113 @@
+.mgz-page {
+  max-width: 1200px;
+  margin: 40px auto 80px;
+  padding: 0 16px;
+}
+
+.mgz-title {
+  text-align: center;
+  font-size: 32px;
+  font-weight: 700;
+  letter-spacing: 0.12em;
+}
+.mgz-sub {
+  text-align: center;
+  font-size: 14px;
+  color: #777;
+  margin-top: 6px;
+}
+
+.mgz-tabs {
+  display: flex;
+  justify-content: center;
+  gap: 10px;
+  margin: 24px 0;
+}
+.mgz-tab {
+  padding: 8px 16px;
+  border-radius: 999px;
+  border: 1px solid #ddd;
+  background: #fff;
+  cursor: pointer;
+  font-size: 12px;
+  letter-spacing: 0.1em;
+}
+.mgz-tab--active {
+  background: #000;
+  border-color: #000;
+  color: #fff;
+}
+
+.mgz-month {
+  margin-top: 36px;
+}
+.mgz-month-title {
+  font-size: 18px;
+  font-weight: 600;
+  margin-bottom: 14px;
+}
+
+.mgz-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(260px, 1fr));
+  gap: 20px;
+}
+
+.mgz-card {
+  display: block;
+  text-decoration: none;
+  color: inherit;
+  background: #fff;
+  border-radius: 10px;
+  overflow: hidden;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.06);
+  transition: transform 0.2s ease, box-shadow 0.2s ease;
+}
+.mgz-card:hover {
+  transform: translateY(-4px);
+  box-shadow: 0 8px 20px rgba(0, 0, 0, 0.1);
+}
+
+.mgz-thumb {
+  position: relative;
+  padding-top: 65%;
+}
+.mgz-thumb img {
+  position: absolute;
+  width: 100%;
+  height: 100%;
+  inset: 0;
+  object-fit: cover;
+}
+
+.mgz-body {
+  padding: 14px 16px 18px;
+}
+.mgz-brand {
+  font-size: 11px;
+  color: #999;
+  letter-spacing: 0.12em;
+}
+.mgz-ctitle {
+  margin: 6px 0 4px;
+  font-size: 15px;
+  font-weight: 600;
+}
+.mgz-desc {
+  font-size: 13px;
+  color: #666;
+  line-height: 1.45;
+}
+
+.mgz-tags {
+  margin-top: 10px;
+  display: flex;
+  gap: 6px;
+  flex-wrap: wrap;
+}
+.mgz-tag {
+  font-size: 11px;
+  padding: 2px 8px;
+  background: #f3f3f3;
+  border-radius: 999px;
+}

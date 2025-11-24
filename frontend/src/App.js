@@ -13,6 +13,12 @@ import Footer from "./components/Footer.jsx";
 import Home from "./pages/home/Home.jsx";
 import Menu from "./pages/menu/Menu.jsx";
 import Ranking from "./pages/Ranking.jsx";
+import MagazineList from "./pages/magazine/MagazineList.jsx";
+import MagazineDetail from "./pages/magazine/MagazineDetail.jsx";
+import SpecialList from "./pages/special/SpecialList.jsx";
+import SpecialDetail from "./pages/special/SpecialDetail.jsx";
+import EventList from "./pages/event/EventList.jsx";
+import EventDetail from "./pages/event/EventDetail.jsx";
 
 
 import Login from "./pages/auth/Login.jsx";
@@ -121,7 +127,12 @@ function App() {
         <Route path="/" element={<Home />} />
         <Route path="/menu" element={<Menu />} />
         <Route path="/ranking" element={<Ranking />} />
-
+        <Route path="/magazine" element={<MagazineList />} />
+        <Route path="/magazine/:id" element={<MagazineDetail />} />
+        <Route path="/special" element={<SpecialList />} />
+        <Route path="/special/:id" element={<SpecialDetail />} />
+        <Route path="/event" element={<EventList />} />
+        <Route path="/event/:id" element={<EventDetail />} />
 
         {/* 로그인/회원가입 */}
         <Route path="/login" element={<Login />} />
@@ -225,8 +236,8 @@ function App() {
         <Route path="/market" element={<MarketHome />} />
         <Route path="/market/new" element={<MarketNew />} />
         <Route path="/market/my" element={<MarketMy />} />
-        <Route path="/market/:id/edit" element={<MarketEdit />} />
-        <Route path="/market/:id" element={<MarketDetail />} />
+        <Route path="/market/:fleaKey/edit" element={<MarketEdit />} />
+        <Route path="/market/:fleaKey" element={<MarketDetail />} />
         <Route path="/market/inbox" element={<MarketInbox />} />
       </Routes>
 

@@ -13,109 +13,49 @@ export const srcOf = (item) => {
   return `${process.env.PUBLIC_URL}${encodeURI(cleaned)}`;
 };
 
-// IndexedDB에서 데이터베이스를 설정하는 함수
-export function openDB() {
-  return new Promise((resolve, reject) => {
-    const request = indexedDB.open("MarketDB", 1);
+/**
+ * 파일 객체를 base64 문자열로 변환 (미리보기용)
+ * @param {File} file
+ * @returns {Promise<string>}
+ */
+export const fileToBase64 = (file) =>
+  new Promise((resolve, reject) => {
+    const reader = new FileReader();
+    reader.onload = () => {
+      if (typeof reader.result === "string") resolve(reader.result);
+      else reject(new Error("Base64 변환 실패"));
+    };
+    reader.onerror = reject;
+    reader.readAsDataURL(file);
+  });
 
-    // 스키마 업그레이드: DB 버전이 변경될 때마다 호출됨
-    request.onupgradeneeded = function (e) {
-      const db = e.target.result;
-      // 'images'라는 objectStore 생성, 이미지 데이터를 저장
-      if (!db.objectStoreNames.contains("images")) {
-        const objectStore = db.createObjectStore("images", { keyPath: "key" });
+/**
+ * 선택된 이미지 파일 배열을 서버에 업로드
+ * @param {File[]} files
+ * @returns {Promise<string[]>} 서버에서 반환한 key 배열
+ */
+export const uploadImagesToServer = async (files) => {
+  if (!files || files.length === 0) return [];
+
+  const formData = new FormData();
+  files.forEach((file) => formData.append("images", file));
+
+ const csrfToken = document.cookie
+   .split('; ')
+   .find(row => row.startsWith('XSRF-TOKEN='))
+   ?.split('=')[1];
+
+  const res = await fetch("/market/upload", {
+    method: "POST",
+    body: formData,
+    credentials: "include", // 로그인 세션 쿠키 전달
+    headers: {
+        "X-XSRF-TOKEN": csrfToken
       }
-    };
-
-    request.onsuccess = function (e) {
-      resolve(e.target.result);
-    };
-
-    request.onerror = function (e) {
-      reject("IndexedDB open error", e);
-    };
   });
-}
 
-// 이미지 데이터를 IndexedDB에 저장하는 함수
-export function saveImageToIndexedDB(key, base64Image) {
-  return new Promise((resolve, reject) => {
-    // IndexedDB 열기
-    openDB().then((db) => {
-      const transaction = db.transaction("images", "readwrite");
-      const store = transaction.objectStore("images");
+  if (!res.ok) throw new Error("이미지 업로드 실패..");
 
-      // 이미지를 저장할 데이터 형식
-      const imageData = {
-        key: key,
-        base64: base64Image,
-      };
-
-      // 이미지 데이터를 objectStore에 추가
-      const request = store.put(imageData);
-
-      request.onsuccess = function () {
-        resolve("Image saved successfully");
-      };
-
-      request.onerror = function (e) {
-        reject("Failed to save image", e);
-      };
-    });
-  });
-}
-
-// IndexedDB에서 이미지 데이터를 가져오는 함수
-export function getImageFromIndexedDB(key) {
-  return new Promise((resolve, reject) => {
-    openDB().then((db) => {
-      const transaction = db.transaction("images", "readonly");
-      const store = transaction.objectStore("images");
-
-      // key로 이미지 가져오기
-      const request = store.get(key);
-
-      request.onsuccess = function () {
-        resolve(request.result ? request.result.base64 : null); // base64 형식 반환
-      };
-
-      request.onerror = function (e) {
-        reject("Failed to get image", e);
-      };
-    });
-  });
-}
-
-// IndexedDB에서 이미지 데이터를 삭제하는 함수
-export function deleteImageFromIndexedDB(key) {
-  return new Promise((resolve, reject) => {
-    openDB().then((db) => {
-      const transaction = db.transaction("images", "readwrite");
-      const store = transaction.objectStore("images");
-
-      // key로 이미지 삭제
-      const request = store.delete(key);
-
-      request.onsuccess = function () {
-        resolve("Image deleted successfully");
-      };
-
-      request.onerror = function (e) {
-        reject("Failed to delete image", e);
-      };
-    });
-  });
-}
-
-export const parseFleaList = (fleaListStr) => {
-  try {
-    // JSON 문자열을 배열로 변환
-    const parsedList = JSON.parse(fleaListStr);
-    if (Array.isArray(parsedList)) {
-      return parsedList;
-    }
-  } catch (e) {
-    console.error("Error parsing fleaList:", e);
-  }
-  return []; // 변환 실패 시 빈 배열 반환
+  const data = await res.json();
+  return data.keys || [];
 };
