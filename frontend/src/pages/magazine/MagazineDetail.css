@@ -1,0 +1,146 @@
+.mgd-page {
+  max-width: 900px;
+  margin: 40px auto 80px;
+  padding: 0 16px;
+}
+
+/* 상단 */
+.mgd-top {
+  margin-bottom: 24px;
+}
+
+.mgd-back-btn {
+  border: none;
+  background: none;
+  padding: 0;
+  margin-bottom: 12px;
+  font-size: 13px;
+  color: #555;
+  cursor: pointer;
+}
+
+.mgd-meta-row {
+  display: flex;
+  gap: 8px;
+  flex-wrap: wrap;
+  margin-bottom: 10px;
+}
+
+.mgd-pill {
+  font-size: 11px;
+  padding: 4px 10px;
+  border-radius: 999px;
+  background: #111;
+  color: #fff;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+}
+.mgd-pill-outline {
+  background: #fff;
+  border: 1px solid #ddd;
+  color: #333;
+}
+
+.mgd-title {
+  font-size: 26px;
+  font-weight: 700;
+  margin: 6px 0 4px;
+}
+.mgd-desc {
+  font-size: 14px;
+  color: #666;
+}
+
+/* 썸네일 */
+.mgd-hero {
+  margin: 24px 0;
+  border-radius: 16px;
+  overflow: hidden;
+}
+.mgd-hero img {
+  width: 100%;
+  display: block;
+  object-fit: cover;
+}
+
+/* 본문 */
+.mgd-content {
+  margin-top: 8px;
+  line-height: 1.8;
+  font-size: 14px;
+  color: #333;
+}
+.mgd-content p + p {
+  margin-top: 12px;
+}
+
+/* 태그 */
+.mgd-tags {
+  margin-top: 20px;
+  display: flex;
+  gap: 8px;
+  flex-wrap: wrap;
+}
+.mgd-tag {
+  font-size: 11px;
+  padding: 3px 8px;
+  background: #f3f3f3;
+  border-radius: 999px;
+}
+
+/* 추천 영역 */
+.mgd-related {
+  margin-top: 40px;
+}
+.mgd-related-title {
+  font-size: 16px;
+  font-weight: 600;
+  margin-bottom: 14px;
+}
+.mgd-related-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(180px, 1fr));
+  gap: 16px;
+}
+.mgd-related-card {
+  text-decoration: none;
+  color: inherit;
+  border-radius: 10px;
+  overflow: hidden;
+  background: #fff;
+  box-shadow: 0 3px 10px rgba(0, 0, 0, 0.05);
+  transition: transform 0.18s ease, box-shadow 0.18s ease;
+}
+.mgd-related-card:hover {
+  transform: translateY(-3px);
+  box-shadow: 0 6px 16px rgba(0, 0, 0, 0.1);
+}
+.mgd-related-thumb {
+  position: relative;
+  padding-top: 60%;
+}
+.mgd-related-thumb img {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+.mgd-related-body {
+  padding: 10px 12px 12px;
+}
+.mgd-related-brand {
+  font-size: 11px;
+  color: #999;
+  letter-spacing: 0.12em;
+}
+.mgd-related-ctitle {
+  font-size: 13px;
+  margin-top: 4px;
+}
+
+/* not found */
+.mgd-notfound {
+  margin-bottom: 12px;
+  font-size: 14px;
+}

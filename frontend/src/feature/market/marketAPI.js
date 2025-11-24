@@ -77,13 +77,36 @@ export const getCreatePost = (formData) => async (dispatch) => {
 /** 판매글 목록 가져오기 */
 export const fetchListingsAPI = async (param) => {
     console.log("param 확인 -> ", param);
-  try {
-    const url = "/market/list";
-    const jsonData = await axiosPost(url, {});
-    console.log("jsonData", jsonData);
-    return jsonData;  // 데이터를 반환
-  } catch (error) {
-    console.error("목록을 가져오는 중 오류 발생:", error);
-    throw error;
-  }
+
+    try {
+      let url = "/market/list";
+      let payload = {};
+
+      const hasQuery = param.q && param.q.trim() !== '';
+
+      if (hasQuery || param.category !== 'all' || param.onlyAvailable) {
+        url = "/market/filterList";
+        payload = { ...param, onlyAvailable: param.onlyAvailable ? "N" : "Y" };
+      }
+
+      const jsonData = await axiosPost(url, payload);
+      return jsonData;
+    } catch (error) {
+      console.error("목록을 가져오는 중 오류 발생:", error);
+      throw error;
+    }
 };
+
+/** 판매글 상세 정보 */
+export const getByFleaKey = async (fleaKey) => {
+    try {
+        const url = "/market/listDetail"; // 백엔드에서 fleaKey로 상세 조회 가능한 API
+        const payload = { fleaKey: Number(fleaKey) };
+        const result = await axiosPost(url, payload);
+        return result;
+
+      } catch (error) {
+        console.error("판매글 상세 조회 실패:", error);
+        throw error;
+      }
+}

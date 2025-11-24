@@ -3,7 +3,7 @@ import React, { useEffect, useMemo, useState, useCallback } from "react";
 import { useNavigate, useLocation } from "react-router-dom";
 import "./Checkout.css";
 import { useDispatch, useSelector } from "react-redux";
-import { fetchDefaultAddress, fetchAddressList, deleteAddress } from "../../feature/order/orderAPI.js";
+import { fetchDefaultAddress, fetchAddressList, deleteAddress, saveAddress } from "../../feature/order/orderAPI.js";
 import { openKakaoPostCode } from "../../utils/postCode.js";
 import CardOptionModal from "../../components/order/CardOptionModal.jsx";
 import { getPayment } from "../../feature/payment/paymentAPI.js";
@@ -320,7 +320,7 @@ export default function Checkout() {
     [subtotal, selectedCoupon]
   );
 
-  const shipping = 0;
+  const shipping = 2500;
   const total = Math.max(0, subtotal - discount + shipping);
 
   useEffect(() => {
@@ -345,43 +345,19 @@ export default function Checkout() {
          memo: memo
        };
 
+       await dispatch(saveAddress({
+        addrName: name,
+        addrTel: phone,
+        addrZipcode: postcode,
+        addrMain: address,
+        addrDetail: addressDetail,
+        addrReq: memo,
+        addrDef: saveAsDefault ? "Y" : "N",
+       }));
+
        const orderSource = localStorage.getItem("orderSource") || "cart";
        const result = await getPayment(receiver, paymentInfo, items, total, orderSource);
   }
-
-  const goPaymentMethod = () => {
-    const payloadData = {
-      items,
-      subtotal,
-      discount,
-      shipping,
-      total,
-      coupon: selectedCoupon ? { ...selectedCoupon, discount } : null,
-    };
-
-    // 구조 고민민
-//     const buildPayload = useCallback(
-//       () => ({
-//         items: compactItems,
-//         subtotal,
-//         discount,
-//         shipping,
-//         total,
-//         coupon: selectedCoupon ? { ...selectedCoupon, discount } : null,
-//       }),
-//       [compactItems, subtotal, discount, shipping, total, selectedCoupon]
-//     );
-//
-
-    try {
-      localStorage.setItem("lastCheckout", JSON.stringify(payloadData));
-    } catch (e) {
-      console.error("Failed to save checkout data:", e);
-    }
-
-    // ★ v6/v7 올바른 방식: 두 번째 인자는 { state: ... }
-    navigate("/pay", { state: payloadData });
-  };
 
   const markCouponUsed = (c) => {
     if (!c) return;

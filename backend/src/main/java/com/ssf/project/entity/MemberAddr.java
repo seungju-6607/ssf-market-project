@@ -1,5 +1,6 @@
 package com.ssf.project.entity;
 
+import com.ssf.project.dto.MemberAddrDto;
 import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -23,4 +24,17 @@ public class MemberAddr {
     private String addrMain;
     private String addrDetail;
     private String addrDef;
+
+    // dto => entity
+    public MemberAddr(MemberAddrDto memberAddrDto) {
+        this.addrKey = memberAddrDto.getAddrKey();
+        this.userKey = memberAddrDto.getUserKey();
+        this.addrZipcode = memberAddrDto.getAddrZipcode();
+        this.addrTel = memberAddrDto.getAddrTel();
+        this.addrReq = memberAddrDto.getAddrReq();
+        this.addrName = memberAddrDto.getAddrName();
+        this.addrMain = memberAddrDto.getAddrMain();
+        this.addrDetail = memberAddrDto.getAddrDetail();
+        this.addrDef = memberAddrDto.getAddrDef();
+    }
 }

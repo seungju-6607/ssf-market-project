@@ -9,6 +9,8 @@ import java.time.LocalDateTime;
 public class FleamarketDto {
     private int fleaKey;            // 판매글번호
     private String userKey;         // 회원고유번호
+
+    @JsonProperty("onlyAvailable")
     private String fleaSale;        // 판매여부
 
     @JsonProperty("sellerName")
@@ -37,4 +39,7 @@ public class FleamarketDto {
 
     @JsonProperty("createdAt")
     private LocalDateTime fleaRdate;    // 판매글등록날짜
+
+    @JsonProperty("q")
+    private String filterWord;
 }

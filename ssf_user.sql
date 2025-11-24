@@ -161,6 +161,7 @@ LIMIT 0, 1000;
 * 작성자 : 박도윤
 * 수정이력 : 
 	2025-11-12	최초 생성
+    2025-11-24  detail 테이블에 size 컬럼 추가
 * 사용예시 : desc ssf_order;
 		   desc ssf_order_detail;
 ****************************************/
@@ -178,6 +179,7 @@ CREATE TABLE ssf_order (
     order_addr_detail	VARCHAR(300)								NOT NULL					COMMENT '상세주소',
     order_tel			VARCHAR(15)									NOT NULL					COMMENT '받는분전화번호',
 	order_req			VARCHAR(100)								NULL						COMMENT '배송시요청사항',
+    order_date			DATETIME		DEFAULT CURRENT_TIMESTAMP	NOT NULL					COMMENT '주문날짜',	
     PRIMARY KEY (order_key),
     CONSTRAINT fk_ssf_order_ssf_user FOREIGN KEY(user_key)	references ssf_user(user_key),
     UNIQUE (order_uuid)
@@ -192,6 +194,7 @@ CREATE TABLE ssf_order_detail (
 	item_key			INT											NOT NULL					COMMENT '상품고유번호',
     order_detail_price	INT											NULL						COMMENT '가격',
     order_detail_cnt	INT				DEFAULT 1					NULL						COMMENT '개수',
+    order_detail_size 	VARCHAR(10) 								NOT NULL 					COMMENT '상품사이즈',
     PRIMARY KEY (order_detail_key),
     CONSTRAINT fk_ssf_order_detail_ssf_order FOREIGN KEY(order_uuid) references ssf_order(order_uuid),
     CONSTRAINT fk_ssf_order_detail_ssf_item FOREIGN KEY(item_key)	references ssf_item(item_key)
@@ -202,6 +205,9 @@ CREATE TABLE ssf_order_detail (
  
 -- ALTER TABLE ssf_order_detail 
 -- ADD COLUMN order_uuid VARCHAR(50) NOT NULL COMMENT '주문UUID';
+
+use ssf;
+desc ssf_order_detail;
 
 drop table ssf_order;
 drop table ssf_order_detail;
@@ -231,15 +237,36 @@ CREATE TABLE flea_market (
     CONSTRAINT fk_flea_market_ssf_user FOREIGN KEY(user_key)	references ssf_user(user_key)
 );
 
+/****************************************
+* 작업내용 : flea_messages 테이블 생성
+* 작성자 : 김소현
+* 수정이력 : 
+	2025-11-23	최초 생성
+* 사용예시 : desc flea_messages;
+****************************************/
+CREATE TABLE flea_messages (
+    msg_id 			BIGINT 			AUTO_INCREMENT 			NOT NULL		COMMENT '문의글번호',
+    flea_key 		INT 									NOT NULL 		COMMENT '판매글번호',
+    buyer_id 		VARCHAR(100) 							NOT NULL 		COMMENT '구매자 회원ID',
+    seller_id 		VARCHAR(100) 							NOT NULL 		COMMENT '판매자 회원ID',
+    sender_id 		VARCHAR(100) 							NOT NULL 		COMMENT '발신자 ID',
+    sender_name 	VARCHAR(50) 							NOT NULL 		COMMENT '발신자 이름',
+    inquiry_msg 	TEXT 									NOT NULL 		COMMENT '문의 내용',
+    created_at 		DATETIME 	DEFAULT CURRENT_TIMESTAMP 	NULL			COMMENT '판매글등록/수정날짜',
+    read_flag 		BOOLEAN 	DEFAULT FALSE 				NULL			COMMENT '읽음 여부',
+    PRIMARY KEY (msg_id),
+    FOREIGN KEY(flea_key) REFERENCES flea_market(flea_key)
+);
+
+update flea_market set flea_sale = "Y"
+where flea_key = 1;
+
+select * from flea_market;
 use ssf;
 show tables;
-desc flea_market;
+desc flea_messages;
+set SQL_SAFE_UPDATES = 0;
 drop table flea_market;
-
-
-
-
-
 
 
 

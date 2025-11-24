@@ -1,116 +1,316 @@
 /* src/pages/order/MyOrders.css — 깔끔 카드형 & 안전한 그리드 배치 */
 
 .my-orders-container {
-  max-width: 1100px;
-  margin: 28px auto 48px;
-  padding: 0 20px;
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 40px 20px;
+  background: #fff;
 }
 
 .my-orders-title {
-  font-size: 22px;
-  font-weight: 800;
-  letter-spacing: -0.3px;
-  margin: 6px 0 18px;
+  font-size: 24px;
+  font-weight: 700;
+  margin-bottom: 30px;
   color: #111;
 }
 
-/* Empty */
+/* Empty State */
 .empty-orders-container {
-  border: 1px dashed #e6e6e6;
-  border-radius: 14px;
-  padding: 32px;
   text-align: center;
+  padding: 60px 20px;
   color: #666;
 }
+
+.empty-orders-container > div {
+  font-size: 16px;
+  margin-bottom: 20px;
+}
+
 .continue-shopping-link {
   display: inline-block;
-  margin-top: 12px;
-  padding: 8px 14px;
-  border-radius: 10px;
-  border: 1px solid #e6e6e6;
+  padding: 12px 24px;
+  background: #111;
+  color: #fff;
   text-decoration: none;
-  color: #111;
+  border-radius: 4px;
+  font-size: 14px;
+}
+
+.continue-shopping-link:hover {
+  background: #333;
+}
+
+/* Orders List */
+.orders-list {
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+}
+
+.my-orders-item {
   background: #fff;
+  border: 1px solid #e5e5e5;
+  border-radius: 8px;
+  padding: 20px;
 }
 
-.orders-list { display: flex; flex-direction: column; gap: 16px; }
-
-.order-item {
-  background: #fff;
-  border: 1px solid #eee;
-  border-radius: 14px;
-  transition: box-shadow .2s ease, border-color .2s ease;
-}
-.order-item:hover { box-shadow: 0 4px 16px rgba(0,0,0,.06); border-color: #e5e5e5; }
-
-/* Header */
-.order-header {
-  display: flex; justify-content: space-between; align-items: center;
-  padding: 14px 16px 8px; color: #666; font-size: 13px;
-  border-bottom: 1px dashed #f0f0f0;
-}
-.order-id { font-weight: 700; color: #333; }
-.order-date { color: #888; }
-
-/* Body: 3열 그리드 + 영역 고정 (여기가 핵심) */
-.order-body {
+/* Order Body - 5 Column Grid: 날짜 | 이미지 | 상품정보 | 가격 | 결제완료 */
+.my-orders-body {
   display: grid;
-  grid-template-columns: 110px 1fr 140px;
-  grid-template-areas: "product product total";
-  gap: 16px; align-items: center;
-  padding: 14px 16px;
-}
-.order-product { grid-area: product; display: grid; grid-template-columns: 110px 1fr; gap: 16px; align-items: center; }
-.order-total   { grid-area: total; text-align: right; font-weight: 800; font-size: 16px; color: #111; }
-
-/* Image */
-.order-product-image {
-  width: 110px; height: 110px; object-fit: cover;
-  border-radius: 10px; border: 1px solid #f0f0f0; background: #fafafa;
+  grid-template-columns: 120px 500px 1fr auto auto;
+  gap: 20px;
+  align-items: center;
 }
 
-/* Texts */
-.order-info { display: flex; flex-direction: column; gap: 6px; }
-.order-name {
-  font-size: 15px; font-weight: 700; color: #222; line-height: 1.4;
-  word-break: keep-all;        /* 낱글자 줄바꿈 방지 */
-  overflow-wrap: anywhere;     /* 긴 영문을 위한 안전한 줄바꿈 */
+/* Date */
+.my-orders-date-label {
+  font-size: 16px;
+  font-weight: 700;
+  color: #111;
 }
-.order-meta { font-size: 13px; color: #666; }
-.order-meta span + span { margin-left: 10px; }
 
-/* Footer */
-.order-footer {
-  display: flex; justify-content: space-between; align-items: center;
-  padding: 10px 16px 14px; border-top: 1px solid #fafafa;
+/* Product Image */
+.my-orders-product-image-wrapper {
+  width: 120px;
+  height: 120px;
+  padding-left: 15px;
 }
-.order-status {
-  display: inline-flex; align-items: center; gap: 6px;
-  font-size: 12px; color: #0a7a2f; background: #eaf7ef; border: 1px solid #d5f0df;
-  padding: 6px 10px; border-radius: 999px;
+
+.my-orders-product-image {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  border-radius: 4px;
 }
-.view-product-link {
-  display: inline-block; padding: 8px 12px; border-radius: 10px;
-  border: 1px solid #e6e6e6; background: #fff; color: #222; text-decoration: none; font-size: 13px;
+
+.my-orders-product-image.placeholder {
+  width: 100%;
+  height: 100%;
+  background: #f5f5f5;
+  border: 1px solid #e5e5e5;
+  border-radius: 4px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 12px;
+  color: #999;
 }
-.view-product-link:hover { border-color: #dcdcdc; box-shadow: 0 2px 8px rgba(0,0,0,.05); }
+
+/* Product Info */
+.my-orders-product-info {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.my-orders-product-name {
+  font-size: 15px;
+  font-weight: 500;
+  color: #111;
+  line-height: 1.4;
+}
+
+.my-orders-option {
+  font-size: 13px;
+  color: #666;
+}
+
+/* Price */
+.my-orders-price-wrapper {
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+}
+
+.my-orders-price {
+  font-size: 16px;
+  font-weight: 700;
+  color: #111;
+}
+
+/* Order Status - 우측 가운데 */
+.my-orders-status-wrapper {
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+}
+
+.my-orders-status {
+  display: inline-block;
+  padding: 8px 16px;
+  background: #f0f0f0;
+  color: #666;
+  font-size: 13px;
+  border-radius: 4px;
+  font-weight: 500;
+}
 
 /* Responsive */
-@media (max-width: 820px) {
-  .order-body {
-    grid-template-columns: 90px 1fr;
-    grid-template-areas:
-      "product product"
-      "total total";
-    row-gap: 12px;
+@media (max-width: 1024px) {
+  .my-orders-body {
+    grid-template-columns: 100px 320px 1fr auto auto;
+    gap: 16px;
   }
-  .order-product { grid-template-columns: 90px 1fr; }
-  .order-product-image { width: 90px; height: 90px; }
-  .order-total { text-align: right; font-size: 15px; }
+
+  .my-orders-product-image-wrapper {
+    width: 100px;
+    height: 100px;
+  }
 }
-@media (max-width: 520px) {
-  .order-header { font-size: 12px; }
-  .order-name { font-size: 14px; }
-  .order-meta { font-size: 12px; }
-  .order-total { font-size: 14px; }
+
+@media (max-width: 768px) {
+  .my-orders-body {
+    grid-template-columns: 80px 340px 1fr auto auto;
+    gap: 12px;
+  }
+
+  .my-orders-product-image-wrapper {
+    width: 80px;
+    height: 80px;
+  }
+
+  .my-orders-price-wrapper {
+    justify-content: flex-end;
+  }
+
+  .my-orders-status-wrapper {
+    justify-content: flex-end;
+  }
 }
+
+@media (max-width: 760px) {
+  .my-orders-item {
+    padding: 16px;
+  }
+
+  .my-orders-body {
+    grid-template-columns: 70px 250px 1fr auto auto;
+    gap: 10px;
+  }
+
+  .my-orders-product-image-wrapper {
+    width: 70px;
+    height: 70px;
+  }
+
+  .my-orders-price-wrapper {
+    justify-content: flex-end;
+  }
+
+  .my-orders-status-wrapper {
+    justify-content: flex-end;
+  }
+
+  .my-orders-status {
+    font-size: 12px;
+    padding: 6px 12px;
+  }
+}
+
+@media (max-width: 620px) {
+  .my-orders-item {
+    padding: 16px;
+  }
+
+  .my-orders-body {
+    grid-template-columns: 65px 130px 1fr auto auto;
+    gap: 10px;
+  }
+
+  .my-orders-product-image-wrapper {
+    width: 65px;
+    height: 65px;
+  }
+
+  .my-orders-price-wrapper {
+    justify-content: flex-end;
+  }
+
+  .my-orders-status-wrapper {
+    justify-content: flex-end;
+  }
+
+  .my-orders-status {
+    font-size: 11px;
+    padding: 6px 12px;
+  }
+}
+
+@media (max-width: 480px) {
+  .my-orders-container {
+    padding: 20px 16px;
+  }
+
+  .my-orders-item {
+    padding: 16px;
+  }
+
+  .my-orders-body {
+    grid-template-columns: 60px 100px 1fr auto auto;
+    gap: 10px;
+  }
+
+  .my-orders-product-image-wrapper {
+    width: 60px;
+    height: 60px;
+  }
+
+  .my-orders-date-label {
+    font-size: 14px;
+  }
+
+  .my-orders-product-name {
+    font-size: 14px;
+  }
+
+  .my-orders-price {
+    font-size: 15px;
+  }
+
+  .my-orders-price-wrapper {
+    justify-content: flex-end;
+  }
+
+  .my-orders-status-wrapper {
+    justify-content: flex-end;
+  }
+}
+
+@media (max-width: 425px) {
+    .my-orders-status {
+        display: none;
+    }
+}
+
+/* 주문 그룹 컨테이너 */
+.my-orders-item-group {
+  border: 1px solid #e5e5e5;
+  border-radius: 10px;
+  padding: 20px;
+  background: #fafafa;
+  display: flex;
+  flex-direction: column;
+  gap: 15px;
+}
+
+/* 주문 그룹 내 날짜 (헤더 역할) */
+.my-orders-group-date {
+  font-size: 16px;
+  font-weight: 700;
+  color: #222;
+  padding-bottom: 10px;
+  border-bottom: 1px solid #ddd;
+}
+
+/* 그룹 내 첫 상품은 위 구분선 제거 */
+.my-orders-item-group .my-orders-item {
+  border-top: 1px solid #eee;
+  border-radius: 0;
+  padding: 16px 0;
+}
+
+.my-orders-item-group .my-orders-item:first-of-type {
+  border-top: none;
+  padding-top: 0;
+}
+

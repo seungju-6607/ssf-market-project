@@ -38,6 +38,7 @@ public class KakaoPayDto {
         private Integer itemKey;
         private Integer itemPrice;
         private Integer itemQty;
+        private String itemSize;
     }//DirectItem
 
 }//KakaoPay dto

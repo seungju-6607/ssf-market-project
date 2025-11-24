@@ -13,7 +13,7 @@ const toBase64 = (file) => new Promise((res, rej) => {
 });
 
 export default function MarketEdit() {
-  const { id } = useParams();
+  const { fleaKey } = useParams();
   const dispatch = useDispatch();
   const navigate = useNavigate();
   const { current } = useSelector((s) => s.market);
@@ -25,20 +25,20 @@ export default function MarketEdit() {
   const [description, setDescription] = useState("");
   const [images, setImages] = useState([]);
 
-  useEffect(() => { dispatch(fetchOne(id)); }, [id, dispatch]);
+  useEffect(() => { dispatch(fetchOne(fleaKey)); }, [fleaKey, dispatch]);
   useEffect(() => {
     if (current) {
-      setTitle(current.title);
-      setPrice(String(current.price));
-      setCategory(current.category);
-      setDescription(current.description || "");
-      setImages(current.images || []);
+      setTitle(current.fleaTitle);
+      setPrice(String(current.fleaPrice));
+      setCategory(current.fleaCategory);
+      setDescription(current.fleaContent || "");
+//       setImages(current.images || []);
     }
   }, [current]);
 
   if (!current) return <div className="mk-container"><div className="mk-empty">불러오는 중…</div></div>;
 
-  const isOwner = isAuthenticated && (current.sellerId === (user.id || user.email));
+  const isOwner = isAuthenticated && (current.fleaId === (user.id || user.email));
   if (!isOwner) return <div className="mk-container"><div className="mk-empty">권한이 없습니다.</div></div>;
 
   const onFiles = async (files) => {
@@ -53,8 +53,8 @@ export default function MarketEdit() {
       price: Number(String(price).replace(/[^\d]/g, "")) || 0,
       category, description, images,
     };
-    await dispatch(updateListing({ id, patch })).unwrap();
-    navigate(`/market/${id}`, { replace: true });
+    await dispatch(updateListing({ fleaKey, patch })).unwrap();
+    navigate(`/market/${fleaKey}`, { replace: true });
   };
 
   return (

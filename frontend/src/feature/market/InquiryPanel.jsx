@@ -4,7 +4,7 @@ import { messageAPI } from "./messageAPI.js";
 import "./market.css";
 import { useMarketAuth } from "./authBridge.js";
 
-export default function InquiryPanel({ listingId, sellerId, sellerName, onClose }) {
+export default function InquiryPanel({ fleaKey, sellerId, fleaName, onClose }) {
   const { isAuthenticated, user } = useMarketAuth();
 
   const [thread, setThread] = useState([]);
@@ -13,17 +13,16 @@ export default function InquiryPanel({ listingId, sellerId, sellerName, onClose 
   const [guestEmail, setGuestEmail] = useState("");
 
   const boxRef = useRef(null);
-
   const buyerId = isAuthenticated ? (user.id || user.email) : `guest:${guestEmail || "anon"}`;
   const buyerName = isAuthenticated ? (user.name || user.email?.split("@")[0] || "USER") : (guestName || "GUEST");
 
   const load = async () => {
-    const t = await messageAPI.getConversation({ listingId, buyerId, sellerId });
+    const t = await messageAPI.getConversation({ fleaKey, buyerId, sellerId });
     setThread(t);
     setTimeout(() => boxRef.current?.scrollTo({ top: 999999, behavior: "smooth" }), 0);
   };
 
-  useEffect(() => { load(); /* eslint-disable-next-line */ }, [listingId, buyerId, sellerId]);
+  useEffect(() => { load(); /* eslint-disable-next-line */ }, [fleaKey, sellerId]);
 
   const send = async (e) => {
     e.preventDefault();
@@ -34,12 +33,12 @@ export default function InquiryPanel({ listingId, sellerId, sellerName, onClose 
       return;
     }
     await messageAPI.send({
-      listingId,
+      fleaKey,
       buyerId,
       sellerId,
       senderId: buyerId,
       senderName: buyerName,
-      text: body,
+      inquiryMsg: body,
     });
     setText("");
     await load();
@@ -70,11 +69,11 @@ export default function InquiryPanel({ listingId, sellerId, sellerName, onClose 
           thread.map((m) => {
             const mine = m.senderId === buyerId;
             return (
-              <div key={m.id} className={`mk-bubble ${mine ? "mine" : ""}`}>
+              <div key={m.msgId} className={`mk-bubble ${mine ? "mine" : ""}`}>
                 <div className="mk-bubble-meta">
                   <b>{mine ? "나" : m.senderName}</b> · {new Date(m.createdAt).toLocaleString()}
                 </div>
-                <div className="mk-bubble-text">{m.text}</div>
+                <div className="mk-bubble-text">{m.inquiryMsg}</div>
               </div>
             );
           })

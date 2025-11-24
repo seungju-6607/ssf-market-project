@@ -1,0 +1,172 @@
+.spd-page {
+  max-width: 900px;
+  margin: 40px auto 80px;
+  padding: 0 16px;
+}
+
+/* 뒤로가기 */
+.spd-back {
+  border: none;
+  background: none;
+  font-size: 13px;
+  color: #555;
+  cursor: pointer;
+  margin-bottom: 10px;
+}
+
+/* 상단 메타 */
+.spd-meta-top {
+  display: flex;
+  gap: 8px;
+  flex-wrap: wrap;
+}
+.spd-pill {
+  font-size: 11px;
+  padding: 3px 10px;
+  border-radius: 999px;
+  background: #111;
+  color: #fff;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+}
+.spd-pill-outline {
+  background: #fff;
+  border: 1px solid #ccc;
+  color: #333;
+}
+.spd-pill-end {
+  background: #b30000;
+}
+
+/* 제목/기간 */
+.spd-title {
+  margin-top: 10px;
+  font-size: 24px;
+  font-weight: 700;
+}
+.spd-period {
+  margin-top: 4px;
+  font-size: 13px;
+  color: #777;
+}
+.spd-short {
+  margin-top: 8px;
+  font-size: 14px;
+  color: #444;
+}
+
+/* 배너 */
+.spd-hero {
+  margin: 24px 0 20px;
+  border-radius: 16px;
+  overflow: hidden;
+}
+.spd-hero img {
+  width: 100%;
+  display: block;
+  object-fit: cover;
+}
+
+/* 섹션 */
+.spd-section {
+  margin-top: 24px;
+}
+.spd-section-title {
+  font-size: 16px;
+  font-weight: 600;
+  margin-bottom: 10px;
+}
+
+/* 혜택 리스트 */
+.spd-benefit-list {
+  padding-left: 18px;
+  font-size: 13px;
+  color: #333;
+}
+.spd-benefit-list li + li {
+  margin-top: 4px;
+}
+
+/* 내용 */
+.spd-content {
+  font-size: 14px;
+  color: #333;
+  line-height: 1.7;
+}
+.spd-content p + p {
+  margin-top: 10px;
+}
+
+/* 태그 */
+.spd-tags {
+  margin-top: 18px;
+  display: flex;
+  gap: 8px;
+  flex-wrap: wrap;
+}
+.spd-tag {
+  font-size: 11px;
+  padding: 3px 8px;
+  background: #f3f3f3;
+  border-radius: 999px;
+}
+
+/* 관련 기획전 */
+.spd-related {
+  margin-top: 32px;
+}
+.spd-related-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+  gap: 14px;
+}
+.spd-related-card {
+  padding: 0;
+  border: none;
+  cursor: pointer;
+  text-align: left;
+  border-radius: 12px;
+  overflow: hidden;
+  background: #fff;
+  box-shadow: 0 3px 12px rgba(0, 0, 0, 0.06);
+  transition: transform 0.18s ease, box-shadow 0.18s ease;
+}
+.spd-related-card:hover {
+  transform: translateY(-3px);
+  box-shadow: 0 7px 18px rgba(0, 0, 0, 0.12);
+}
+.spd-related-thumb {
+  position: relative;
+  padding-top: 56%;
+}
+.spd-related-thumb img {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+.spd-related-body {
+  padding: 10px 12px 12px;
+}
+.spd-related-brand {
+  font-size: 11px;
+  color: #888;
+}
+.spd-related-title {
+  margin-top: 3px;
+  font-size: 13px;
+  font-weight: 500;
+}
+.spd-related-period {
+  display: block;
+  margin-top: 4px;
+  font-size: 11px;
+  color: #999;
+}
+
+/* not found */
+.spd-notfound {
+  margin-bottom: 10px;
+  font-size: 14px;
+}

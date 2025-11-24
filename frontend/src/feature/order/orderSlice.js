@@ -3,6 +3,7 @@ import { createSlice } from '@reduxjs/toolkit';
 const initialState = {
     defaultAddress: null,
     addressList: [],
+    orderHistory: [],
 }
 
 export const orderSlice = createSlice({
@@ -17,9 +18,13 @@ export const orderSlice = createSlice({
         setAddressList(state, action) {
             state.addressList = action.payload;
         },
+
+        setOrderHistory(state, action) {
+            state.orderHistory = action.payload;
+        },
     }
 })
 
-export const { setDefaultAddress, setAddressList } = orderSlice.actions;
+export const { setDefaultAddress, setAddressList, setOrderHistory } = orderSlice.actions;
 export default orderSlice.reducer;
 

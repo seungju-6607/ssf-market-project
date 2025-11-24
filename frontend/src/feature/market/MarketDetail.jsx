@@ -7,10 +7,11 @@ import { Link, useNavigate, useParams } from "react-router-dom";
 import { useMarketAuth } from "./authBridge.js";
 import InquiryPanel from "./InquiryPanel.jsx";
 
+const BACKEND_URL = "http://localhost:8080";
 const fmt = (n) => `₩${Number(n || 0).toLocaleString()}`;
 
 export default function MarketDetail() {
-  const { id } = useParams();
+  const { fleaKey } = useParams();
   const dispatch = useDispatch();
   const navigate = useNavigate();
   const { current } = useSelector((s) => s.market);
@@ -18,9 +19,9 @@ export default function MarketDetail() {
   const [showInquiry, setShowInquiry] = useState(false);
 
   useEffect(() => {
-    dispatch(fetchOne(id));
+    dispatch(fetchOne(fleaKey));
     setShowInquiry(false);
-  }, [id, dispatch]);
+  }, [fleaKey, dispatch]);
 
   if (!current) {
     return (
@@ -31,94 +32,84 @@ export default function MarketDetail() {
   }
 
   const isOwner =
-    isAuthenticated && current.sellerId === (user.id || user.email);
+    isAuthenticated && current.fleaId === (user.id || user.email);
 
   const onDelete = async () => {
-    if (!window.confirm("삭제할까요?")) return;
-    await dispatch(
-      deleteListing({ id, userId: user?.id || user?.email })
-    ).unwrap();
-    navigate("/market", { replace: true });
+//     if (!window.confirm("삭제할까요?")) return;
+//     await dispatch(
+//       deleteListing({ id, userId: user?.id || user?.email })
+//     ).unwrap();
+//     navigate("/market", { replace: true });
   };
 
   const toggleSold = async () => {
     await dispatch(
       updateListing({
-        id,
+        fleaKey: current.fleaKey,
         patch: { status: current.status === "SOLD" ? "FOR_SALE" : "SOLD" },
       })
     ).unwrap();
   };
 
+  const images = current.fleaList ? JSON.parse(current.fleaList) : [];
+  const mainImages = images.length > 0 ? images.map((key) => `${BACKEND_URL}/uploads/${key}`) : [];
+
   return (
     <div className="mk-container">
       <div className="mk-detail">
         <div className="mk-detail-gallery">
-          {(current.images?.length ? current.images : [""]).map((src, i) => (
-            <img
-              key={i}
-              src={src || `${process.env.PUBLIC_URL || ""}/images/placeholder.webp`}
-              alt={`img-${i}`}
-            />
-          ))}
+        {mainImages.length > 0
+          ? mainImages.map((src, i) => (
+              <img key={i} src={src} alt={`img-${i}`} />
+            ))
+          : <span>이미지 미리보기 없음</span>}
         </div>
 
         <div className="mk-detail-info">
-          <h2>{current.title}</h2>
-          <div className="mk-detail-price">{fmt(current.price)}</div>
+          <h2>{current.fleaTitle}</h2>
+          <div className="mk-detail-price">{fmt(current.fleaPrice)}</div>
           <div className="mk-detail-meta">
-            {current.sellerName} · {new Date(current.createdAt).toLocaleString()} ·{" "}
-            {current.category}
+            {current.fleaName} · {new Date(current.fleaRdate).toLocaleString()} ·{" "}
+            {current.fleaCategory}
           </div>
           <div className="mk-detail-desc">
-            {current.description || "(설명 없음)"}
+            {current.fleaContent || "(설명 없음)"}
           </div>
 
           <div className="mk-detail-actions">
-            {!isOwner ? (
-              <button
-                className="mk-btn outline"
-                type="button"
-                onClick={() => setShowInquiry((v) => !v)}
-              >
-                {showInquiry ? "문의 닫기" : "문의하기"}
-              </button>
-            ) : (
-              <Link
-                to={`/market/inbox?listing=${current.id}`}
-                className="mk-btn outline"
-              >
-                문의함
-              </Link>
-            )}
-
-            {isOwner && (
-              <>
-                <Link to={`/market/${current.id}/edit`} className="mk-btn">
-                  수정
+              {!isOwner ? (
+                <button className="mk-btn outline" type="button" onClick={() => setShowInquiry((v) => !v)}>
+                  {showInquiry ? "문의 닫기" : "문의하기"}
+                </button>
+              ) : (
+                <Link to={`/market/inbox?listing=${current.fleaKey}`} className="mk-btn outline">
+                  문의함
                 </Link>
-                <button className="mk-btn" onClick={toggleSold}>
-                  {current.status === "SOLD" ? "판매중으로 변경" : "판매완료 표시"}
-                </button>
-                <button className="mk-btn danger" onClick={onDelete}>
-                  삭제
-                </button>
-              </>
-            )}
-          </div>
+              )}
+
+              {isOwner && (
+                <>
+                  <Link to={`/market/${current.fleaKey}/edit`} className="mk-btn">수정</Link>
+                  <button className="mk-btn" onClick={toggleSold}>
+                    {current.fleaSale === "Y" ? "판매중으로 변경" : "판매완료 표시"}
+                  </button>
+                  <button className="mk-btn danger" onClick={onDelete}>삭제</button>
+                </>
+              )}
+            </div>
 
           {!isOwner && showInquiry && (
             <div style={{ marginTop: 12 }}>
               <InquiryPanel
-                listingId={current.id}
-                sellerId={current.sellerId}
-                sellerName={current.sellerName}
+                fleaKey={current.fleaKey}
+                sellerId={current.fleaId}
+                fleaName={current.fleaName}
                 onClose={() => setShowInquiry(false)}
               />
             </div>
           )}
 
-          {current.status === "SOLD" && (
+          {current.fleaSale === "Y" && (
             <div className="mk-sold-banner">판매완료</div>
           )}
         </div>
