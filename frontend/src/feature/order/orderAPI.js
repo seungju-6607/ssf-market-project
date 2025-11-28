@@ -65,18 +65,42 @@ export const saveAddress = (formData = {}) => async () => {
 }
 
 /** 주문 내역 조회 */
-export const fetchOrderHistory = () => async (dispatch) => {
+export const fetchOrderHistory = (filters = {}) => async (dispatch) => {
     const loginUser = JSON.parse(localStorage.getItem("loginUser") || "{}");
     const { email } = loginUser;
+
+    const payload = {
+        email,
+        startDate: filters.startDate || null,
+        endDate: filters.endDate || null,
+    };
     
     try {
-        const data = await axiosPost("/member/orderhistory", { email });
+        const data = await axiosPost("/member/orderhistory", payload);
         dispatch(setOrderHistory(data));
         return data;
     } catch (error) {
         console.error("주문 내역 조회 실패:", error);
         dispatch(setOrderHistory([]));
         return [];
+    }
+}
+
+/** 주문 상세 조회 */
+export const fetchOrderDetail = (orderId) => async () => {
+    const loginUser = JSON.parse(localStorage.getItem("loginUser") || "{}");
+    const { email } = loginUser;
+
+    if (!email || !orderId) {
+        throw new Error("email and orderId are required");
+    }
+
+    try {
+        const payload = { email, orderId };
+        return await axiosPost("/member/orderhistory/detail", payload);
+    } catch (error) {
+        console.error("주문 상세 조회 실패:", error);
+        throw error;
     }
 }
 

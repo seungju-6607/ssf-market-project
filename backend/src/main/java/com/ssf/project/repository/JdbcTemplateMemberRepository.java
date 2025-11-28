@@ -1,12 +1,14 @@
 package com.ssf.project.repository;
 
 import com.ssf.project.dto.MemberDto;
+import org.springframework.dao.DataAccessException;
 import org.springframework.dao.EmptyResultDataAccessException;
 import org.springframework.jdbc.core.BeanPropertyRowMapper;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.stereotype.Repository;
 
 import javax.sql.DataSource;
+import java.util.List;
 import java.util.Optional;
 
 @Repository
@@ -19,6 +21,42 @@ public class JdbcTemplateMemberRepository implements MemberRepository {
     public JdbcTemplateMemberRepository(DataSource dataSource) {
         this.jdbcTemplate = new JdbcTemplate(dataSource);   // 커넥션 생성
     };
+
+    @Override
+    public int updatePwd(MemberDto member) {
+        String sql = " update ssf_user set userpwd = ? where email = ?" ;  // 보안 이슈로 prepareStatement
+        Object[] param = {  member.getUserpwd(), member.getEmail() };
+
+        try {
+            int rows = jdbcTemplate.update(sql, param);
+            System.out.println("rows ==> " + rows);
+            return rows;
+        } catch (DataAccessException e) {
+            e.printStackTrace();
+            return 0; // 예외 발생 시 0 반환
+        }
+    }
+
+    @Override
+    public MemberDto findId(MemberDto member) {
+        String sql = "select user_key, email, username, userpwd, banned, signout, signin, snsprov, snsid, referralId, phone, role from ssf_user where username = ? and phone = ?";
+        try {
+            return jdbcTemplate.queryForObject(sql, new BeanPropertyRowMapper<>(MemberDto.class),
+                    member.getUsername(), member.getPhone());
+        } catch (EmptyResultDataAccessException e) {
+            return null;
+        }
+    }
+
+    @Override
+    public Long findPwd(MemberDto member) {
+        String sql = "select count(user_key) from ssf_user where username = ? and email = ?";
+        try {
+            return jdbcTemplate.queryForObject(sql, Long.class, member.getUsername(), member.getEmail());
+        } catch (EmptyResultDataAccessException e) {
+            return null;
+        }
+    }
 
     @Override
     public Long countById(String id) {
@@ -75,6 +113,21 @@ public class JdbcTemplateMemberRepository implements MemberRepository {
 
         } catch (EmptyResultDataAccessException e) {
             return Optional.empty();
+        }
+    }
+
+    /**
+     * email로 user_key 검색
+     */
+    public String findUserKey(String email) {
+        try {
+            return jdbcTemplate.queryForObject(
+                    "SELECT user_key FROM ssf_user WHERE email = ?",
+                    String.class,
+                    email
+            );
+        } catch (EmptyResultDataAccessException ex) {
+            return null;
         }
     }
 }

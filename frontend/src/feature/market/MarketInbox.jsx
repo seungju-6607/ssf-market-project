@@ -19,7 +19,7 @@ export default function MarketInbox() {
   const [rows, setRows] = useState([]);
   const q = useQuery();
   const filterListingId = q.get("listing") || null;
-
+console.log("filterListingId -> ", filterListingId);
   useEffect(() => {
     if (!items || items.length === 0) dispatch(fetchListings({}));
   }, [dispatch]);
@@ -29,6 +29,7 @@ export default function MarketInbox() {
     const me = user.id || user.email;
     return (items || []).filter((x) => x.fleaId === me)
   }, [items, isAuthenticated, user.id, user.email]);
+console.log("items", items);
 
   useEffect(() => {
     (async () => {

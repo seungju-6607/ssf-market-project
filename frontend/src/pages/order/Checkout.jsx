@@ -7,6 +7,7 @@ import { fetchDefaultAddress, fetchAddressList, deleteAddress, saveAddress } fro
 import { openKakaoPostCode } from "../../utils/postCode.js";
 import CardOptionModal from "../../components/order/CardOptionModal.jsx";
 import { getPayment } from "../../feature/payment/paymentAPI.js";
+import { fetchCouponInfo, consumeCoupon } from "../../feature/coupon/couponAPI.js";
 
 const toNumber = (v) =>
   typeof v === "number" ? v : Number(String(v ?? "").replace(/[^\d]/g, "")) || 0;
@@ -151,7 +152,8 @@ export default function Checkout() {
     return JSON.parse(localStorage.getItem("loginUser") || "{}");
   }, []);
 
-  const [coupons, setCoupons] = useState(() => readJSON("coupons", []));
+  const [couponInfo, setCouponInfo] = useState(null);
+  const [couponLoading, setCouponLoading] = useState(false);
   const [couponId, setCouponId] = useState("");
 
   // 결제 방법 목록
@@ -178,6 +180,33 @@ export default function Checkout() {
       .then((res) => res.json())
       .then((data) => setPaymentData(data));
   }, []);
+
+  useEffect(() => {
+    if (!loginUser?.email) {
+      setCouponInfo(null);
+      return;
+    }
+
+    // DB에서 회원에 대한 쿠폰 소지 정보를 가져와 setCouponInfo
+    let mounted = true;
+    const loadCoupon = async () => {
+      setCouponLoading(true);
+      try {
+        const data = await fetchCouponInfo(loginUser.email);
+        if (mounted) setCouponInfo(data || null);
+      } catch (error) {
+        console.error("쿠폰 조회 실패:", error);
+        if (mounted) setCouponInfo(null);
+      } finally {
+        if (mounted) setCouponLoading(false);
+      }
+    };
+
+    loadCoupon();
+    return () => {
+      mounted = false;
+    };
+  }, [loginUser?.email]);
 
   // 기본 배송지 조회
   useEffect(() => {
@@ -298,28 +327,36 @@ export default function Checkout() {
     [items]
   );
 
-  const availableCoupons = useMemo(() => {
-    const now = Date.now();
-    return (coupons || []).filter((c) => {
-      if (c.used) return false;
-      if (c.expiresAt) {
-        const t = new Date(c.expiresAt).getTime();
-        if (!isNaN(t) && t < now) return false;
-      }
-      return true;
-    });
-  }, [coupons]);
+  const availableCoupon = useMemo(() => {
+    if (!couponInfo) return null;
+    if (couponInfo.couponYn && couponInfo.couponYn.toUpperCase() !== "Y") return null;
+    if (couponInfo.couponEnd) {
+      const t = new Date(couponInfo.couponEnd).getTime();
+      if (!isNaN(t) && t < Date.now()) return null;
+    }
+    return couponInfo;
+  }, [couponInfo]);
 
-  const selectedCoupon = useMemo(
-    () => availableCoupons.find((c) => String(c.id) === String(couponId)),
-    [availableCoupons, couponId]
-  );
+  const selectedCoupon = useMemo(() => {
+    if (!availableCoupon) return null;
+    return String(availableCoupon.couponId) === String(couponId) ? availableCoupon : null;
+  }, [availableCoupon, couponId]);
+
+  const normalizedCoupon = useMemo(() => {
+    if (!selectedCoupon) return null;
+    return {
+      id: selectedCoupon.couponId,
+      amount: selectedCoupon.couponCost || selectedCoupon.discount || 0,
+      expiresAt: selectedCoupon.couponEnd,
+    };
+  }, [selectedCoupon]);
 
   const discount = useMemo(
-    () => getDiscountByCoupon(subtotal, selectedCoupon),
-    [subtotal, selectedCoupon]
+    () => getDiscountByCoupon(subtotal, normalizedCoupon),
+    [subtotal, normalizedCoupon]
   );
 
+  //배송비 2500원으로 고정 - 추후에 지역별 배송비 적용시 수정 필요
   const shipping = 2500;
   const total = Math.max(0, subtotal - discount + shipping);
 
@@ -336,6 +373,24 @@ export default function Checkout() {
   });
 
   const handlePayment = async() => {
+
+      //쿠폰 사용
+      if(selectedCoupon && loginUser?.email) {
+        const result = await consumeCoupon({
+           email: loginUser.email,
+           couponId: selectedCoupon.couponId,
+        });
+      }
+
+       //mount시 set한 쿠폰번호 = 사용할 쿠폰번호 => 사용된 쿠폰으로 상태변경
+       setCouponInfo((prev) =>
+         prev && prev.couponId === selectedCoupon.couponId
+           ? { ...prev, couponYn: "N", usedYn: "Y" }
+           : prev
+       );
+       setCouponId("");
+
+       //결제 로직 시작
        const receiver = {
          name: name,
          phone: phone,
@@ -359,24 +414,19 @@ export default function Checkout() {
        const result = await getPayment(receiver, paymentInfo, items, total, orderSource);
   }
 
-  const markCouponUsed = (c) => {
-    if (!c) return;
-    const next = (coupons || []).map((x) =>
-      String(x.id) === String(c.id)
-        ? { ...x, used: true, usedAt: new Date().toISOString() }
-        : x
-    );
-    setCoupons(next);
-    localStorage.setItem("coupons", JSON.stringify(next));
-  };
-
-  const placeOrderForDemo = () => {
-    markCouponUsed(selectedCoupon);
-    localStorage.removeItem("cartCheckout");
-    localStorage.removeItem("directCheckout");
-    localStorage.removeItem("orderSource");
-    alert(`결제가 완료되었습니다!\n총 ${items.length}개 상품\n결제 금액: ${formatKRW(total)}`);
-    navigate("/order/success", { replace: true });
+  const handleCouponConsume = async () => {
+    if (!selectedCoupon || !loginUser?.email) return;
+    try {
+      await consumeCoupon({ email: loginUser.email, couponId: selectedCoupon.couponId });
+      setCouponInfo((prev) =>
+        prev && prev.couponId === selectedCoupon.couponId
+          ? { ...prev, couponYn: "N" }
+          : prev
+      );
+      setCouponId("");
+    } catch (error) {
+      console.error("쿠폰 사용 처리 실패:", error);
+    }
   };
 
   if (!items || items.length === 0) {
@@ -427,7 +477,9 @@ export default function Checkout() {
 
       <section className="section">
         <h3 className="section-title">쿠폰 선택</h3>
-        {availableCoupons.length === 0 ? (
+        {couponLoading ? (
+          <p className="no-coupon">쿠폰 정보를 불러오는 중입니다.</p>
+        ) : !availableCoupon ? (
           <p className="no-coupon">사용 가능한 쿠폰이 없습니다.</p>
         ) : (
           <>
@@ -437,28 +489,9 @@ export default function Checkout() {
               onChange={(e) => setCouponId(e.target.value)}
             >
               <option value="">선택 안 함</option>
-              {availableCoupons.map((c) => {
-                const ctype = String(c.type || "").toLowerCase().trim();
-                const isPercent =
-                  ctype === "percent" || ctype === "percentage" || ctype === "rate";
-                let label = "";
-                if (isPercent) {
-                  const rate = Number(c.rate) || toNumber(c.rate) || 0;
-                  const cap = toNumber(c.max) || toNumber(c.amount) || 0;
-                  label = `${rate}%${cap ? ` (최대 ${formatKRW(cap)})` : ""}`;
-                } else {
-                  const amt =
-                    toNumber(c.amount) ||
-                    toNumber(c.value) ||
-                    toNumber(c.name);
-                  label = formatKRW(amt);
-                }
-                return (
-                  <option key={String(c.id)} value={String(c.id)}>
-                    {c.name} - {label}
-                  </option>
-                );
-              })}
+              <option value={String(availableCoupon.couponId)}>
+                {availableCoupon.couponName} - {formatKRW(toNumber(availableCoupon.couponCost || availableCoupon.amount || availableCoupon.discount))}
+              </option>
             </select>
             <p className="coupon-hint">
               적용 할인 예상: <b>{formatKRW(discount)}</b>

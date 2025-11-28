@@ -5,7 +5,7 @@ import { useAuth } from "../context/AuthContext";
 
 export default function Signup() {
   const navigate = useNavigate();
-  const { login, issueWelcomeCouponIfNeeded } = useAuth();
+  const { login } = useAuth();
   const [form, setForm] = useState({ name: "", email: "" });
 
   const onSubmit = (e) => {
@@ -14,11 +14,6 @@ export default function Signup() {
 
     // 간단 로그인 대체
     login({ id: `u_${Date.now()}`, name: form.name, email: form.email });
-
-    // 웰컴쿠폰 발급
-    setTimeout(() => {
-      issueWelcomeCouponIfNeeded();
-    }, 0);
 
     navigate("/mypage/coupons");
   };

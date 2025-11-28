@@ -87,15 +87,11 @@ export default function PaymentGateway() {
 
       // 2) 쿠폰 사용 처리
       if (payment?.coupon?.id) {
-        const coupons = JSON.parse(localStorage.getItem("coupons") || "[]");
-        const idx = coupons.findIndex((c) => c.id === payment.coupon.id);
-        if (idx >= 0) {
-          coupons[idx] = {
-            ...coupons[idx],
-            used: true,
-            usedAt: new Date().toISOString(),
-          };
-          localStorage.setItem("coupons", JSON.stringify(coupons));
+        const raw = localStorage.getItem("signupCoupon");
+        const saved = raw ? JSON.parse(raw) : null;
+        if (saved && saved.id === payment.coupon.id && !saved.used) {
+          const updated = { ...saved, used: true, usedAt: new Date().toISOString() };
+          localStorage.setItem("signupCoupon", JSON.stringify(updated));
         }
       }
 

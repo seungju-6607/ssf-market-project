@@ -6,6 +6,9 @@ import com.ssf.project.dto.MemberDto;
 import java.util.List;
 
 public interface MemberService {
+    int updatePwd(MemberDto member);
+    MemberDto findId(MemberDto member);
+    boolean findPwd(MemberDto member);
     boolean idCheck(String id);
     int signup(MemberDto member);
     int apiSignup(MemberDto member);

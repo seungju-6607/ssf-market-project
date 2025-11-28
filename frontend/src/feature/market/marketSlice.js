@@ -1,6 +1,9 @@
+import axios from "axios";
 import { createAsyncThunk, createSlice } from "@reduxjs/toolkit";
-import { marketAPI, getCreatePost, fetchListingsAPI, getByFleaKey } from "./marketAPI.js";
+import { marketAPI, getCreatePost, fetchListingsAPI, getByFleaKey, listUpdate, listRemove } from "./marketAPI.js";
 import { axiosPost } from '../../utils/dataFetch.js';
+
+const BACKEND_URL = "http://localhost:8080";
 
 export const fetchListings = createAsyncThunk(
   "market/fetchListings",
@@ -29,14 +32,45 @@ export const createListing = createAsyncThunk(
 
 export const updateListing = createAsyncThunk(
   "market/updateListing",
-  async ({ id, patch }) => await marketAPI.update(id, patch)
+//  async ({ fleaKey, patch }) => await marketAPI.update(fleaKey, patch)
+  async ({ fleaKey, patch }) => await listUpdate(fleaKey, patch)
 );
 
 export const deleteListing = createAsyncThunk(
   "market/deleteListing",
-  async ({ id, userId }) => {
-    await marketAPI.remove(id, userId);
-    return id;
+  async ({ fleaKey }) => {
+//    await marketAPI.remove(fleaKey, userId);
+    await listRemove(fleaKey);
+    return fleaKey;
+  }
+);
+
+export const deleteListingAndImages = createAsyncThunk(
+  "market/deleteListingAndImages",
+  async ({ fleaKey, imageKeys }, { dispatch, rejectWithValue }) => {
+    try {
+      // 1) DB 삭제
+      await dispatch(deleteListing({ fleaKey })).unwrap();
+
+      // 2) DB가 정상 삭제되면 이미지 삭제 실행
+      if (imageKeys?.length) {
+        const csrfToken = document.cookie
+          .split("; ")
+          .find((row) => row.startsWith("XSRF-TOKEN="))
+          ?.split("=")[1];
+
+        await axios.delete(`${BACKEND_URL}/market/delete`, {
+          headers: { "X-XSRF-TOKEN": csrfToken },
+          withCredentials: true,
+          data: { keys: imageKeys },
+        });
+      }
+
+      return fleaKey;
+    } catch (err) {
+      console.error("삭제 중 오류:", err);
+      return rejectWithValue(err.message);
+    }
   }
 );
 
@@ -60,12 +94,12 @@ const marketSlice = createSlice({
     b.addCase(createListing.fulfilled, (s, a) => { s.items.unshift(a.payload); });
     b.addCase(updateListing.fulfilled, (s, a) => {
       s.current = a.payload;
-      const idx = s.items.findIndex((x) => x.id === a.payload.id);
+      const idx = s.items.findIndex((x) => x.fleaKey  === a.payload.fleaKey );
       if (idx >= 0) s.items[idx] = a.payload;
     });
     b.addCase(deleteListing.fulfilled, (s, a) => {
-      s.items = s.items.filter((x) => x.id !== a.payload);
-      if (s.current?.id === a.payload) s.current = null;
+      s.items = s.items.filter((x) => x.fleaKey  !== a.payload);
+      if (s.current?.fleaKey  === a.payload) s.current = null;
     });
   },
 });

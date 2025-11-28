@@ -31,6 +31,34 @@ CREATE TABLE ssf_user (
     role			VARCHAR(13)		NOT NULL		COMMENT '권한구분코드'
 );
 
+ -- ALTER TABLE ssf_user 
+ -- DROP COLUMN coupon_yn;
+
+/****************************************
+* 작업내용 : 쿠폰 정보 테이블, 쿠폰 사용여부 테이블 생성
+* 작성자 : 박도윤
+* 수정이력 :
+	2025-11-25	최초 생성
+* 사용예시 : desc ssf_coupon;
+****************************************/
+CREATE TABLE ssf_coupon (
+    coupon_id       VARCHAR(50)     NOT NULL    COMMENT '쿠폰UUID',
+    coupon_name     VARCHAR(150)    NOT NULL    COMMENT '쿠폰명',
+    coupon_cost     INT             NOT NULL    COMMENT '할인금액',
+    expire_at       DATE            NOT NULL    COMMENT '쿠폰 만료일',
+    PRIMARY KEY (coupon_id)
+);
+
+DROP TABLE IF EXISTS ssf_coupon_used;
+
+CREATE TABLE ssf_coupon_used (
+    id 				BIGINT 		AUTO_INCREMENT 	PRIMARY KEY 			COMMENT '단일 PK',
+    coupon_id 		VARCHAR(50) 				NOT NULL 				COMMENT '쿠폰 UUID',
+    user_key 		VARCHAR(100) 				NOT NULL 				COMMENT '회원고유번호',
+    used_yn 		CHAR(1) 					NOT NULL 	DEFAULT 'N' COMMENT '사용여부',
+    UNIQUE KEY uq_coupon_user (coupon_id, user_key),
+    CONSTRAINT fk_coupon FOREIGN KEY (coupon_id) REFERENCES ssf_coupon(coupon_id)
+);
 
 /****************************************
 * 작업내용 : 주소 테이블 생성
@@ -161,7 +189,6 @@ LIMIT 0, 1000;
 * 작성자 : 박도윤
 * 수정이력 : 
 	2025-11-12	최초 생성
-    2025-11-24  detail 테이블에 size 컬럼 추가
 * 사용예시 : desc ssf_order;
 		   desc ssf_order_detail;
 ****************************************/
@@ -179,7 +206,6 @@ CREATE TABLE ssf_order (
     order_addr_detail	VARCHAR(300)								NOT NULL					COMMENT '상세주소',
     order_tel			VARCHAR(15)									NOT NULL					COMMENT '받는분전화번호',
 	order_req			VARCHAR(100)								NULL						COMMENT '배송시요청사항',
-    order_date			DATETIME		DEFAULT CURRENT_TIMESTAMP	NOT NULL					COMMENT '주문날짜',	
     PRIMARY KEY (order_key),
     CONSTRAINT fk_ssf_order_ssf_user FOREIGN KEY(user_key)	references ssf_user(user_key),
     UNIQUE (order_uuid)
@@ -194,7 +220,6 @@ CREATE TABLE ssf_order_detail (
 	item_key			INT											NOT NULL					COMMENT '상품고유번호',
     order_detail_price	INT											NULL						COMMENT '가격',
     order_detail_cnt	INT				DEFAULT 1					NULL						COMMENT '개수',
-    order_detail_size 	VARCHAR(10) 								NOT NULL 					COMMENT '상품사이즈',
     PRIMARY KEY (order_detail_key),
     CONSTRAINT fk_ssf_order_detail_ssf_order FOREIGN KEY(order_uuid) references ssf_order(order_uuid),
     CONSTRAINT fk_ssf_order_detail_ssf_item FOREIGN KEY(item_key)	references ssf_item(item_key)
@@ -205,9 +230,6 @@ CREATE TABLE ssf_order_detail (
  
 -- ALTER TABLE ssf_order_detail 
 -- ADD COLUMN order_uuid VARCHAR(50) NOT NULL COMMENT '주문UUID';
-
-use ssf;
-desc ssf_order_detail;
 
 drop table ssf_order;
 drop table ssf_order_detail;
@@ -255,18 +277,21 @@ CREATE TABLE flea_messages (
     created_at 		DATETIME 	DEFAULT CURRENT_TIMESTAMP 	NULL			COMMENT '판매글등록/수정날짜',
     read_flag 		BOOLEAN 	DEFAULT FALSE 				NULL			COMMENT '읽음 여부',
     PRIMARY KEY (msg_id),
-    FOREIGN KEY(flea_key) REFERENCES flea_market(flea_key)
+    CONSTRAINT fk_flea_messages_flea_market FOREIGN KEY(flea_key) REFERENCES flea_market(flea_key) ON DELETE CASCADE
 );
 
-update flea_market set flea_sale = "Y"
-where flea_key = 1;
+update ssf_user set userpwd = ? where email = ?;
+
+delete from ssf_user where username = "9999";
 
 select * from flea_market;
+select user_key, email, username, userpwd, banned, signout, signin, snsprov, snsid, referralId, phone, role from ssf_user;
+
 use ssf;
 show tables;
-desc flea_messages;
+desc ssf_user;
 set SQL_SAFE_UPDATES = 0;
-drop table flea_market;
+drop table flea_messages;
 
 
 

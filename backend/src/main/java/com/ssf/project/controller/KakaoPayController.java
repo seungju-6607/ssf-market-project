@@ -167,7 +167,7 @@ public class KakaoPayController {
     }
 
     /**
-     * 주문 목록
+     * 결제 후 주문 완료 화면
      */
     @PostMapping("/orderList")
     public List<OrderListResponseDto> findOrderListByEmail(@RequestBody Map<String, String> payload) {

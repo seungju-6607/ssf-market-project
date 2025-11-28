@@ -8,6 +8,8 @@ import java.util.List;
 
 public interface FleamarketService {
     int add(FleamarketDto fleamarketDto);
+    int updateList(FleamarketDto fleamarketDto);
+    boolean deleteByFleaKey(Integer fleaKey);
     int add(FleamarketMsgDto fleamarketMsgDto);
     List<FleamarketMsgDto> findMsgByBuyer(FleamarketMsgDto fleamarketMsgDto);
     List<FleamarketMsgDto> findMsgBySeller(FleamarketMsgDto fleamarketMsgDto);

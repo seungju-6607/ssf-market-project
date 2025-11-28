@@ -44,6 +44,7 @@ import PayConfirm from "./pages/order/PayConfirm.jsx";
 // 주문/장바구니
 import Checkout from "./pages/order/Checkout.jsx";
 import MyOrders from "./pages/order/MyOrders.jsx";
+import MyOrdersDetail from "./pages/order/MyOrdersDetail.jsx";
 import CartPage from "./pages/cart/CartPage.jsx";
 
 // 카테고리
@@ -147,6 +148,7 @@ function App() {
 
         {/* 주문/장바구니/결제 */}
         <Route path="/orders" element={<PrivateRoute><MyOrders /></PrivateRoute>} />
+        <Route path="/mypage/orders/detail" element={<PrivateRoute><MyOrdersDetail /></PrivateRoute>} />
         <Route path="/cart" element={<PrivateRoute><CartPage /></PrivateRoute>} />
         <Route path="/checkout" element={<PrivateRoute><Checkout /></PrivateRoute>} />
         <Route path="/order/success" element={<OrderSuccess />} />

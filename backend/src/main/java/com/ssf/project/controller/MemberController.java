@@ -1,9 +1,12 @@
 package com.ssf.project.controller;
 
+import com.ssf.project.dto.CouponDto;
 import com.ssf.project.dto.MemberAddrDto;
 import com.ssf.project.dto.MemberDto;
+import com.ssf.project.dto.OrderDetailResponseDto;
 import com.ssf.project.dto.OrderHistoryDto;
 import com.ssf.project.repository.MemberRepository;
+import com.ssf.project.service.CouponService;
 import com.ssf.project.service.MemberService;
 import com.ssf.project.service.OrderService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -28,6 +31,7 @@ public class MemberController {
     private final HttpSessionSecurityContextRepository contextRepository;
     private final MemberRepository memberRepository;
     private final OrderService orderService;
+    private final CouponService couponService;
 
     // 서비스 객체 가져오기
     private final MemberService memberService;
@@ -38,12 +42,29 @@ public class MemberController {
                             AuthenticationManager authenticationManager,
                             HttpSessionSecurityContextRepository contextRepository,
                             MemberRepository memberRepository,
-                            OrderService orderService) {
+                            OrderService orderService,
+                            CouponService couponService) {
         this.memberService = memberService;
         this.authenticationManager = authenticationManager;
         this.contextRepository = contextRepository;
         this.memberRepository = memberRepository;
         this.orderService = orderService;
+        this.couponService = couponService;
+    }
+
+    @PostMapping("/updatePwd")
+    public int updatePwd(@RequestBody MemberDto member) {
+        return memberService.updatePwd(member);
+    }
+
+    @PostMapping("/findPwd")
+    public boolean findPwd(@RequestBody MemberDto member) {
+        return memberService.findPwd(member);
+    }
+
+    @PostMapping("/findId")
+    public MemberDto findId(@RequestBody MemberDto member) {
+        return memberService.findId(member);
     }
 
     @PostMapping("/idcheck")
@@ -58,7 +79,10 @@ public class MemberController {
         
         // 서비스 호출
         int rows = memberService.signup(member);
-        if(rows == 1) result = true;
+        if(rows == 1) {
+            result = true;
+            couponService.issueSignupCoupon(member.getEmail());
+        }
         
         return result;
     }
@@ -70,7 +94,10 @@ public class MemberController {
 
         // 서비스 호출
         int rows = memberService.apiSignup(member);
-        if(rows == 1) result = true;
+        if(rows == 1) {
+            result = true;
+            couponService.issueSignupCoupon(member.getEmail());
+        }
 
         return result;
     }
@@ -222,6 +249,43 @@ public class MemberController {
     @PostMapping("/orderhistory")
     public List<List<OrderHistoryDto>> orderHistory(@RequestBody Map<String, String> request) {
         String email = request.get("email");
-        return orderService.findOrderHistory(email);
+        String startDate = request.get("startDate");
+        String endDate = request.get("endDate");
+        return orderService.findOrderHistory(email, startDate, endDate);
+    }
+
+    @PostMapping("/orderhistory/detail")
+    public ResponseEntity<?> orderHistoryDetail(@RequestBody Map<String, String> request) {
+        String email = request.get("email");
+        String orderId = request.get("orderId");
+        if (email == null || email.isBlank() || orderId == null || orderId.isBlank()) {
+            return ResponseEntity.badRequest().body(Map.of("message", "email and orderId are required"));
+        }
+        OrderDetailResponseDto detail = orderService.findOrderDetail(email, orderId);
+        if (detail == null) {
+            return ResponseEntity.notFound().build();
+        }
+        return ResponseEntity.ok(detail);
+    }
+
+    @PostMapping("/coupon/info")
+    public ResponseEntity<?> couponInfo(@RequestBody Map<String, String> request) {
+        String email = request.get("email");
+        if (email == null || email.isBlank()) {
+            return ResponseEntity.badRequest().body(Map.of("message", "email is required"));
+        }
+        CouponDto coupon = couponService.getCouponInfo(email);
+        return ResponseEntity.ok(coupon);
+    }
+
+    @PostMapping("/coupon/use")
+    public ResponseEntity<?> consumeCoupon(@RequestBody Map<String, String> request) {
+        String email = request.get("email");
+        String couponId = request.get("couponId");
+        if (email == null || email.isBlank() || couponId == null || couponId.isBlank()) {
+            return ResponseEntity.badRequest().body(Map.of("message", "email and couponId are required"));
+        }
+        boolean success = couponService.consumeCoupon(email, couponId);
+        return ResponseEntity.ok(Map.of("success", success));
     }
 }
