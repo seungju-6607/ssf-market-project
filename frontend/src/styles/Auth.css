@@ -200,6 +200,26 @@ body {
   line-height: var(--leading-normal);
 }
 
+.auth-submit-update {
+  width: 100%;
+  padding: 16px;
+  background: #111;
+  color: #fff;
+  border: none;
+  border-radius: var(--radius-sm);
+  font-size: var(--font-base);
+  font-weight: var(--font-weight-semibold);
+  cursor: pointer;
+  margin-top: 8px;
+  transition: background 0.2s ease;
+  line-height: var(--leading-normal);
+}
+
+.auth-submit-update.disabled {
+  background-color: #ccc; /* 비활성화 시 회색 */
+  cursor: not-allowed;
+}
+
 .auth-submit:hover {
   background: #333;
 }

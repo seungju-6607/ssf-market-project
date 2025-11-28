@@ -1,5 +1,5 @@
 // src/pages/order/MyOrders.jsx
-import React, { useEffect, useMemo } from "react";
+import React, { useEffect, useMemo, useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import { useDispatch, useSelector } from "react-redux";
 import { fetchOrderHistory } from "../../feature/order/orderAPI.js";
@@ -15,12 +15,43 @@ export default function MyOrders() {
     try { return JSON.parse(localStorage.getItem("loginUser")) || null; } catch { return null; }
   }, []);
 
+  const today = useMemo(() => new Date(), []);
+
+  // 3개월 전 날짜가 기본
+  const threeMonthsAgo = useMemo(() => {
+    const base = new Date();
+    base.setMonth(base.getMonth() - 3);
+    return base;
+  }, []);
+
+  const toDateInput = (d) => {
+    if (!d) return "";
+    const y = d.getFullYear();
+    const m = String(d.getMonth() + 1).padStart(2, "0");
+    const day = String(d.getDate()).padStart(2, "0");
+    return `${y}-${m}-${day}`;
+  };
+
+  const [startDate, setStartDate] = useState(toDateInput(threeMonthsAgo));
+  const [endDate, setEndDate] = useState(toDateInput(today));
+  const [appliedRange, setAppliedRange] = useState({
+    startDate: toDateInput(threeMonthsAgo),
+    endDate: toDateInput(today),
+  });
 
   useEffect(() => {
     if (user?.email) {
-      dispatch(fetchOrderHistory());
+      dispatch(fetchOrderHistory(appliedRange));
     }
-  }, [dispatch, user?.email]);
+  }, [dispatch, user?.email, appliedRange.startDate, appliedRange.endDate]);
+
+  const handleSearch = () => {
+    if (startDate && endDate && startDate > endDate) {
+      alert("시작일이 종료일 이후입니다.");
+      return;
+    }
+    setAppliedRange({ startDate, endDate });
+  };
 
   // 날짜값을 YYYY.MM.DD 형식의 문자열로 바꿔줌
   const formatDate = (dateValue) => {
@@ -56,7 +87,9 @@ export default function MyOrders() {
   if (!user) {
     return (
       <div className="my-orders-container">
-        <h1 className="my-orders-title">주문내역</h1>
+        <div className="my-orders-header">
+          <h1 className="my-orders-title">주문내역</h1>
+        </div>
         <p>로그인이 필요합니다.</p>
         <button onClick={() => navigate("/login")} className="login-button">로그인 하러가기</button>
       </div>
@@ -65,7 +98,22 @@ export default function MyOrders() {
 
   return (
     <div className="my-orders-container">
-      <h1 className="my-orders-title">주문내역</h1>
+      <div className="my-orders-header">
+        <h1 className="my-orders-title">주문내역</h1>
+        <div className="my-orders-filter">
+          <label>
+            <span>시작일</span>
+            <input type="date" value={startDate} onChange={(e) => setStartDate(e.target.value)} />
+          </label>
+          <label>
+            <span>종료일</span>
+            <input type="date" value={endDate} onChange={(e) => setEndDate(e.target.value)} />
+          </label>
+          <button type="button" onClick={handleSearch} className="my-orders-filter-btn">
+            검색
+          </button>
+        </div>
+      </div>
 
       {!orderHistory || orderHistory.length === 0 ? (
         <div className="empty-orders-container">
@@ -80,8 +128,21 @@ export default function MyOrders() {
             const firstItem = orderItems[0]; // 주문 정보는 첫 번째 아이템에서 가져오기
             return (
               <div key={firstItem.orderId} className="my-orders-item-group">
-                <div className="my-orders-date-label">
-                  {formatDate(firstItem.orderedAt)}
+                <div className="my-orders-group-header">
+                  <div className="my-orders-date-label">
+                    {formatDate(firstItem.orderedAt)}
+                  </div>
+                  <button
+                    type="button"
+                    className="my-orders-detail-btn"
+                    onClick={() =>
+                      navigate("/mypage/orders/detail", {
+                        state: { orderId: firstItem.orderId, orderedAt: firstItem.orderedAt },
+                      })
+                    }
+                  >
+                    주문상세 &gt;
+                  </button>
                 </div>
 
                 {/* 두번째 그룹 반복 - 위에서 가져온 orderItems 요소를 다시한번 map 돌린다. */}

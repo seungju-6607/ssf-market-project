@@ -36,7 +36,6 @@ public class FleamarketServiceImpl implements FleamarketService{
     @Override
     public List<FleamarketMsgDto> findMsgBySeller(FleamarketMsgDto fleamarketMsgDto) {
         return jpaFleamarketRepository.findMsgBySeller(fleamarketMsgDto.getFleaKey(),
-                                                    fleamarketMsgDto.getBuyerId(),
                                                     fleamarketMsgDto.getSellerId());
     }
 
@@ -77,6 +76,24 @@ public class FleamarketServiceImpl implements FleamarketService{
         Fleamarket saved = jpaFleamarketRepository.save(entity);
 
         return saved != null ? 1 : 0;
+    }
+
+    @Override
+    public boolean deleteByFleaKey(Integer fleaKey) {
+        int result = jpaFleamarketRepository.deleteByFleaKey(fleaKey);
+        return result > 0;
+    }
+
+    @Override
+    public int updateList(FleamarketDto fleamarketDto) {
+        return jpaFleamarketRepository.updateList(
+                fleamarketDto.getFleaKey(),
+                fleamarketDto.getFleaSale(),
+                fleamarketDto.getFleaCategory(),
+                fleamarketDto.getFleaTitle(),
+                fleamarketDto.getFleaContent(),
+                fleamarketDto.getFleaList(),
+                fleamarketDto.getFleaPrice());
     }
 
     @Override

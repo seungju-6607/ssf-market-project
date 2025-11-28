@@ -1,7 +1,7 @@
 // src/feature/market/MarketDetail.jsx
 import React, { useEffect, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
-import { deleteListing, fetchOne, updateListing } from "./marketSlice.js";
+import { deleteListing, fetchOne, updateListing, deleteListingAndImages } from "./marketSlice.js";
 import "./market.css";
 import { Link, useNavigate, useParams } from "react-router-dom";
 import { useMarketAuth } from "./authBridge.js";
@@ -35,20 +35,25 @@ export default function MarketDetail() {
     isAuthenticated && current.fleaId === (user.id || user.email);
 
   const onDelete = async () => {
-//     if (!window.confirm("삭제할까요?")) return;
-//     await dispatch(
-//       deleteListing({ id, userId: user?.id || user?.email })
-//     ).unwrap();
-//     navigate("/market", { replace: true });
+    if (!window.confirm("삭제할까요?")) return;
+    await dispatch(
+      deleteListingAndImages({
+        fleaKey: fleaKey,
+        imageKeys: current.fleaList
+      })
+    ).unwrap();
+    alert("삭제되었습니다.");
+    navigate("/market", { replace: true });
   };
 
   const toggleSold = async () => {
     await dispatch(
       updateListing({
         fleaKey: current.fleaKey,
-        patch: { status: current.status === "SOLD" ? "FOR_SALE" : "SOLD" },
+        patch: { status: current.fleaSale === "Y" ? "N" : "Y" },
       })
     ).unwrap();
+    navigate(`/market/${fleaKey}`);
   };
 
   const images = current.fleaList ? JSON.parse(current.fleaList) : [];

@@ -1,8 +1,15 @@
+// src/pages/home/Home.jsx
 import React, { useEffect, useState, useMemo } from "react";
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import "./Home.css";
+import {
+  toggleWishlistServer,
+  syncWishlistFromServer,
+} from "../../hooks/useWishlist.js";
+import { isInWishlist } from "../../hooks/useWishlist.js";
 
-// 브랜드 로고 이미지 import
+
+// 브랜드 로고 이미지
 import brand8Seconds from "../../assets/brands/brand_에잇세컨즈.webp";
 import brandBeanpole from "../../assets/brands/brand_빈폴.webp";
 import brandBeaker from "../../assets/brands/brand_비이커.webp";
@@ -44,35 +51,117 @@ export default function Home() {
   const [activeProductTab, setActiveProductTab] = useState(0);
   const [activeRankingTab, setActiveRankingTab] = useState(0);
   const [brandPage, setBrandPage] = useState(0);
+  const navigate = useNavigate();
 
-  // ---- NEW: 위시리스트 상태 (id 셋만 캐시해서 빠르게 렌더) ----
-  const [wishIds, setWishIds] = useState(() => {
+  const [email, setEmail] = useState(null);
+  const [wishlistVersion, setWishlistVersion] = useState(0);
+
+  
+  useEffect(() => {
     try {
-      const w = JSON.parse(localStorage.getItem("wishlist")) || [];
-      return new Set(w.map((it) => it.id));
+      const raw = localStorage.getItem("loginUser");
+      const loginUser = raw ? JSON.parse(raw) : null;
+      setEmail(loginUser?.email || null);
     } catch {
-      return new Set();
+      setEmail(null);
     }
-  });
+  }, []);
 
-  const totalPages = 3; // 9장 / 3장씩
+  const [wishIds, setWishIds] = useState(new Set());
+
+  // 서버에서 위시리스트 동기화
+  useEffect(() => {
+    const loadWishlist = async () => {
+      if (!email) {
+        setWishIds(new Set());
+        return;
+      }
+      try {
+        const list = await syncWishlistFromServer(email); // DTO 리스트
+        const ids = new Set(
+          (list || []).map((item) => item.productId || item.id)
+        );
+        setWishIds(ids);
+      } catch (e) {
+        console.error("Home wishlist sync error:", e);
+      }
+    };
+
+    loadWishlist();
+  }, [email]);
+
+  // 상품 / 랭킹 카드별 선택된 사이즈
+  const [selectedSizes, setSelectedSizes] = useState({});
+  const [selectedRankSizes, setSelectedRankSizes] = useState({});
+
+  const totalPages = 3;
 
   const slides = useMemo(
     () => [
-      { title: "8SECONDS", subtitle: "리즈와 함께면 지금이 리즈", desc: "BEYOND THE REBELS · 2nd Drop", image: "/icons/main1.webp" },
-      { title: "KUHO PLUS", subtitle: "25 Winter Collection", desc: "혜택이 넘치는 세싸패 LIVE", image: "/icons/main2.webp" },
-      { title: "J RIUM", subtitle: "나를 안는 부드러움", desc: "~38% + 7% + 5만포인트 + 사은품", image: "/icons/main3.webp" },
-
-      { title: "COS", subtitle: "다가온 가을의 순간", desc: "변화하는 계절의 감각적인 스타일링", image: "/icons/main4.webp" },
-      { title: "UGG & REQINS", subtitle: "어쩔 수 없이 걷고 싶은 계절", desc: "어그, 호갱 등 인기 슈즈 특가", image: "/icons/main5.webp" },
-      { title: "ROUGE & LOUNGE", subtitle: "인플루언서가 탐낸 실루엣", desc: "F/W 레더 백 단독 할인", image: "/icons/main6.webp" },
-
-      { title: "LEMAIRE", subtitle: "코지 니트 컬렉션", desc: "FW 신상품 얼리버드 20%", image: "/icons/main7.webp" },
-      { title: "BEANPOLE", subtitle: "따뜻한 데일리 아우터", desc: "시즌오프 최대 60% + 쿠폰", image: "/icons/main8.webp" },
-      { title: "Theory", subtitle: "소프트 캐시미어", desc: "한정 수량 특별가", image: "/icons/main9.webp" },
+      {
+        title: "8SECONDS",
+        subtitle: "리즈와 함께면 지금이 리즈",
+        desc: "BEYOND THE REBELS · 2nd Drop",
+        image: "/icons/main1.webp",
+      },
+      {
+        title: "KUHO PLUS",
+        subtitle: "25 Winter Collection",
+        desc: "혜택이 넘치는 세싸패 LIVE",
+        image: "/icons/main2.webp",
+      },
+      {
+        title: "J RIUM",
+        subtitle: "나를 안는 부드러움",
+        desc: "~38% + 7% + 5만포인트 + 사은품",
+        image: "/icons/main3.webp",
+      },
+      {
+        title: "COS",
+        subtitle: "다가온 가을의 순간",
+        desc: "변화하는 계절의 감각적인 스타일링",
+        image: "/icons/main4.webp",
+      },
+      {
+        title: "UGG & REQINS",
+        subtitle: "어쩔 수 없이 걷고 싶은 계절",
+        desc: "어그, 호갱 등 인기 슈즈 특가",
+        image: "/icons/main5.webp",
+      },
+      {
+        title: "ROUGE & LOUNGE",
+        subtitle: "인플루언서가 탐낸 실루엣",
+        desc: "F/W 레더 백 단독 할인",
+        image: "/icons/main6.webp",
+      },
+      {
+        title: "LEMAIRE",
+        subtitle: "코지 니트 컬렉션",
+        desc: "FW 신상품 얼리버드 20%",
+        image: "/icons/main7.webp",
+      },
+      {
+        title: "BEANPOLE",
+        subtitle: "따뜻한 데일리 아우터",
+        desc: "시즌오프 최대 60% + 쿠폰",
+        image: "/icons/main8.webp",
+      },
+      {
+        title: "Theory",
+        subtitle: "소프트 캐시미어",
+        desc: "한정 수량 특별가",
+        image: "/icons/main9.webp",
+      },
     ],
     []
   );
+
+  useEffect(() => {
+  const handler = () => setWishlistVersion(v => v + 1);
+  window.addEventListener("wishlistUpdated", handler);
+  return () => window.removeEventListener("wishlistUpdated", handler);
+  }, []);
+
 
   useEffect(() => {
     const t = setInterval(() => setPage((p) => (p + 1) % totalPages), 5000);
@@ -82,94 +171,321 @@ export default function Home() {
   const prev = () => setPage((p) => (p - 1 + totalPages) % totalPages);
   const next = () => setPage((p) => (p + 1) % totalPages);
 
-  const productCategories = ["니트 카디건", "백 & 슈즈", "쥬얼리 & 액세서리", "뷰티 & 향수", "코스메틱", "키즈 & 베이비"];
-  const rankingCategories = ["여성", "남성", "키즈", "럭셔리", "백&슈즈", "스포츠", "골프", "뷰티", "라이프"];
+  const productCategories = [
+    "니트 카디건",
+    "백 & 슈즈",
+    "럭셔리",
+    "뷰티 & 향수",
+    "코스메틱",
+    "키즈 & 베이비",
+  ];
+  const rankingCategories = [
+    "여성",
+    "남성",
+    "키즈",
+    "럭셔리",
+    "백&슈즈",
+    "스포츠",
+    "골프",
+    "뷰티",
+    "라이프",
+  ];
 
-  // ---- NEW: 홈 상품 데이터 (아이디/가격/할인/이미지 포함) ----
-  const homeProducts = useMemo(
+  // 홈 상품 탭 데이터
+  const productTabsData = useMemo(
     () => [
-      {
-        id: "P-ANGGAE-1",
-        brand: "anggae",
-        name: "Smocked Knit Cardigan - Grey",
-        image: "/images/3207359177.jpeg",
-        price: 159000,
-      },
-      {
-        id: "P-8SEC-1",
-        brand: "8 seconds",
-        name: "울100 카디건 - 카키",
-        image: "/images/1010207927.jpeg",
-        price: 59900,
-        originalPrice: 69900,
-        discountLabel: "10%",
-      },
-      {
-        id: "P-MAIA-1",
-        brand: "Maia",
-        name: "Two-Way Cardigan - French Roast",
-        image: "/images/3793950654.jpeg",
-        priceLabel: "품절",
-      },
-      {
-        id: "P-320S-1",
-        brand: "320Showroom",
-        name: "V-Neck Button-Up Wool Alpaca Knit Cardigan",
-        image: "/images/3826030000.jpeg",
-        price: 64800,
-        originalPrice: 79000,
-        discountLabel: "10%",
-      },
-      {
-        id: "P-HANE-1",
-        brand: "HANE",
-        name: "플라테카드 자켓 울 니트 가디건_Charcoal",
-        image: "/images/635366670.jpeg",
-        price: 118800,
-        originalPrice: 156000,
-        discountLabel: "26%",
-      },
+      // 0. 니트 카디건
+      [
+        {
+          id: "P-ANGGAE-1",
+          brand: "anggae",
+          name: "Soft Smocked Knit Cardigan",
+          image: "/images/women/knit/women_knit1.webp",
+          price: 159000,
+        },
+        {
+          id: "P-8SEC-1",
+          brand: "8SECONDS",
+          name: "울100 루즈핏 니트 - 카키",
+          image: "/images/women/knit/women_knit2.webp",
+          price: 59900,
+          originalPrice: 69900,
+          discountLabel: "10%",
+        },
+        {
+          id: "P-MAIA-1",
+          brand: "MAIA",
+          name: "Two-Way 버튼업 가디건",
+          image: "/images/women/knit/women_knit3.webp",
+          priceLabel: "품절",
+        },
+        {
+          id: "P-320S-1",
+          brand: "320SHOWROOM",
+          name: "V-Neck 알파카 니트",
+          image: "/images/women/knit/women_knit4.webp",
+          price: 64800,
+          originalPrice: 79000,
+          discountLabel: "10%",
+        },
+        {
+          id: "P-HANE-1",
+          brand: "HANE",
+          name: "플라테 울 니트 가디건",
+          image: "/images/women/knit/women_knit5.webp",
+          price: 118800,
+          originalPrice: 156000,
+          discountLabel: "26%",
+        },
+      ],
+
+      // 1. 백 & 슈즈
+      [
+        {
+          id: "P-BAG-1",
+          brand: "ROUGE&LOUNGE",
+          name: "블랙 메리제인 레더 플랫",
+          image: "/images/shoes/women/shoes_women1.webp",
+          price: 298000,
+          originalPrice: 398000,
+          discountLabel: "25%",
+        },
+        {
+          id: "P-BAG-2",
+          brand: "BEANPOLE",
+          name: "레오파드 클래식 플랫",
+          image: "/images/shoes/women/shoes_women2.webp",
+          price: 189000,
+        },
+        {
+          id: "P-SHOES-1",
+          brand: "FITFLOP",
+          name: "벨트 메리제인 컴포트 슈즈",
+          image: "/images/shoes/men/shoes_men1.webp",
+          price: 246050,
+          originalPrice: 259000,
+          discountLabel: "5%",
+        },
+        {
+          id: "P-SHOES-2",
+          brand: "UGG",
+          name: "CLASSIC MINI PLATFORM - Chestnut",
+          image: "/images/shoes/men/shoes_men2.webp",
+          price: 219000,
+        },
+      ],
+
+      // 2. 럭셔리
+      [
+        {
+          id: "P-JEWEL-1",
+          brand: "MAISON KITSUNÉ",
+          name: "클래식 울 블렌드 니트",
+          image: "/images/luxury/men/luxury_men1.webp",
+          price: 98000,
+        },
+        {
+          id: "P-JEWEL-2",
+          brand: "TORY BURCH",
+          name: "마린 스트라이프 롱슬리브 티",
+          image: "/images/luxury/men/luxury_men3.webp",
+          price: 118000,
+        },
+        {
+          id: "P-ACC-1",
+          brand: "LEMAIRE",
+          name: "레메르 클래식 스트라이프 셔츠",
+          image: "/images/luxury/women/luxury_women4.webp",
+          price: 158000,
+        },
+      ],
+
+      // 3. 뷰티 & 향수
+      [
+        {
+          id: "P-BEAUTY-1",
+          brand: "HERA",
+          name: "스킨케어 에센스 세트",
+          image: "/images/beauty/skin/beauty_skin1.webp",
+          price: 68000,
+        },
+        {
+          id: "P-BEAUTY-2",
+          brand: "TOM FORD",
+          name: "Soleil Brûlant EDP",
+          image: "/images/beauty/skin/beauty_skin2.webp",
+          price: 395000,
+        },
+        {
+          id: "P-BEAUTY-3",
+          brand: "LE LABO",
+          name: "Santal 33",
+          image: "/images/beauty/skin/beauty_skin3.webp",
+          price: 289000,
+        },
+      ],
+
+      // 4. 코스메틱
+      [
+        {
+          id: "P-COS-1",
+          brand: "HERA",
+          name: "센슈얼 누드 밤",
+          image: "/images/beauty/makeup/beauty_makeup1.webp",
+          price: 39000,
+        },
+        {
+          id: "P-COS-2",
+          brand: "MAC",
+          name: "파우더 키스 립스틱",
+          image: "/images/beauty/makeup/beauty_makeup2.webp",
+          price: 34000,
+        },
+        {
+          id: "P-COS-3",
+          brand: "NARS",
+          name: "블러쉬 ORGASM",
+          image: "/images/beauty/makeup/beauty_makeup3.webp",
+          price: 48000,
+        },
+      ],
+
+      // 5. 키즈 & 베이비
+      [
+        {
+          id: "P-KIDS-1",
+          brand: "ASICS KIDS",
+          name: "키즈 플리스 겨울 머플러",
+          image: "/images/kids/baby/kids_baby3.webp",
+          price: 39000,
+        },
+        {
+          id: "P-KIDS-2",
+          brand: "PATAGONIA",
+          name: "베이비 레트로-X 미튼",
+          image: "/images/kids/baby/kids_baby1.webp",
+          price: 29000,
+        },
+        {
+          id: "P-KIDS-3",
+          brand: "BEANPOLE KIDS",
+          name: "키즈 클래식 스니커즈 – Black",
+          image: "/images/kids/girl/kids_girl2.webp",
+          price: 59000,
+        },
+      ],
     ],
     []
   );
 
-  // ---- NEW: 위시리스트 헬퍼 ----
-  const isWishlisted = (id) => wishIds.has(id);
+  // 홈 상품 사이즈 옵션
+  const PRODUCT_SIZE_OPTIONS = useMemo(
+    () => ({
+      "P-ANGGAE-1": ["S", "M", "L"],
+      "P-8SEC-1": ["S", "M", "L"],
+      "P-MAIA-1": ["S", "M", "L"],
+      "P-320S-1": ["S", "M", "L"],
+      "P-HANE-1": ["S", "M", "L"],
 
-  const toggleWishlist = (product) => {
+      "P-BAG-1": ["ONE"],
+      "P-BAG-2": ["ONE"],
+      "P-SHOES-1": ["230", "240", "250", "260"],
+      "P-SHOES-2": ["230", "240", "250", "260"],
+
+      "P-JEWEL-1": ["FREE"],
+      "P-JEWEL-2": ["FREE"],
+      "P-ACC-1": ["FREE"],
+
+      "P-BEAUTY-1": ["13g", "15g"],
+      "P-BEAUTY-2": ["50ml", "100ml"],
+      "P-BEAUTY-3": ["50ml", "100ml"],
+
+      "P-COS-1": ["1호", "2호"],
+      "P-COS-2": ["01", "02", "03"],
+      "P-COS-3": ["Light", "Medium"],
+
+      "P-KIDS-1": ["XS", "S", "M"],
+      "P-KIDS-2": ["3Y", "4Y", "5Y"],
+      "P-KIDS-3": ["110", "120", "130"],
+    }),
+    []
+  );
+
+
+  const isWishlisted = (id) => {
+  try {
+    const list = JSON.parse(localStorage.getItem("wishlist")) || [];
+    return list.some(item => item.id === id || item.productId === id);
+  } catch {
+    return false;
+  }
+};
+
+  const toggleWishlist = async (product) => {
+    if (!email) {
+      alert("로그인 후 찜 기능을 이용할 수 있습니다.");
+      return;
+    }
+
     try {
-      let list = JSON.parse(localStorage.getItem("wishlist")) || [];
-      const exists = list.some((it) => it.id === product.id);
+      const normalizedPrice =
+        typeof product.price === "number" ? product.price : 0;
 
-      if (exists) {
-        list = list.filter((it) => it.id !== product.id);
-      } else {
-        const payload = {
-          id: product.id,
-          name: product.name,
-          brand: product.brand,
-          image: product.image,
-          price: product.price ?? null,
-          originalPrice: product.originalPrice ?? null,
-          priceLabel: product.priceLabel ?? null,
-          discountLabel: product.discountLabel ?? null,
-        };
-        list.push(payload);
-      }
+      const on = await toggleWishlistServer(email, {
+        ...product,
+        price: normalizedPrice,
+      });
 
-      localStorage.setItem("wishlist", JSON.stringify(list));
-      // 로컬 상태도 즉시 반영
-      setWishIds(new Set(list.map((it) => it.id)));
-      // 헤더 카운트 갱신용 커스텀 이벤트
-      try { window.dispatchEvent(new Event("wishlistUpdated")); } catch {}
+      setWishIds((prev) => {
+        const next = new Set(prev);
+        if (on) next.add(product.id);
+        else next.delete(product.id);
+        return next;
+      });
     } catch (e) {
-      console.error("Failed to update wishlist", e);
+      console.error("Home wishlist toggle error:", e);
+      alert("찜 처리 중 오류가 발생했습니다.");
     }
   };
 
-  // 브랜드 데이터 (총 35개 브랜드)
+  const handleSizeSelect = (productId, size) => {
+    setSelectedSizes((prev) => ({
+      ...prev,
+      [productId]: prev[productId] === size ? undefined : size,
+    }));
+  };
+
+  // 홈 상품 카드 클릭 → Checkout
+  const handleProductClick = (product) => {
+    if (!product || typeof product.price !== "number") {
+      alert("품절 상품은 구매할 수 없습니다.");
+      return;
+    }
+
+    const sizeOptions = PRODUCT_SIZE_OPTIONS[product.id] || [];
+    const selectedSize = selectedSizes[product.id];
+
+    if (sizeOptions.length > 0 && !selectedSize) {
+      alert("사이즈를 선택해 주세요.");
+      return;
+    }
+
+    navigate("/checkout", {
+      state: {
+        order: {
+          id: product.id,
+          name: product.name,
+          image: product.image,
+          price: product.price,
+          qty: 1,
+          size: selectedSize || "",
+        },
+      },
+    });
+  };
+
+  // 인기 브랜드 데이터
   const brandData = [
-    // Page 1 (1-12)
     { logo: brand8Seconds, name: "에잇세컨즈", link: "/brand/8seconds", isImage: true },
     { logo: brandBeanpole, name: "빈폴", link: "/brand/beanpole", isImage: true },
     { logo: brandBeaker, name: "비이커", link: "/brand/beaker", isImage: true },
@@ -178,12 +494,16 @@ export default function Home() {
     { logo: brandMaisonKitsune, name: "메종키츠네", link: "/brand/maison-kitsune", isImage: true },
     { logo: brandTheory, name: "띠어리", link: "/brand/theory", isImage: true },
     { logo: brandKuhoPlus, name: "구호플러스", link: "/brand/kuho-plus", isImage: true },
-    { logo: brandCommeDesGarcons, name: "꼼데가르송", link: "/brand/comme-des-garcons", isImage: true },
+    {
+      logo: brandCommeDesGarcons,
+      name: "꼼데가르송",
+      link: "/brand/comme-des-garcons",
+      isImage: true,
+    },
     { logo: brandPatagonia, name: "파타고니아", link: "/brand/patagonia", isImage: true },
     { logo: brandSportyRich, name: "스포티앤리치", link: "/brand/sporty-rich", isImage: true },
     { logo: brandSie, name: "시에", link: "/brand/sie", isImage: true },
 
-    // Page 2 (13-24)
     { logo: brandInuGolf, name: "이뉴골프", link: "/brand/inu-golf", isImage: true },
     { logo: brandGeneralIdea, name: "제너럴 아이디어", link: "/brand/general-idea", isImage: true },
     { logo: brandLeMouton, name: "르무통", link: "/brand/le-mouton", isImage: true },
@@ -197,10 +517,14 @@ export default function Home() {
     { logo: brandSaintJames, name: "세인트제임스", link: "/brand/saint-james", isImage: true },
     { logo: brandTommyHilfiger, name: "타미힐피거", link: "/brand/tommy-hilfiger", isImage: true },
 
-    // Page 3 (25-35)
     { logo: brandCanadaGoose, name: "캐나다구스", link: "/brand/canada-goose", isImage: true },
     { logo: brandHera, name: "헤라", link: "/brand/hera", isImage: true },
-    { logo: brandGalaxyLifestyle, name: "갤럭시라이프스타일", link: "/brand/galaxy-lifestyle", isImage: true },
+    {
+      logo: brandGalaxyLifestyle,
+      name: "갤럭시라이프스타일",
+      link: "/brand/galaxy-lifestyle",
+      isImage: true,
+    },
     { logo: brandRebaige, name: "르베이지", link: "/brand/rebaige", isImage: true },
     { logo: brandToryBurch, name: "토리버치", link: "/brand/tory-burch", isImage: true },
     { logo: brandGalaxy, name: "갤럭시", link: "/brand/galaxy", isImage: true },
@@ -208,12 +532,15 @@ export default function Home() {
     { logo: brandFitflop, name: "핏플랍", link: "/brand/fitflop", isImage: true },
     { logo: brandGanni, name: "가니", link: "/brand/ganni", isImage: true },
     { logo: brandRagBone, name: "랙앤본", link: "/brand/rag-bone", isImage: true },
-    { logo: brandSandsound, name: "샌드사운드", link: "/brand/sandsound", isImage: true }
+    { logo: brandSandsound, name: "샌드사운드", link: "/brand/sandsound", isImage: true },
   ];
 
   const brandsPerPage = 12;
   const totalBrandPages = Math.ceil(brandData.length / brandsPerPage);
-  const currentBrands = brandData.slice(brandPage * brandsPerPage, (brandPage + 1) * brandsPerPage);
+  const currentBrands = brandData.slice(
+    brandPage * brandsPerPage,
+    (brandPage + 1) * brandsPerPage
+  );
 
   const handleBrandPrev = () => {
     setBrandPage((prev) => (prev - 1 + totalBrandPages) % totalBrandPages);
@@ -223,16 +550,447 @@ export default function Home() {
     setBrandPage((prev) => (prev + 1) % totalBrandPages);
   };
 
-  // 가격 포맷
-  const formatPrice = (n) => (typeof n === "number" ? n.toLocaleString() : n);
+  const formatPrice = (n) =>
+    typeof n === "number" ? n.toLocaleString() : n;
+
+  const currentProducts = productTabsData[activeProductTab] || [];
+
+
+  const rankingTabsData = [
+    // 0. 여성
+    [
+      {
+        id: "R-W-1",
+        rank: 1,
+        brand: "KUHO",
+        name: "플리츠 니트 스커트 셋업",
+        image: "/images/women/new/women_new1.webp",
+        discount: 30,
+        price: 197100,
+      },
+      {
+        id: "R-W-2",
+        rank: 2,
+        brand: "KUHO PLUS",
+        name: "벨티드 슬랙스 니트 톱 세트",
+        image: "/images/women/new/women_new2.webp",
+        discount: 20,
+        price: 246000,
+      },
+      {
+        id: "R-W-3",
+        rank: 3,
+        brand: "anggae",
+        name: "롱 슬릿 니트 원피스",
+        image: "/images/women/new/women_new3.webp",
+        discount: 15,
+        price: 238400,
+      },
+      {
+        id: "R-W-4",
+        rank: 4,
+        brand: "LEMAIRE",
+        name: "하이넥 니트 탑 & 플리츠 팬츠",
+        image: "/images/women/new/women_new4.webp",
+        price: 298000,
+      },
+    ],
+
+    // 1. 남성
+    [
+      {
+        id: "R-M-1",
+        rank: 1,
+        brand: "GALAXY",
+        name: "클래식 테일러드 싱글 수트",
+        image: "/images/men/suit/men_suit4.webp",
+        discount: 30,
+        price: 298000,
+      },
+      {
+        id: "R-M-2",
+        rank: 2,
+        brand: "JUUN.J",
+        name: "오버핏 모던 싱글 블레이저",
+        image: "/images/men/suit/men_suit5.webp",
+        discount: 15,
+        price: 328000,
+      },
+      {
+        id: "R-M-3",
+        rank: 3,
+        brand: "PATAGONIA",
+        name: "리사이클 폴라 플리스 머플러",
+        image: "/images/men/new/men_new3.webp",
+        price: 89000,
+      },
+      {
+        id: "R-M-4",
+        rank: 4,
+        brand: "AMI",
+        name: "하트 로고 니트 머플러",
+        image: "/images/men/new/men_new4.webp",
+        price: 98000,
+      },
+    ],
+
+    // 2. 키즈
+    [
+      {
+        id: "R-K-1",
+        rank: 1,
+        brand: "ASICS KIDS",
+        name: "테디 버킷 햇 점퍼 세트",
+        image: "/images/kids/new/kids_new1.webp",
+        price: 69000,
+      },
+      {
+        id: "R-K-2",
+        rank: 2,
+        brand: "PATAGONIA",
+        name: "베이비 레트로-X 점퍼",
+        image: "/images/kids/new/kids_new2.webp",
+        price: 129000,
+      },
+      {
+        id: "R-K-3",
+        rank: 3,
+        brand: "BEANPOLE KIDS",
+        name: "플러피 미트 글러브",
+        image: "/images/kids/new/kids_new3.webp",
+        price: 39000,
+      },
+      {
+        id: "R-K-4",
+        rank: 4,
+        brand: "ASICS KIDS",
+        name: "프린트 트렁크 2팩",
+        image: "/images/kids/new/kids_new4.webp",
+        price: 89000,
+      },
+    ],
+
+    // 3. 럭셔리
+    [
+      {
+        id: "R-LUX-1",
+        rank: 1,
+        brand: "LEMAIRE",
+        name: "Croissant Sling Bag - Black",
+        image: "/images/luxury/new/luxury_new1.webp",
+        price: 1980000,
+      },
+      {
+        id: "R-LUX-2",
+        rank: 2,
+        brand: "COMOLI",
+        name: "체크 스트랩 숄더 백",
+        image: "/images/luxury/new/luxury_new2.webp",
+        price: 980000,
+      },
+      {
+        id: "R-LUX-3",
+        rank: 3,
+        brand: "SUITSUPPLY",
+        name: "울 하프 슬리브 니트 톱",
+        image: "/images/luxury/new/luxury_new3.webp",
+        price: 398000,
+      },
+      {
+        id: "R-LUX-4",
+        rank: 4,
+        brand: "AMI",
+        name: "체크 울 재킷",
+        image: "/images/luxury/new/luxury_new4.webp",
+        price: 598000,
+      },
+    ],
+
+    // 4. 백 & 슈즈
+    [
+      {
+        id: "R-BS-1",
+        rank: 1,
+        brand: "ROUGE&LOUNGE",
+        name: "레오파드 퍼 키링 파우치",
+        image: "/images/shoes/new/shoes_new1.webp",
+        price: 98000,
+      },
+      {
+        id: "R-BS-2",
+        rank: 2,
+        brand: "BEANPOLE",
+        name: "퍼 슬링백 뮬",
+        image: "/images/shoes/new/shoes_new2.webp",
+        price: 189000,
+      },
+      {
+        id: "R-BS-3",
+        rank: 3,
+        brand: "FITFLOP",
+        name: "시어 글라스 스트랩 힐",
+        image: "/images/shoes/new/shoes_new3.webp",
+        price: 246050,
+      },
+      {
+        id: "R-BS-4",
+        rank: 4,
+        brand: "UGG",
+        name: "화이트 러닝 스니커즈",
+        image: "/images/shoes/new/shoes_new4.webp",
+        price: 219000,
+      },
+    ],
+
+    // 5. 스포츠
+    [
+      {
+        id: "R-SP-1",
+        rank: 1,
+        brand: "PATAGONIA",
+        name: "레트로X 숏 패딩",
+        image: "/images/sports/new/sports_new1.webp",
+        price: 259000,
+      },
+      {
+        id: "R-SP-2",
+        rank: 2,
+        brand: "VOLVIK",
+        name: "라이트 다운 베스트",
+        image: "/images/sports/new/sports_new2.webp",
+        price: 189000,
+      },
+      {
+        id: "R-SP-3",
+        rank: 3,
+        brand: "ASICS",
+        name: "하이넥 패딩베스트",
+        image: "/images/sports/new/sports_new3.webp",
+        price: 199000,
+      },
+      {
+        id: "R-SP-4",
+        rank: 4,
+        brand: "NIKE",
+        name: "플리스 조거 팬츠",
+        image: "/images/sports/new/sports_new4.webp",
+        price: 69000,
+      },
+    ],
+
+    // 6. 골프
+    [
+      {
+        id: "R-GOLF-1",
+        rank: 1,
+        brand: "VOLVIK",
+        name: "컬러 패턴 골프 니트",
+        image: "/images/golf/new/golf_new1.webp",
+        price: 298000,
+      },
+      {
+        id: "R-GOLF-2",
+        rank: 2,
+        brand: "GALAXY",
+        name: "남성 골프 점퍼 세트",
+        image: "/images/golf/new/golf_new2.webp",
+        price: 398000,
+      },
+      {
+        id: "R-GOLF-3",
+        rank: 3,
+        brand: "PATAGONIA",
+        name: "윈드브레이커 풀오버",
+        image: "/images/golf/new/golf_new3.webp",
+        price: 219000,
+      },
+      {
+        id: "R-GOLF-4",
+        rank: 4,
+        brand: "BEANPOLE GOLF",
+        name: "플레이어 셋업",
+        image: "/images/golf/new/golf_new4.webp",
+        price: 159000,
+      },
+    ],
+
+    // 7. 뷰티
+    [
+      {
+        id: "R-BEAUTY-1",
+        rank: 1,
+        brand: "HERA",
+        name: "블랙 쿠션 세트",
+        image: "/images/beauty/new/beauty_new1.webp",
+        price: 68000,
+      },
+      {
+        id: "R-BEAUTY-2",
+        rank: 2,
+        brand: "TOM FORD",
+        name: "프라이빗 블렌드 EDP",
+        image: "/images/beauty/new/beauty_new2.webp",
+        price: 395000,
+      },
+      {
+        id: "R-BEAUTY-3",
+        rank: 3,
+        brand: "LE LABO",
+        name: "Santal 33 오 드 퍼퓸",
+        image: "/images/beauty/new/beauty_new3.webp",
+        price: 289000,
+      },
+      {
+        id: "R-BEAUTY-4",
+        rank: 4,
+        brand: "MAC",
+        name: "립스틱 3종 키트",
+        image: "/images/beauty/new/beauty_new4.webp",
+        price: 99000,
+      },
+    ],
+
+    // 8. 라이프
+    [
+      {
+        id: "R-LIFE-1",
+        rank: 1,
+        brand: "SSF HOME",
+        name: "코지 워싱 코튼 베딩세트",
+        image: "/images/life/new/life_new1.webp",
+        price: 189000,
+      },
+      {
+        id: "R-LIFE-2",
+        rank: 2,
+        brand: "anggae",
+        name: "스트라이프 코튼 이불커버",
+        image: "/images/life/new/life_new2.webp",
+        price: 189000,
+      },
+      {
+        id: "R-LIFE-3",
+        rank: 3,
+        brand: "anggae",
+        name: "라이트 코튼 블랭킷",
+        image: "/images/life/new/life_new3.webp",
+        price: 159000,
+      },
+      {
+        id: "R-LIFE-4",
+        rank: 4,
+        brand: "COMOLI",
+        name: "플라워 프린트 코튼 베딩",
+        image: "/images/life/new/life_new4.webp",
+        price: 189000,
+      },
+    ],
+  ];
+
+  // 랭킹 사이즈 옵션 (향수는 ml, 침구는 사이즈 등)
+  const RANKING_SIZE_OPTIONS = useMemo(
+    () => ({
+      // 여성
+      "R-W-1": ["S", "M", "L"],
+      "R-W-2": ["S", "M", "L"],
+      "R-W-3": ["S", "M", "L"],
+      "R-W-4": ["S", "M", "L"],
+
+      // 남성
+      "R-M-1": ["M", "L", "XL"],
+      "R-M-2": ["M", "L", "XL"],
+      "R-M-3": ["FREE"],
+      "R-M-4": ["FREE"],
+
+      // 키즈
+      "R-K-1": ["160", "170", "180"],
+      "R-K-2": ["3Y", "4Y", "5Y"],
+      "R-K-3": ["FREE"],
+      "R-K-4": ["110", "120", "130"],
+
+      // 럭셔리
+      "R-LUX-1": ["ONE"],
+      "R-LUX-2": ["ONE"],
+      "R-LUX-3": ["S", "M", "L"],
+      "R-LUX-4": ["S", "M", "L"],
+
+      // 백 & 슈즈
+      "R-BS-1": ["ONE"],
+      "R-BS-2": ["230", "235", "240", "245"],
+      "R-BS-3": ["225", "230", "235", "240", "245"],
+      "R-BS-4": ["230", "240", "250", "260"],
+
+      // 스포츠
+      "R-SP-1": ["S", "M", "L"],
+      "R-SP-2": ["S", "M", "L"],
+      "R-SP-3": ["S", "M", "L"],
+      "R-SP-4": ["S", "M", "L"],
+
+      // 골프
+      "R-GOLF-1": ["S", "M", "L"],
+      "R-GOLF-2": ["S", "M", "L", "XL"],
+      "R-GOLF-3": ["S", "M", "L"],
+      "R-GOLF-4": ["S", "M", "L"],
+
+      // 뷰티 (향수는 ml 선택)
+      "R-BEAUTY-1": ["13g", "15g"],
+      "R-BEAUTY-2": ["30ml", "50ml", "100ml"],
+      "R-BEAUTY-3": ["50ml", "100ml"],
+      "R-BEAUTY-4": ["SET"],
+
+      // 라이프 (침구 사이즈)
+      "R-LIFE-1": ["SS", "Q", "K"],
+      "R-LIFE-2": ["SS", "Q", "K"],
+      "R-LIFE-3": ["SS", "Q"],
+      "R-LIFE-4": ["SS", "Q", "K"],
+    }),
+    []
+  );
+
+  const currentRankingProducts = rankingTabsData[activeRankingTab] || [];
+
+  const handleRankSizeSelect = (productId, size) => {
+    setSelectedRankSizes((prev) => ({
+      ...prev,
+      [productId]: prev[productId] === size ? undefined : size,
+    }));
+  };
+
+  const handleRankingClick = (item) => {
+    if (!item || typeof item.price !== "number") return;
+
+    const sizeOptions = RANKING_SIZE_OPTIONS[item.id] || [];
+    const selectedSize = selectedRankSizes[item.id];
+
+    if (sizeOptions.length > 0 && !selectedSize) {
+      alert("사이즈를 선택해 주세요.");
+      return;
+    }
+
+    navigate("/checkout", {
+      state: {
+        order: {
+          id: item.id,
+          name: item.name,
+          image: item.image,
+          price: item.price,
+          qty: 1,
+          size: selectedSize || "",
+        },
+      },
+    });
+  };
 
   return (
     <>
       <main className="main-content">
-        {/* === 3장씩 보이는 슬라이드 === */}
+        {/* 3장씩 보이는 메인 슬라이드 */}
         <section className="tri-hero">
           <div className="tri-hero__container">
-            <div className="tri-hero__wrap" style={{ transform: `translateX(-${page * 100}%)` }}>
+            <div
+              className="tri-hero__wrap"
+              style={{ transform: `translateX(-${page * 100}%)` }}
+            >
               {slides.map((s, i) => (
                 <Link key={i} to="/menu" className="tri-card">
                   <img src={s.image} alt={s.title} className="tri-card__img" />
@@ -244,25 +1002,49 @@ export default function Home() {
                 </Link>
               ))}
             </div>
-            <button className="tri-hero__nav tri-hero__prev" onClick={prev} aria-label="이전">
+            <button
+              className="tri-hero__nav tri-hero__prev"
+              onClick={prev}
+              aria-label="이전"
+            >
               <svg width="24" height="24" viewBox="0 0 24 24">
-                <path d="M15 18l-6-6 6-6" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" />
+                <path
+                  d="M15 18l-6-6 6-6"
+                  fill="none"
+                  stroke="currentColor"
+                  strokeWidth="2"
+                  strokeLinecap="round"
+                />
               </svg>
             </button>
-            <button className="tri-hero__nav tri-hero__next" onClick={next} aria-label="다음">
+            <button
+              className="tri-hero__nav tri-hero__next"
+              onClick={next}
+              aria-label="다음"
+            >
               <svg width="24" height="24" viewBox="0 0 24 24">
-                <path d="M9 18l6-6-6-6" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" />
+                <path
+                  d="M9 18l6-6-6-6"
+                  fill="none"
+                  stroke="currentColor"
+                  strokeWidth="2"
+                  strokeLinecap="round"
+                />
               </svg>
             </button>
             <div className="tri-hero__dots">
               {[0, 1, 2].map((n) => (
-                <span key={n} className={`tri-dot ${page === n ? "active" : ""}`} onClick={() => setPage(n)} />
+                <span
+                  key={n}
+                  className={`tri-dot ${page === n ? "active" : ""}`}
+                  onClick={() => setPage(n)}
+                />
               ))}
             </div>
           </div>
         </section>
 
-        {/* === 인기 브랜드 === */}
+        {/* 인기 브랜드 */}
         <section className="popular-brands">
           <div className="container">
             <h2 className="section-title">인기 브랜드</h2>
@@ -273,7 +1055,11 @@ export default function Home() {
                   <Link key={index} to={brand.link} className="brand-card">
                     <div className="brand-logo-box">
                       {brand.isImage ? (
-                        <img src={brand.logo} alt={brand.name} className="brand-logo-img" />
+                        <img
+                          src={brand.logo}
+                          alt={brand.name}
+                          className="brand-logo-img"
+                        />
                       ) : (
                         <span className="brand-logo-text">{brand.logo}</span>
                       )}
@@ -291,24 +1077,38 @@ export default function Home() {
                 aria-label="이전 페이지"
               >
                 <svg width="24" height="24" viewBox="0 0 24 24">
-                  <path d="M15 18l-6-6 6-6" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round"/>
+                  <path
+                    d="M15 18l-6-6 6-6"
+                    fill="none"
+                    stroke="currentColor"
+                    strokeWidth="2"
+                    strokeLinecap="round"
+                  />
                 </svg>
               </button>
-              <span className="pagination-text">{brandPage + 1} / {totalBrandPages}</span>
+              <span className="pagination-text">
+                {brandPage + 1} / {totalBrandPages}
+              </span>
               <button
                 className="pagination-arrow"
                 onClick={handleBrandNext}
                 aria-label="다음 페이지"
               >
                 <svg width="24" height="24" viewBox="0 0 24 24">
-                  <path d="M9 18l6-6-6-6" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round"/>
+                  <path
+                    d="M9 18l6-6-6-6"
+                    fill="none"
+                    stroke="currentColor"
+                    strokeWidth="2"
+                    strokeLinecap="round"
+                  />
                 </svg>
               </button>
             </div>
           </div>
         </section>
 
-        {/* === 이벤트 배너 === */}
+        {/* 이벤트 배너 */}
         <section className="event-banner">
           <div className="container">
             <h2 className="section-title">이벤트</h2>
@@ -328,7 +1128,10 @@ export default function Home() {
                 </div>
               </div>
               <div className="event-card">
-                <img src="/images/1642450336.jpeg" alt="앱에서 첫 로그인하고 쿠폰 받기" />
+                <img
+                  src="/images/1642450336.jpeg"
+                  alt="앱에서 첫 로그인하고 쿠폰 받기"
+                />
                 <div className="event-content">
                   <h3>앱에서 첫 로그인하고 쿠폰 받기</h3>
                   <p>1만원 쿠폰 즉시 지급</p>
@@ -338,65 +1141,112 @@ export default function Home() {
           </div>
         </section>
 
-        {/* Product Grid Section */}
+        {/* 홈 상품 섹션 */}
         <section className="product-section">
           <div className="container">
             <div className="section-header">
               <h2 className="section-title">고마움과 안부, 마음껏 전할 시간</h2>
 
-              {/* ---- NEW: 위시리스트 페이지로 가는 링크 ---- */}
               <div className="category-tabs">
                 {productCategories.map((category, index) => (
                   <button
                     key={index}
-                    className={`tab-btn ${index === activeProductTab ? 'active' : ''}`}
+                    className={`tab-btn ${
+                      index === activeProductTab ? "active" : ""
+                    }`}
                     onClick={() => setActiveProductTab(index)}
                   >
                     {category}
                   </button>
                 ))}
-                <Link to="/wishlist" className="tab-btn" style={{ textDecoration: "none" }}>
+                <Link
+                  to="/wishlist"
+                  className="tab-btn"
+                  style={{ textDecoration: "none" }}
+                >
                   위시리스트 보러가기 →
                 </Link>
               </div>
             </div>
 
             <div className="product-grid">
-              {homeProducts.map((p) => {
-                const wished = isWishlisted(p.id);
+              {currentProducts.map((p) => {
+                const wished = isWishlisted(p.id); // 
+                const sizeOptions = PRODUCT_SIZE_OPTIONS[p.id] || [];
+                const selectedSize = selectedSizes[p.id];
+
                 return (
-                  <div className="product-card" key={p.id}>
+                  <div
+                    className="product-card"
+                    key={p.id}
+                    onClick={() => handleProductClick(p)}
+                  >
                     <div className="product-image">
                       <img src={p.image} alt={p.name} />
-                      {/* ---- NEW: 하트 버튼 (토글) ---- */}
                       <button
                         className={`wishlist-btn ${wished ? "active" : ""}`}
                         aria-pressed={wished}
                         aria-label={wished ? "위시에서 제거" : "위시에 추가"}
-                        onClick={() => toggleWishlist(p)}
+                        onClick={(e) => {
+                          e.stopPropagation();
+                          toggleWishlist(p); // 
+                        }}
                         title={wished ? "위시에 담김" : "위시에 담기"}
                       >
-                        <svg width="20" height="20" viewBox="0 0 24 24" fill="none">
+                        <svg
+                          width="20"
+                          height="20"
+                          viewBox="0 0 24 24"
+                          fill="none"
+                        >
                           <path
                             d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"
                             stroke="currentColor"
                             strokeWidth="2"
-                            // 활성화 시 하트 채우기
                             fill={wished ? "currentColor" : "none"}
                           />
                         </svg>
                       </button>
-                      {p.discountLabel && <span className="discount-badge">{p.discountLabel}</span>}
+                      {p.discountLabel && (
+                        <span className="discount-badge">{p.discountLabel}</span>
+                      )}
                     </div>
                     <div className="product-info">
                       <span className="brand">{p.brand}</span>
                       <h3 className="product-name">{p.name}</h3>
                       <div className="price">
-                        {p.originalPrice && <span className="original-price">{formatPrice(p.originalPrice)}</span>}
+                        {p.originalPrice && (
+                          <span className="original-price">
+                            {formatPrice(p.originalPrice)}
+                          </span>
+                        )}
                         <span className="current-price">
                           {p.priceLabel ? p.priceLabel : formatPrice(p.price)}
                         </span>
                       </div>
+
+                      {sizeOptions.length > 0 && (
+                        <div className="size-selector">
+                          <span className="size-label">SIZE</span>
+                          <div className="size-options">
+                            {sizeOptions.map((size) => (
+                              <button
+                                key={size}
+                                type="button"
+                                className={`size-pill ${
+                                  selectedSize === size ? "selected" : ""
+                                }`}
+                                onClick={(e) => {
+                                  e.stopPropagation();
+                                  handleSizeSelect(p.id, size);
+                                }}
+                              >
+                                {size}
+                              </button>
+                            ))}
+                          </div>
+                        </div>
+                      )}
                     </div>
                   </div>
                 );
@@ -405,15 +1255,18 @@ export default function Home() {
           </div>
         </section>
 
-        {/* Ranking Section */}
+        {/* 랭킹 섹션 */}
         <section className="ranking-section">
           <div className="container">
             <h2 className="section-title">랭킹</h2>
+
             <div className="ranking-tabs">
               {rankingCategories.map((category, index) => (
                 <button
                   key={index}
-                  className={`tab-btn ${index === activeRankingTab ? 'active' : ''}`}
+                  className={`tab-btn ${
+                    index === activeRankingTab ? "active" : ""
+                  }`}
                   onClick={() => setActiveRankingTab(index)}
                 >
                   {category}
@@ -422,107 +1275,78 @@ export default function Home() {
             </div>
 
             <div className="ranking-grid">
-              <div className="ranking-item">
-                <span className="rank">1</span>
-                <img src="/images/3206396286.jpeg" alt="SAMSONITE" />
-                <div className="item-info">
-                  <h4>SAMSONITE</h4>
-                  <p>[캠소나이트] OCLITE 캐리어 55/68(2024년형) 2종세트 4종택1</p>
-                  <div className="price">
-                    <span className="discount">59%</span>
-                    <strong>197,100</strong>
-                  </div>
-                </div>
-              </div>
+              {currentRankingProducts.map((item) => {
+                const sizeOptions = RANKING_SIZE_OPTIONS[item.id] || [];
+                const selectedSize = selectedRankSizes[item.id];
 
-              <div className="ranking-item">
-                <span className="rank">2</span>
-                <img src="/images/357450008.jpeg" alt="FITFLOP" />
-                <div className="item-info">
-                  <h4>FITFLOP</h4>
-                  <p>[핏플랍] 여성 벨트 메리제인 탈레미나 블랙루소스 - 톰 플랙</p>
-                  <div className="price">
-                    <span className="discount">5%</span>
-                    <strong>246,050</strong>
-                  </div>
-                </div>
-              </div>
+                return (
+                  <div
+                    key={item.id}
+                    className="ranking-item"
+                    onClick={() => handleRankingClick(item)}
+                  >
+                    <div className="rank-badge">{item.rank}</div>
+                    <div className="ranking-img-wrap">
+                      <img src={item.image} alt={item.brand} />
 
-              <div className="ranking-item">
-                <span className="rank">3</span>
-                <img src="/images/1491953271.jpeg" alt="KUHO" />
-                <div className="item-info">
-                  <h4>KUHO</h4>
-                  <p>[BINA] Nylon Buckle Point Shoulder Bag - Black</p>
-                  <div className="price">
-                    <span className="discount">20%</span>
-                    <strong>238,400</strong>
-                  </div>
-                </div>
-              </div>
+                      <button
+                        className={`ranking-heart ${
+                          isWishlisted(item.id) ? "active" : ""
+                        }`}
+                        onClick={(e) => {
+                          e.stopPropagation();
+                          toggleWishlistServer(email, item);
+                        }}
+                      >
+                        ♥
+                      </button>
+                    </div>
 
-              <div className="ranking-item">
-                <span className="rank">4</span>
-                <img src="/images/573690851.jpeg" alt="LEMAIRE" />
-                <div className="item-info">
-                  <h4>LEMAIRE</h4>
-                  <p>[UNISEX] Croissant Coin Purse - Dark Chocolate</p>
-                  <div className="price">
-                    <strong>1,980,000</strong>
+                    <div className="item-info">
+                      <h4>{item.brand}</h4>
+                      <p>{item.name}</p>
+                      <div className="price">
+                        {item.discount ? (
+                          <span className="discount">{item.discount}%</span>
+                        ) : null}
+                        {item.price ? (
+                          <strong>{formatPrice(item.price)}</strong>
+                        ) : null}
+                      </div>
+
+                      {sizeOptions.length > 0 && (
+                        <div className="size-selector ranking-size">
+                          <span className="size-label">SIZE</span>
+                          <div className="size-options">
+                            {sizeOptions.map((size) => (
+                              <button
+                                key={size}
+                                type="button"
+                                className={`size-pill ${
+                                  selectedSize === size ? "selected" : ""
+                                }`}
+                                onClick={(e) => {
+                                  e.stopPropagation();
+                                  handleRankSizeSelect(item.id, size);
+                                }}
+                              >
+                                {size}
+                              </button>
+                            ))}
+                          </div>
+                        </div>
+                      )}
+                    </div>
                   </div>
-                </div>
-              </div>
+                );
+              })}
             </div>
           </div>
         </section>
 
-        {/* Featured Brands Section */}
-        <section className="featured-brands">
-          <div className="container">
-            <h2 className="section-title">주목할 브랜드</h2>
-            <div className="featured-grid">
-              <div className="featured-card">
-                <img src="/images/1119019333.jpeg" alt="anggae" />
-                <div className="featured-content">
-                  <h3>anggae</h3>
-                  <p>25F/W 3rd Drop</p>
-                  <p className="subtitle">일상에 스며들 가을의 설레임</p>
-                  <Link to="/brand/anggae" className="featured-link">기획전 바로가기 →</Link>
-                </div>
-              </div>
 
-              <div className="featured-card">
-                <img src="/images/578281922.jpeg" alt="anggae" />
-                <div className="featured-products">
-                  <div className="mini-product">
-                    <img src="/images/1202455836.jpeg" alt="anggae Ribbed Snake Cardigan" />
-                    <span className="brand">anggae</span>
-                    <span className="name">Ribbed Snake Cardigan - Black</span>
-                    <strong>189,000</strong>
-                  </div>
-                  <div className="mini-product">
-                    <img src="/images/3859394708.jpeg" alt="anggae Off Shoulder Pullover" />
-                    <span className="brand">anggae</span>
-                    <span className="name">Off Shoulder Pullover - Black</span>
-                    <strong>159,000</strong>
-                  </div>
-                </div>
-              </div>
 
-              <div className="featured-card">
-                <img src="/images/3086143679.jpeg" alt="VOLVIK" />
-                <div className="featured-content">
-                  <h3>VOLVIK</h3>
-                  <p>혜택이 불어오는</p>
-                  <p className="subtitle">필드를 즐길 시간</p>
-                  <Link to="/brand/volvik" className="featured-link">기획전 바로가기 →</Link>
-                </div>
-              </div>
-            </div>
-          </div>
-        </section>
-
-        {/* Brand Story Section */}
+        {/* 브랜드 스토리 */}
         <section className="brand-story">
           <div className="container">
             <h2 className="section-title">이 주의 브랜드 이슈</h2>

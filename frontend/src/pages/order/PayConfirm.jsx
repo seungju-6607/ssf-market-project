@@ -67,7 +67,7 @@ export default function PayConfirm() {
                     <div>
                         <div className="pc-date">{orderDateLabel}</div>
                         <p className="pc-recipient">
-                            받으시는 분 <strong>{firstOrder?.userName || "-"}</strong>
+                            받으시는 분 : <strong>{firstOrder?.userName || "-"}</strong>
                         </p>
                     </div>
                     <div className="pc-order-links">

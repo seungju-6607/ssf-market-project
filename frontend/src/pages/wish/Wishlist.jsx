@@ -1,128 +1,230 @@
 // src/pages/wish/Wishlist.jsx
-import React, { useEffect, useState } from "react";
-import { Link, useNavigate } from "react-router-dom";
-import "../../styles/Wishlist.css";
+import React, { useEffect, useMemo, useState } from "react";
+import { useNavigate, Link } from "react-router-dom";
+import "./Wishlist.css";
+import {
+  syncWishlistFromServer,
+  toggleWishlistServer,
+  clearWishlistOnServer,
+} from "../../hooks/useWishlist";
 
-const KEY = "wishlist";
+const formatKRW = (n) =>
+  `₩${Number(n || 0).toLocaleString()}`;
 
-const readWishlist = () => {
-  try {
-    return JSON.parse(localStorage.getItem(KEY)) || [];
-  } catch {
-    return [];
-  }
-};
-
-export default function Wishlist() {
+function Wishlist() {
   const navigate = useNavigate();
-  const [items, setItems] = useState(() => readWishlist());
-  const count = items.length;
+  const [items, setItems] = useState([]);
+  const [loading, setLoading] = useState(true);
+  const [email, setEmail] = useState("");
 
-  // 같은 탭 즉시 반영: 커스텀 이벤트 + storage 둘 다 구독
   useEffect(() => {
-    const onCustom = (e) => setItems(e.detail?.items ?? readWishlist());
-    const onStorage = () => setItems(readWishlist());
-    window.addEventListener("wishlist:update", onCustom);
-    window.addEventListener("storage", onStorage);
-    return () => {
-      window.removeEventListener("wishlist:update", onCustom);
-      window.removeEventListener("storage", onStorage);
+    const loginUser = JSON.parse(
+      localStorage.getItem("loginUser") || "{}"
+    );
+    if (!loginUser.email) {
+      alert("로그인 후 이용해 주세요.");
+      navigate("/login");
+      return;
+    }
+    setEmail(loginUser.email);
+  }, [navigate]);
+
+
+  useEffect(() => {
+    if (!email) return;
+    let cancelled = false;
+
+    const load = async () => {
+      setLoading(true);
+      const list = await syncWishlistFromServer(email);
+      if (!cancelled) {
+        setItems(list);
+        setLoading(false);
+      }
     };
-  }, []);
 
-  const goDetail = (p) => {
-    localStorage.setItem("lastProduct", JSON.stringify(p));
-    navigate(`/product/${p.id}`, { product: p });
+    load();
+    return () => {
+      cancelled = true;
+    };
+  }, [email]);
+
+  const empty = !loading && items.length === 0;
+
+  const handleRemoveOne = async (item) => {
+    if (!email) return;
+    setItems((prev) =>
+      prev.filter((it) => it.productId !== item.productId)
+    );
+
+    try {
+      await toggleWishlistServer(email, item);
+    } catch (e) {
+      console.error("위시 개별 삭제 오류:", e);
+      const list = await syncWishlistFromServer(email);
+      setItems(list);
+    }
   };
+  const handleClearAll = async () => {
+    if (!email) return;
+    if (!window.confirm("위시리스트를 모두 비우시겠습니까?")) return;
 
-  // ✅ 단건 삭제: 로컬스토리지 저장 + 두 이벤트 발행
-  const removeOne = (id) => {
-    const next = items.filter((it) => it.id !== id);
-    localStorage.setItem(KEY, JSON.stringify(next));
-    window.dispatchEvent(new CustomEvent("wishlist:update", { detail: { items: next } }));
-    window.dispatchEvent(new Event("storage")); // 헤더가 storage만 듣는 경우까지 커버
-    setItems(next);
-  };
-
-  // ✅ 전체 삭제: 로컬스토리지 저장 + 두 이벤트 발행
-  const clearAll = () => {
-    localStorage.setItem(KEY, JSON.stringify([]));
-    window.dispatchEvent(new CustomEvent("wishlist:update", { detail: { items: [] } }));
-    window.dispatchEvent(new Event("storage"));
     setItems([]);
+
+    try {
+      await clearWishlistOnServer(email);
+      localStorage.setItem("wishlist", JSON.stringify([]));
+      window.dispatchEvent(new Event("wishlistUpdated"));
+
+    } catch (e) {
+      console.error("위시 전체 삭제 오류:", e);
+      const list = await syncWishlistFromServer(email);
+      setItems(list);
+    }
   };
 
-  const fmt = (v) =>
-    (typeof v === "number" ? v : Number(String(v).replace(/[^\d]/g, "")) || 0).toLocaleString() + "원";
+
+  const totalPrice = useMemo(
+    () =>
+      items.reduce(
+        (sum, it) => sum + Number(it.productPrice || 0),
+        0
+      ),
+    [items]
+  );
 
   return (
     <div className="wishlist-page">
-      <div className="container">
-        <div className="wl-header">
-          <h1 className="wl-title">
-            나의 위시리스트 <span className="heart">❤</span>
-            <span className="count">{count}</span>
-          </h1>
+      <div className="wishlist-header">
+        <h1 className="wishlist-title">위시리스트</h1>
 
-          <div className="wl-actions">
-            <Link to="/" className="btn ghost lg">계속 쇼핑하기</Link>
-            {count > 0 && (
-              <button className="btn danger lg" onClick={clearAll}>전체 삭제</button>
-            )}
-          </div>
+        <div className="wishlist-header-right">
+          <span className="wishlist-count">
+            총{" "}
+            <strong>{items.length}</strong>개
+          </span>
+          {items.length > 0 && (
+            <button
+              type="button"
+              className="wishlist-clear-btn"
+              onClick={handleClearAll}
+            >
+              위시리스트 비우기
+            </button>
+          )}
         </div>
+      </div>
 
-        {count === 0 ? (
-          <div className="wl-empty">
-            <p>위시에 담긴 상품이 없습니다.</p>
-            <Link to="/" className="btn primary lg">홈으로</Link>
-          </div>
-        ) : (
+      {loading && (
+        <div className="wishlist-empty">
+          불러오는 중...
+        </div>
+      )}
+
+      {empty && (
+        <div className="wishlist-empty">
+          <p>담긴 상품이 없습니다.</p>
+          <button
+            type="button"
+            className="wishlist-go-shopping"
+            onClick={() => navigate("/")}
+          >
+            쇼핑하러 가기
+          </button>
+        </div>
+      )}
+
+      {!loading && items.length > 0 && (
+        <>
           <div className="wishlist-grid">
-            {items.map((p) => (
+            {items.map((item) => (
               <div
-                className="wish-card"
-                key={p.id}
-                role="link"
-                onClick={() => goDetail(p)}
-                tabIndex={0}
-                onKeyDown={(e) => { if (e.key === "Enter") goDetail(p); }}
+                key={item.productId}
+                className="wishlist-card"
               >
-                <div className="thumb">
+                <Link
+                  to={`/product/${item.productId}`}
+                  className="wishlist-image-wrap"
+                >
                   <img
-                    src={
-                      /^https?:\/\//i.test(p.image)
-                        ? p.image
-                        : `${process.env.PUBLIC_URL}/${String(p.image || "")
-                            .replace(/^\.?\/*/, "")}`
-                    }
-                    alt={p.name || "product"}
-                    loading="lazy"
+                    src={item.productImage}
+                    alt={item.productName}
                     onError={(e) => {
-                      e.currentTarget.src = `${process.env.PUBLIC_URL}/images/placeholder.png`;
+                      e.target.src =
+                        "https://via.placeholder.com/300x400?text=NO+IMAGE";
                     }}
                   />
+                </Link>
+
+                <div className="wishlist-info">
+                  <div className="wishlist-brand">
+                    {item.productBrand}
+                  </div>
+                  <div className="wishlist-name">
+                    {item.productName}
+                  </div>
+                  <div className="wishlist-price-row">
+                    <span className="wishlist-price">
+                      {formatKRW(item.productPrice)}
+                    </span>
+                   {item.productPriceOri > 0 &&
+                    Number(item.productPriceOri) > Number(item.productPrice) && (
+                    <span className="wishlist-price-ori">
+                    {formatKRW(item.productPriceOri)}
+                     </span>
+                  )}
+
+                  </div>
+                </div>
+
+                <div className="wishlist-actions">
                   <button
-                    className="remove"
-                    onClick={(e) => { e.stopPropagation(); removeOne(p.id); }}
+                    type="button"
+                    className="wishlist-remove-btn"
+                    onClick={() => handleRemoveOne(item)}
                   >
                     삭제
                   </button>
-                </div>
-
-                <div className="info">
-                  {p.brand && <div className="brand">{p.brand}</div>}
-                  <div className="name" title={p.name}>{p.name}</div>
-                  <div className="price">
-                    {p.originalPrice && <span className="original">{fmt(p.originalPrice)}</span>}
-                    <span className="current">{fmt(p.price)}</span>
-                  </div>
+                  <button
+                    type="button"
+                    className="wishlist-buy-btn"
+                    onClick={() =>
+                      navigate("/checkout", {
+                        state: {
+                          from: "wishlist",
+                          items: [
+                            {
+                              id: item.productId,
+                              name: item.productName,
+                              image: item.productImage,
+                              price: item.productPrice,
+                              quantity: 1,
+                              brand: item.productBrand,
+                            },
+                          ],
+                        },
+                      })
+                    }
+                  >
+                    바로구매
+                  </button>
                 </div>
               </div>
             ))}
           </div>
-        )}
-      </div>
+
+          <div className="wishlist-summary">
+            <div className="wishlist-summary-text">
+              선택 상품 합계
+            </div>
+            <div className="wishlist-summary-price">
+              {formatKRW(totalPrice)}
+            </div>
+          </div>
+        </>
+      )}
     </div>
   );
 }
+
+export default Wishlist;

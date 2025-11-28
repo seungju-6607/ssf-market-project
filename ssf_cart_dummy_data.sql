@@ -5,6 +5,8 @@ select * from ssf_item;
 select * from ssf_addr;
 select * from ssf_order;
 select * from ssf_order_detail;
+select * from ssf_coupon;
+select * from ssf_coupon_used;
 show tables;
 
 USE ssf;
@@ -92,3 +94,26 @@ INSERT INTO ssf_order_detail (
 SET SQL_SAFE_UPDATES = 0;
 delete from ssf_order_detail;
 delete from ssf_order;
+
+INSERT INTO ssf_coupon (
+    coupon_id,
+    coupon_name,
+    coupon_cost,
+    expire_at
+) VALUES (
+    '0d8c39a1-77fc-4a3e-a29d-1acb311e97f4',
+    '신규가입 10,000원 할인쿠폰',
+    10000,
+    '2099-12-31'
+);
+
+INSERT INTO ssf_coupon_used (
+    coupon_id,
+    user_key,
+    used_yn
+) VALUES (
+    '0d8c39a1-77fc-4a3e-a29d-1acb311e97f4',
+    '0dd2453b-ba23-11f0-ab67-7085c26d510a',
+    'N'
+);
+

@@ -3,7 +3,7 @@ import { useDispatch, useSelector } from "react-redux";
 import { fetchListings } from "../../feature/market/marketSlice.js";
 import ListingCard from "./ListingCard.jsx";
 import "./market.css";
-import { Link, useSearchParams } from "react-router-dom";
+import { Link, useSearchParams, useNavigate } from "react-router-dom";
 
 export default function MarketHome() {
   const [searchParams, setSearchParams] = useSearchParams();
@@ -13,7 +13,21 @@ export default function MarketHome() {
   const [onlyAvailable, setOnlyAvailable] = useState(false);
 
   const dispatch = useDispatch();
+  const navigate = useNavigate();
   const { items, loading } = useSelector((s) => s.market);
+
+  useEffect(() => {
+    const isLogin = localStorage.getItem("isLogin") === "true";
+    if (!isLogin) {
+      alert("로그인이 필요합니다.");
+      navigate("/login");
+      return;
+    }
+  }, [navigate]);
+
+  useEffect(() => {
+    setQ(q0);
+  }, [q0]);
 
   useEffect(() => {
     dispatch(fetchListings({ q: q0, category, onlyAvailable }));
@@ -24,7 +38,6 @@ export default function MarketHome() {
     const params = {};
     if (q.trim()) params.q = q.trim();
     setSearchParams(params, { replace: true });
-    dispatch(fetchListings({ q, category, onlyAvailable }));
   };
 
   return (

@@ -116,10 +116,9 @@ public interface JpaFleamarketRepository extends JpaRepository<Fleamarket, Integ
                 v.readFlag
             )
             from Message v
-            where v.fleaKey = :fleaKey and v.buyerId = :buyerId and v.sellerId = :sellerId
+            where v.fleaKey = :fleaKey and v.sellerId = :sellerId
             """)
     List<FleamarketMsgDto> findMsgBySeller(@Param("fleaKey") Integer fleaKey,
-                                           @Param("buyerId") String buyerId,
                                            @Param("sellerId") String sellerId);
 
     @Modifying
@@ -135,6 +134,32 @@ public interface JpaFleamarketRepository extends JpaRepository<Fleamarket, Integ
                 @Param("senderId") String senderId,
                 @Param("senderName") String senderName,
                 @Param("inquiryMsg") String inquiryMsg);
+
+    /* 판매글 삭제 */
+    @Modifying
+    @Query("DELETE FROM Fleamarket f WHERE f.fleaKey = :fleaKey")
+    int deleteByFleaKey(@Param("fleaKey") Integer fleaKey);
+
+    /* 판매글 수정 */
+    @Modifying
+    @Query(value = """
+                    update flea_market v
+                    set v.flea_category = CASE WHEN :fleaCategory IS NOT NULL THEN :fleaCategory ELSE v.flea_category END,
+                        v.flea_sale     = CASE WHEN :fleaSale IS NOT NULL     THEN :fleaSale     ELSE v.flea_sale END,
+                        v.flea_content  = CASE WHEN :fleaContent IS NOT NULL  THEN :fleaContent  ELSE v.flea_content END,
+                        v.flea_title    = CASE WHEN :fleaTitle IS NOT NULL    THEN :fleaTitle    ELSE v.flea_title END,
+                        v.flea_list     = CASE WHEN :fleaList IS NOT NULL     THEN :fleaList     ELSE v.flea_list END,
+                        v.flea_price    = CASE WHEN :fleaPrice <> 0 THEN :fleaPrice ELSE v.flea_price END,
+                        v.flea_rdate    = now()
+                    where v.flea_key = :fleaKey
+                """, nativeQuery = true)
+    int updateList(@Param("fleaKey") Integer fleaKey,
+                   @Param("fleaSale") String fleaSale,
+                   @Param("fleaCategory") String fleaCategory,
+                   @Param("fleaTitle") String fleaTitle,
+                   @Param("fleaContent") String fleaContent,
+                   @Param("fleaList") String fleaList,
+                   @Param("fleaPrice") Integer fleaPrice);
 
     /* 판매글 등록 */
     Fleamarket save(Fleamarket fleamarket);

@@ -1,6 +1,7 @@
 package com.ssf.project.repository;
 
 import com.ssf.project.dto.OrderDto;
+import com.ssf.project.dto.OrderDetailRow;
 import com.ssf.project.dto.OrderListResponseDto;
 import com.ssf.project.entity.Order;
 import org.springframework.data.jpa.repository.JpaRepository;
@@ -102,7 +103,149 @@ public interface JpaOrderRepository extends JpaRepository<Order, Integer> {
             where o.user_key = (
                 select u.user_key from ssf_user u where u.email = :email
             )
+            and (:startDate is null or date(o.order_date) >= :startDate)
+            and (:endDate is null or date(o.order_date) <= :endDate)
             order by o.order_key desc
             """, nativeQuery = true)
-    List<Object[]> findOrderHistory(@Param("email") String email);
+    List<Object[]> findOrderHistory(@Param("email") String email,
+                                    @Param("startDate") java.time.LocalDate startDate,
+                                    @Param("endDate") java.time.LocalDate endDate);
+
+    @Query(value = """
+            select
+                o.order_uuid as orderId,
+                o.order_date as orderedAt,
+                o.order_price as orderPrice,
+                2500 as shippingFee,
+                coalesce(i.item_price - i.item_sale, 0) as discountAmount,
+                o.order_name as receiverName,
+                o.order_tel as receiverPhone,
+                o.order_zipcode as receiverZipcode,
+                o.order_addr as receiverAddress,
+                o.order_addr_detail as receiverAddrDetail,
+                o.order_req as receiverMemo,
+                u.username as customerName,
+                u.email as customerEmail,
+                u.phone as customerPhone,
+                coalesce((
+                    select sum(o2.order_price)
+                    from ssf_order o2
+                    where o2.user_key = o.user_key
+                ), 0) as totalPurchase,
+                coalesce((
+                    select count(*)
+                    from ssf_coupon_used cu
+                    where cu.user_key = o.user_key
+                      and cu.used_yn = 'N'
+                ), 0) as couponCount,
+                0 as pointBalance,
+                sum(d.order_detail_price * d.order_detail_cnt)
+                    over(partition by o.order_uuid) as productTotal,
+                i.item_name as itemName,
+                i.item_list as itemList,
+                d.order_detail_price as itemPrice,
+                d.order_detail_cnt as itemQty,
+                d.order_detail_size as itemSize
+            from ssf_order o
+            join ssf_user u on u.user_key = o.user_key
+            join ssf_order_detail d on o.order_uuid = d.order_uuid
+            join ssf_item i on d.item_key = i.item_key
+            where o.order_uuid = :orderId
+              and u.email = :email
+            order by d.order_detail_key asc
+            """, nativeQuery = true)
+    List<OrderDetailRow> findOrderDetail(@Param("email") String email,
+                                         @Param("orderId") String orderId);
+
+    @Query(value = """
+            select
+                o.order_uuid as orderId,
+                o.order_date as orderedAt,
+                o.order_price as orderPrice,
+                2500 as shippingFee,
+                coalesce(i.item_price - i.item_sale, 0) as discountAmount,
+                o.order_name as receiverName,
+                o.order_tel as receiverPhone,
+                o.order_zipcode as receiverZipcode,
+                o.order_addr as receiverAddress,
+                o.order_addr_detail as receiverAddrDetail,
+                o.order_req as receiverMemo,
+                u.username as customerName,
+                u.email as customerEmail,
+                u.phone as customerPhone,
+                coalesce((
+                    select sum(o2.order_price)
+                    from ssf_order o2
+                    where o2.user_key = o.user_key
+                ), 0) as totalPurchase,
+                coalesce((
+                    select count(*)
+                    from ssf_coupon_used cu
+                    where cu.user_key = o.user_key
+                      and cu.used_yn = 'N'
+                ), 0) as couponCount,
+                0 as pointBalance,
+                sum(d.order_detail_price * d.order_detail_cnt)
+                    over(partition by o.order_uuid) as productTotal,
+                i.item_name as itemName,
+                i.item_list as itemList,
+                d.order_detail_price as itemPrice,
+                d.order_detail_cnt as itemQty,
+                d.order_detail_size as itemSize
+            from ssf_order o
+            join ssf_user u on u.user_key = o.user_key
+            join ssf_order_detail d on o.order_uuid = d.order_uuid
+            join ssf_item i on d.item_key = i.item_key
+            where o.order_uuid = :orderId
+            order by d.order_detail_key asc
+            """, nativeQuery = true)
+    List<OrderDetailRow> findOrderDetailForAdmin(@Param("orderId") String orderId);
+
+    @Query(value = """
+            select count(*)
+            from ssf_order o
+            where (:start is null or date(o.order_date) >= :start)
+              and (:end   is null or date(o.order_date) <= :end)
+            """, nativeQuery = true)
+    long countOrdersForAdmin(@Param("start") java.time.LocalDate start,
+                             @Param("end") java.time.LocalDate end);
+
+    @Query(value = """
+            select
+                o.order_uuid  as orderId,
+                o.order_date  as orderedAt,
+                u.username    as ordererName,
+                o.order_name  as receiverName,
+                o.order_price as orderPrice
+            from ssf_order o
+            join ssf_user u on u.user_key = o.user_key
+            where (:start is null or date(o.order_date) >= :start)
+              and (:end   is null or date(o.order_date) <= :end)
+            order by o.order_key desc
+            limit :limit offset :offset
+            """, nativeQuery = true)
+    java.util.List<Object[]> findOrdersForAdmin(@Param("start") java.time.LocalDate start,
+                                                @Param("end") java.time.LocalDate end,
+                                                @Param("limit") int limit,
+                                                @Param("offset") int offset);
+
+    @Query(value = """
+            select
+                month(o.order_date) as month,
+                sum(o.order_price)  as totalAmount
+            from ssf_order o
+            where year(o.order_date) = :year
+            group by month(o.order_date)
+            order by month(o.order_date)
+            """, nativeQuery = true)
+    java.util.List<Object[]> findMonthlyRevenue(@Param("year") int year);
+
+
+    @Query(value = """
+            select
+                coalesce(sum(case when year(order_date) = year(now()) then order_price else 0 end), 0) as thisYearSales,
+                coalesce(sum(case when year(order_date) = year(now()) - 1 then order_price else 0 end), 0) as lastYearSales
+            from ssf_order;
+            """, nativeQuery = true)
+    Object[] sumRevenueThisAndLastYear();
 }

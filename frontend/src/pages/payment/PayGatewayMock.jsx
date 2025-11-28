@@ -71,14 +71,13 @@ export default function PayGatewayMock() {
     // 2) couponId가 있으면 로컬 쿠폰에서 금액 탐색 (amount/discount/value 등 관용 필드 지원)
     if (payload.couponId != null) {
       try {
-        const list = JSON.parse(localStorage.getItem("coupons") || "[]");
-        const cid = String(payload.couponId);
-        const found = list.find((c) => String(c.id) === cid);
-        if (found) {
+        const raw = localStorage.getItem("signupCoupon");
+        const saved = raw ? JSON.parse(raw) : null;
+        if (saved && String(saved.id) === String(payload.couponId)) {
           return (
-            toNum(found.amount) ||
-            toNum(found.discount) ||
-            toNum(found.value) ||
+            toNum(saved.amount) ||
+            toNum(saved.discount) ||
+            toNum(saved.value) ||
             0
           );
         }
@@ -101,12 +100,12 @@ export default function PayGatewayMock() {
     // 1) 쿠폰 사용 처리
     try {
       if (payload.couponId != null) {
-        const saved = JSON.parse(localStorage.getItem("coupons") || "[]");
-        const cid = String(payload.couponId);
-        const next = saved.map((c) =>
-          String(c.id) === cid ? { ...c, used: true, usedAt: new Date().toISOString() } : c
-        );
-        localStorage.setItem("coupons", JSON.stringify(next));
+        const raw = localStorage.getItem("signupCoupon");
+        const saved = raw ? JSON.parse(raw) : null;
+        if (saved && String(saved.id) === String(payload.couponId) && !saved.used) {
+          const updated = { ...saved, used: true, usedAt: new Date().toISOString() };
+          localStorage.setItem("signupCoupon", JSON.stringify(updated));
+        }
       }
     } catch {}
 

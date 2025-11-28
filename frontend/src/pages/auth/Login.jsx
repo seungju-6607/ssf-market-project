@@ -93,21 +93,6 @@ export default function Login() {
       <div className="auth-box">
         <h1 className="auth-title">로그인</h1>
 
-        <div className="login-tabs">
-          <button
-            className={`tab-button ${activeTab === "member" ? "active" : ""}`}
-            onClick={() => setActiveTab("member")}
-          >
-            회원
-          </button>
-          <button
-            className={`tab-button ${activeTab === "non-member" ? "active" : ""}`}
-            onClick={() => setActiveTab("non-member")}
-          >
-            비회원 (주문조회)
-          </button>
-        </div>
-
         <form className="auth-form" onSubmit={onSubmit}>
           <div className="login-form-layout">
             <div className="login-inputs-section">
@@ -174,8 +159,8 @@ export default function Login() {
         </form>
 
         <div className="auth-links-box">
-          <Link to="/find-id">아이디 찾기</Link>
-          <Link to="/find-password">비밀번호 찾기</Link>
+          <Link to="/account/recovery">아이디 찾기</Link>
+          <Link to="/account/recovery">비밀번호 찾기</Link>
           <Link to="/signup">회원가입</Link>
         </div>
 

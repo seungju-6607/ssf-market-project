@@ -3,7 +3,6 @@ import React, { useState, useEffect } from "react";
 import { useNavigate, useLocation } from "react-router-dom";
 import { useDispatch } from 'react-redux';
 import { signupApi } from "../../api/auth";
-import { useAuth } from "../../context/AuthContext";
 import "./Signup.css";
 import { getSignup, getIdCheck } from '../../feature/auth/authAPI.js';
 
@@ -11,7 +10,6 @@ export default function Signup() {
   const dispatch = useDispatch();
   const navigate = useNavigate();
   const location = useLocation();
-  const { issueWelcomeCouponIfNeeded } = useAuth();
 
   const [form, setForm] = useState({
     name: "",
@@ -219,12 +217,23 @@ export default function Signup() {
     setExpandedTerms((prev) => ({ ...prev, [name]: !prev[name] }));
   };
 
+  const formatPhone = (number) => {
+    if (number.length === 10) {
+      // 10자리
+      return number.replace(/(\d{3})(\d{3})(\d{4})/, "$1-$2-$3");
+    } else if (number.length === 11) {
+      // 11자리
+      return number.replace(/(\d{3})(\d{4})(\d{4})/, "$1-$2-$3");
+    }
+    return number;
+  };
+
   // 회원가입 처리
   const handleSignup = async (e) => {
     e.preventDefault();
 
     // 필수 항목 체크
-    if (!form.name || !form.password || !form.passwordCheck || !form.email) {
+    if (!form.name || !form.password || !form.passwordCheck || !form.email || !form.phone) {
       alert("필수 항목을 모두 입력해주세요.");
       return;
     }
@@ -259,20 +268,18 @@ export default function Signup() {
     }
 
     // 전화번호 검사 (선택사항이지만 입력했으면 검사)
-    if (form.phone && !/^[0-9]{10,11}$/.test(form.phone.replace(/-/g, ""))) {
+    if (!/^[0-9]{10,11}$/.test(form.phone.replace(/-/g, ""))) {
       alert("올바른 전화번호 형식이 아닙니다. (10-11자리 숫자)");
       return;
     }
-
-    // 신규 회원 웰컴 쿠폰 발급 (AuthContext의 중복 방지 함수 사용)
-    //issueWelcomeCouponIfNeeded();
 
     try {
       const idResult = await dispatch(getIdCheck(form.email));
 
       if (!idResult) {
         try {
-          const signResult = await dispatch(getSignup(form, "ssf"));
+          const newForm = { ...form, phone: formatPhone(form.phone) };
+          const signResult = await dispatch(getSignup(newForm, "ssf"));
           if (signResult) {
             alert("회원가입이 완료되었습니다! 🎉");
             navigate("/login");
@@ -369,7 +376,9 @@ export default function Signup() {
 
           {/* 휴대폰 번호 */}
           <div className="form-group">
-            <label className="form-label">휴대폰 번호</label>
+            <label className="form-label">
+                휴대폰 번호 <span className="required">*</span>
+            </label>
             <div className="form-input-wrapper">
               <div className="input-with-clear">
                 <input
@@ -378,7 +387,8 @@ export default function Signup() {
                   className="form-input"
                   value={form.phone}
                   onChange={onChange}
-                  placeholder="숫자만 입력 (선택)"
+                  placeholder="숫자만 입력하세요"
+                  required
                 />
                 {form.phone && (
                   <button

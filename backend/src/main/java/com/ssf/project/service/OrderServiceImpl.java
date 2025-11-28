@@ -1,6 +1,9 @@
 package com.ssf.project.service;
 
 import com.ssf.project.dto.KakaoPayDto;
+import com.ssf.project.dto.OrderDetailItemDto;
+import com.ssf.project.dto.OrderDetailResponseDto;
+import com.ssf.project.dto.OrderDetailRow;
 import com.ssf.project.dto.OrderDto;
 import com.ssf.project.dto.OrderHistoryDto;
 import com.ssf.project.dto.OrderListResponseDto;
@@ -12,6 +15,8 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.sql.Timestamp;
+import java.time.LocalDate;
+import java.time.format.DateTimeParseException;
 import java.util.*;
 import java.util.stream.Collectors;
 
@@ -82,8 +87,13 @@ public class OrderServiceImpl implements OrderService {
     }
 
     @Override
-    public List<List<OrderHistoryDto>> findOrderHistory(String email) {
-        List<OrderHistoryDto> dtos = jpaOrderRepository.findOrderHistory(email).stream()
+    public List<List<OrderHistoryDto>> findOrderHistory(String email, String startDate, String endDate) {
+
+        // 날짜 파싱 함수 이용
+        LocalDate parsedStart = parseLocalDate(startDate);
+        LocalDate parsedEnd = parseLocalDate(endDate);
+
+        List<OrderHistoryDto> dtos = jpaOrderRepository.findOrderHistory(email, parsedStart, parsedEnd).stream()
                 .map(row -> {
 
                     String orderId = (String) row[0];
@@ -110,12 +120,124 @@ public class OrderServiceImpl implements OrderService {
         return new ArrayList<>(groupByOrderUUID.values()); //key 제외하고 주문 상품 목록인 values만 필요함.
     }
 
+    @Override
+    public OrderDetailResponseDto findOrderDetail(String email, String orderId) {
+        if (email == null || email.isBlank() || orderId == null || orderId.isBlank()) {
+            return null;
+        }
+
+        // Raw Data를 rows에 담은 뒤 List로 반환 > Dto에 세팅
+        List<OrderDetailRow> rows = jpaOrderRepository.findOrderDetail(email, orderId);
+        return buildOrderDetail(rows);
+    }
+
+    @Override
+    public OrderDetailResponseDto findOrderDetailForAdmin(String orderId) {
+        if (orderId == null || orderId.isBlank()) {
+            return null;
+        }
+        // Raw Data를 rows에 담은 뒤 List로 반환 > Dto에 세팅
+        List<OrderDetailRow> rows = jpaOrderRepository.findOrderDetailForAdmin(orderId);
+        return buildOrderDetail(rows);
+    }
+
+    /**
+     * 공통정보 + 상세상품목록 포함하는 최종 DTO로 반환
+     */
+    private OrderDetailResponseDto buildOrderDetail(List<OrderDetailRow> rows) {
+        if (rows == null || rows.isEmpty()) {
+            return null;
+        }
+
+        // Raw Data중 첫번째 로우 : 주문공통정보를 head에 담음.
+        OrderDetailRow head = rows.get(0);
+
+        // 주문공통정보 중 하나인 총금액을 head에서 가져오나 없을 시 계산함.
+        int productTotal = optionalInt(head.getProductTotal())
+                .orElse(rows.stream()
+                        .mapToInt(r -> toInt(r.getItemPrice()) * toInt(r.getItemQty()))
+                        .sum());
+
+        // Raw Data를 순회하며 주문한 상품 데이터를 Dto에 담음
+        List<OrderDetailItemDto> items = rows.stream()
+                .map(r -> new OrderDetailItemDto(
+                        r.getItemName(),
+                        r.getItemList(),
+                        toInt(r.getItemPrice()),
+                        toInt(r.getItemQty()),
+                        r.getItemSize()
+                ))
+                .toList();
+
+        // head에 담긴 주문공통정보 : 배송비, 할인금액, 주문금액을  Dto에 담음.
+        OrderDetailResponseDto.Amounts amounts = new OrderDetailResponseDto.Amounts(
+                productTotal,
+                optionalInt(head.getShippingFee()).orElse(0),
+                optionalInt(head.getDiscountAmount()).orElse(0),
+                optionalInt(head.getOrderPrice()).orElse(0)
+        );
+
+        // head에 담긴 주문공통정보 : 구매자 정보를 Dto에 담음.
+        OrderDetailResponseDto.Buyer buyer = new OrderDetailResponseDto.Buyer(
+                head.getCustomerName(),
+                head.getCustomerPhone(),
+                head.getCustomerEmail()
+        );
+
+        // head에 담긴 주문공통정보 : 받으시는분 정보를 Dto에 담음.
+        OrderDetailResponseDto.Shipping shipping = new OrderDetailResponseDto.Shipping(
+                head.getReceiverName(),
+                head.getReceiverPhone(),
+                head.getReceiverZipcode(),
+                head.getReceiverAddress(),
+                head.getReceiverAddrDetail(),
+                head.getReceiverMemo()
+        );
+
+        // 위에서 담은 정보를 리턴
+        return new OrderDetailResponseDto(
+                head.getOrderId(),
+                toLocalDateTime(head.getOrderedAt()),
+                head.getCustomerName(),
+                head.getCustomerEmail(),
+                head.getCustomerPhone(),
+                optionalInt(head.getTotalPurchase()).orElse(0),
+                optionalInt(head.getCouponCount()).orElse(0),
+                optionalInt(head.getPointBalance()).orElse(0),
+                buyer,
+                shipping,
+                amounts,
+                items
+        );
+    }
+
+    // 날짜 형식으로 파싱
+    private LocalDate parseLocalDate(String raw) {
+
+        if (raw == null || raw.isBlank()) return null;
+
+        try {
+            return LocalDate.parse(raw);
+        } catch (DateTimeParseException ex) {
+            return null;
+        }
+
+    }
+
     // Object로 받은 Number를 Int로 안전하게 변환 (number -> int, string -> 0)
     private static int toInt(Object value) {
         if (value instanceof Number number) {
             return number.intValue();
         }
         return 0;
+    }
+
+    // null일 경우 에러가 나지않도록 처리.
+    private static OptionalInt optionalInt(Number value) {
+        if (value == null) {
+            return OptionalInt.empty();
+        }
+        return OptionalInt.of(value.intValue());
     }
 
     // java.sql.Timestamp로 받은 객체를 java.time.LocalDateTime으로 변환
@@ -128,6 +250,4 @@ public class OrderServiceImpl implements OrderService {
         } //LocalDateTime으로 들어오면 그대로 사용
         return null;
     }
-
-
 }

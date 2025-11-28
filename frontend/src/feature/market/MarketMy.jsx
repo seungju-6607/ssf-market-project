@@ -12,13 +12,13 @@ export default function MarketMy() {
   const { items, loading } = useSelector((s) => s.market);
 
   useEffect(() => {
-    dispatch(fetchListings({}));
+    dispatch(fetchListings({ useListOnly: true }));
   }, [dispatch]);
 
   const mine = useMemo(() => {
     if (!user) return [];
     const me = user.id || user.email;
-    return items.filter((x) => x.sellerId === me);
+    return items.filter((x) => x.fleaId === me);
   }, [items, user]);
 
   if (!isAuthenticated) {

@@ -13,7 +13,7 @@ export default function AdminDashboard() {
   });
 
   const authState = useSelector((state) => state.auth);
-  const isAdmin = authState?.role === "admin";
+  const isAdmin = (authState?.role || "").toLowerCase() === "admin";
 
   useEffect(() => {
     if (!authState?.isLogin || !isAdmin) {
@@ -69,7 +69,7 @@ export default function AdminDashboard() {
         <div className="admin-title">관리자 대시보드</div>
         <div className="admin-actions">
           <Link className="btn" to="/">홈으로</Link>
-          <Link className="btn" to={{ pathname: "/mypage", state: { activeTab: "admin-orders" } }}>주문 관리</Link>
+          <Link className="btn" to="/admin/orders">주문 관리</Link>
           <button className="btn" onClick={onLogout}>관리자 로그아웃</button>
         </div>
       </div>

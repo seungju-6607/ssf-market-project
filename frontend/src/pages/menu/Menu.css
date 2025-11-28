@@ -86,54 +86,71 @@
   background:var(--primary);
   opacity:.6;
 }
-.menu-list{
-  margin:0;
-  padding:0;
-  list-style:none;
-  display:grid;
-  grid-template-columns:repeat(4,minmax(0,1fr));
-  gap:10px 12px;
+.menu-list {
+  margin: 0;
+  padding: 0;
+  list-style: none;
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  row-gap: 14px;
+  column-gap: 14px;
 }
-.menu-link{
-  display:inline-flex;
-  align-items:center;
-  gap:6px;
-  width:max-content;
-  max-width:100%;
-  padding:8px 12px;
-  border-radius:var(--radius-full);
-  border:1px solid transparent;
-  background:#fafafa;
-  color:var(--text);
-  text-decoration:none;
-  font-size: var(--font-sm);
-  font-weight: var(--font-weight-normal);
-  white-space:nowrap;
-  overflow:hidden;
-  text-overflow:ellipsis;
-  transition:background .18s ease,color .18s ease,border-color .18s ease,transform .18s ease;
-  position:relative;
-  line-height: var(--leading-normal);
+
+.menu-link {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+
+  gap: 8px;
+  min-width: max-content;
+  width: auto;
+
+  padding: 10px 20px;        
+  border-radius: 999px;       
+  border: 1px solid transparent;
+  background: #f2f2f2;
+
+  color: var(--text);
+  text-decoration: none;
+
+  font-size: 15px;            
+  font-weight: 500;        
+  white-space: nowrap;
+
+  overflow: visible;
+  text-overflow: unset;
+
+  transition: background .18s ease, color .18s ease,
+              border-color .18s ease, transform .18s ease;
+
+  line-height: 1;
+  height: 36px;              
 }
-.menu-link::after{
-  content:"↗";
-  font-size: var(--font-xs);
-  transform:translateX(-4px);
-  opacity:0;
-  transition:transform .18s ease,opacity .18s ease;
+
+.menu-link::after {
+  content: "↗";
+  font-size: 12px;
+  transform: translateX(-4px);
+  opacity: 0;
+  transition: transform .18s ease, opacity .18s ease;
 }
+
 .menu-link:hover,
-.menu-link:focus-visible{
-  background:var(--primary-weak);
-  border-color:#e4dcff;
-  color:var(--primary);
-  transform:translateY(-1px);
+.menu-link:focus-visible {
+  background: var(--primary-weak);
+  border-color: #dcd0ff;
+  color: var(--primary);
+  transform: translateY(-1px);
 }
+
 .menu-link:hover::after,
-.menu-link:focus-visible::after{
-  transform:translateX(0);
-  opacity:.9;
+.menu-link:focus-visible::after {
+  transform: translateX(0);
+  opacity: .9;
 }
+
+
+
 @media(max-width:1200px){
   .menu-grid{grid-template-columns:repeat(2,1fr);}
   .menu-list{grid-template-columns:repeat(3,minmax(0,1fr));}

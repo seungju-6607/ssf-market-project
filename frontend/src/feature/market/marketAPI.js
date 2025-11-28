@@ -76,9 +76,12 @@ export const getCreatePost = (formData) => async (dispatch) => {
 
 /** 판매글 목록 가져오기 */
 export const fetchListingsAPI = async (param) => {
-    console.log("param 확인 -> ", param);
-
     try {
+      if (param.useListOnly) {
+        const jsonData = await axiosPost("/market/list", {});
+        return jsonData;
+      }
+
       let url = "/market/list";
       let payload = {};
 
@@ -102,6 +105,44 @@ export const getByFleaKey = async (fleaKey) => {
     try {
         const url = "/market/listDetail"; // 백엔드에서 fleaKey로 상세 조회 가능한 API
         const payload = { fleaKey: Number(fleaKey) };
+        const result = await axiosPost(url, payload);
+        return result;
+
+      } catch (error) {
+        console.error("판매글 상세 조회 실패:", error);
+        throw error;
+      }
+}
+
+/** 판매글 정보 수정 */
+export const listUpdate = async (fleaKey, patch) => {
+    try {
+        const payload = {
+            fleaKey : Number(fleaKey),
+            category : patch.category,
+            description : patch.description,
+            images : patch.images,
+            price : patch.price,
+            sellerId : patch.sellerEmail,
+            title : patch.title,
+            onlyAvailable : patch.status
+        }
+
+        const url = "/market/listUpdate";
+        const result = await axiosPost(url, payload);
+        return result;
+
+      } catch (error) {
+        console.error("판매글 상세 조회 실패:", error);
+        throw error;
+      }
+}
+
+/** 판매글 삭제 */
+export const listRemove = async (fleaKey) => {
+    try {
+        const url = "/market/listRemove";
+        const payload = {fleaKey : Number(fleaKey)}
         const result = await axiosPost(url, payload);
         return result;
 

@@ -6,9 +6,30 @@ import { resetCartCount } from '../../feature/cart/cartSlice.js';
 import { createCsrfToken, refreshCsrfToken } from '../csrf/manageCsrfToken.js';
 import { validateFormCheck, validateSignupFormCheck } from '../../utils/validate.js';
 
+/** 아이디 찾기 */
+export const getFindId = (payload) => async (dispatch) => {
+    const url = "/member/findId";
+    const result = await axiosPost(url, payload);
+    return result;
+};
+
+/** 비밀번호 찾기 */
+export const getFindPwd = (payload) => async (dispatch) => {
+    const url = "/member/findPwd";
+    const result = await axiosPost(url, payload);
+    return result;
+};
+
+/** 비밀번호 변경 */
+export const updatePwd = (payload) => async (dispatch) => {
+    console.log("payload -> ", payload);
+    const url = "/member/updatePwd";
+    const result = await axiosPost(url, payload);
+    return result;
+};
+
 /** email 중복 체크 */
 export const getIdCheck = (email) => async (dispatch) => {
-
     const data = { "email" : email };
     const url = "/member/idcheck";
     const result = await axiosPost(url, data);
@@ -17,7 +38,7 @@ export const getIdCheck = (email) => async (dispatch) => {
 
 /** Signup */
 export const getSignup = (formData, logInType) => async (dispatch) => {
-
+console.log("formData : ", formData);
     let result = null;
     if(logInType === "ssf"){
         const url = "/member/signup";

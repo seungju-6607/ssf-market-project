@@ -40,29 +40,10 @@ export const messageAPI = {
   },
   
   listBySeller: async (sellerId, { fleaKey } = {}) => {
-//    const all = readAll();
-//    const rows = [];
-//    for (const key in all) {
-//      const conv = all[key];
-//      if (conv.sellerId !== sellerId) continue;
-//      if (fleaKey && conv.fleaKey !== fleaKey) continue;
-//      if (!conv.messages?.length) continue;
-//      rows.push({
-//        key,
-//        fleaKey: conv.fleaKey,
-//        buyerId: conv.buyerId,
-//        sellerId: conv.sellerId,
-//        last: conv.messages[conv.messages.length - 1],
-//        count: conv.messages.length,
-//      });
-//    }
-//
-//    rows.sort((a, b) => (b.last?.createdAt || 0) - (a.last?.createdAt || 0));
-//    return rows;
     try {
       let rows = [];
       const url = "/market/getSellerMsg";
-      const params = { sellerId };
+      const params = { sellerId, fleaKey };
       if (fleaKey) params.fleaKey = fleaKey;
 
       const convList = await axiosPost(url, params);
@@ -92,7 +73,7 @@ export const messageAPI = {
         }, {})
       )
       .sort((a, b) => new Date(b.last.createdAt) - new Date(a.last.createdAt));
-
+        console.log("rows -> ", rows)
       return rows;
 
     } catch (error) {
