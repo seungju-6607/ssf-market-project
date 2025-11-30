@@ -17,6 +17,20 @@ function Wishlist() {
   const [loading, setLoading] = useState(true);
   const [email, setEmail] = useState("");
 
+  const fetchItemKey = async (productId) => {
+      try {
+        const res = await fetch(
+          `http://localhost:8080/api/items/product/${productId}`
+        );
+        if (!res.ok) throw new Error("상품 정보를 불러오지 못했습니다.");
+        const data = await res.json();
+        return data.itemKey;
+      } catch (err) {
+        console.error("fetchItemKey 오류:", err);
+        return null;
+      }
+    };
+
   useEffect(() => {
     const loginUser = JSON.parse(
       localStorage.getItem("loginUser") || "{}"
@@ -142,12 +156,52 @@ function Wishlist() {
                 key={item.productId}
                 className="wishlist-card"
               >
+                {/* ---------------- 이미지 클릭 시 itemKey 확보 ---------------- */}
                 <Link
-                  to={`/product/${item.productId}`}
+                  to="#"
                   className="wishlist-image-wrap"
+                  onClick={async (e) => {
+                    e.preventDefault();
+
+                    // 1. itemKey 확인, 없으면 fetch
+                    let key = item.itemKey;
+                    if (!key) {
+                      try {
+                        key = await fetchItemKey(item.productId);
+                        if (!key) {
+                          alert("상품 정보를 가져오지 못했습니다.");
+                          return;
+                        }
+                        item.itemKey = key; // 임시 저장
+                      } catch (err) {
+                        console.error("상품 키 fetch 오류:", err);
+                        alert("상품 정보를 가져오는 중 오류가 발생했습니다.");
+                        return;
+                      }
+                    }
+
+                    // 2. ProductDetail로 navigate + state 전달
+                    navigate(`/product/${key}`, {
+                      state: {
+                        product: {
+                          id: item.itemKey,          // ProductDetail에서 id
+                          name: item.productName,
+                          image: item.productImage,
+                          price: item.productPrice,
+                          selectedSize: item.selectedSize || "",
+                          brand: item.productBrand,
+                          // 필요하면 다른 필드도 추가 가능
+                        },
+                      },
+                    });
+                  }}
                 >
                   <img
-                    src={item.productImage}
+                    src={
+                      item.productImage ||
+                      item.product?.img ||
+                      "https://via.placeholder.com/300x400?text=NO+IMAGE"
+                    }
                     alt={item.productName}
                     onError={(e) => {
                       e.target.src =
@@ -155,6 +209,7 @@ function Wishlist() {
                     }}
                   />
                 </Link>
+                {/* ---------------------------------------------------------------- */}
 
                 <div className="wishlist-info">
                   <div className="wishlist-brand">
@@ -177,6 +232,40 @@ function Wishlist() {
                   </div>
                 </div>
 
+                {/* ---------------- 옵션 선택 ---------------- */}
+                <div style={{ display: "grid", gap: "8px", margin: "12px 0", width: "100%", maxWidth: "320px" }}>
+                  <label style={{ display: "grid", gap: "4px", fontSize: "13px" }}>
+                    사이즈
+                    <select
+                      value={item.selectedSize || ""}
+                      onChange={(e) =>
+                        setItems((prev) =>
+                          prev.map((it) =>
+                            it.productId === item.productId
+                              ? { ...it, selectedSize: e.target.value }
+                              : it
+                          )
+                        )
+                      }
+                      style={{
+                        border: "1px solid #ccc",
+                        borderRadius: "8px",
+                        padding: "8px",
+                        fontSize: "14px",
+                        width: "100%",
+                      }}
+                    >
+                      <option value="">선택하세요</option>
+                      {["XS", "S", "M", "L", "XL"].map((s) => (
+                        <option key={s} value={s}>
+                          {s}
+                        </option>
+                      ))}
+                    </select>
+                  </label>
+                </div>
+                {/* --------------------------------------------- */}
+
                 <div className="wishlist-actions">
                   <button
                     type="button"
@@ -188,23 +277,30 @@ function Wishlist() {
                   <button
                     type="button"
                     className="wishlist-buy-btn"
-                    onClick={() =>
-                      navigate("/checkout", {
-                        state: {
-                          from: "wishlist",
-                          items: [
-                            {
-                              id: item.productId,
+                    onClick={async () => {
+                      if (!item.selectedSize) { alert("사이즈를 선택해 주세요."); return; }
+                      try {
+                        const data = await fetchItemKey(item.productId);
+                        const payload = {
+                            product: {
+                              id: data.itemKey,
                               name: item.productName,
                               image: item.productImage,
                               price: item.productPrice,
-                              quantity: 1,
-                              brand: item.productBrand,
                             },
-                          ],
-                        },
-                      })
-                    }
+                            qty: 1,
+                            size: item.selectedSize,
+                          };
+
+                        // itemKey 사용해서 checkout 페이지로 이동
+                        localStorage.setItem("directCheckout", JSON.stringify([payload]));
+                        localStorage.setItem("orderSource", "direct");
+                        navigate("/checkout", { state: { order: payload } });
+                      } catch (err) {
+                        console.error("바로구매 오류:", err);
+                        alert("상품 정보를 가져오는 중 오류가 발생했습니다.");
+                      }
+                    }}
                   >
                     바로구매
                   </button>

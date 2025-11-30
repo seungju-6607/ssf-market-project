@@ -1,8 +1,6 @@
-// src/pages/CategoryPage.jsx
 import React, { useEffect, useMemo, useState } from "react";
 import { Link, useLocation, useNavigate } from "react-router-dom";
 import { CATEGORY_DATA } from "../data/categoryData";
-import { getProductsByCategory } from "../data/productData";
 import "./Page.css";
 import "../styles/CategoryPage.css";
 
@@ -11,29 +9,34 @@ import {
   syncWishlistFromServer,
 } from "../hooks/useWishlist.js";
 
-// 이미지 URL 처리
 const srcOf = (p) => {
-  const url = p?.image || p?.img || "";
+  let itemArray = [];
+  try {
+    itemArray = JSON.parse(p?.itemList || "[]");
+  } catch (e) {
+    console.error("itemList parse error:", e, p?.itemList);
+    itemArray = [];
+  }
+
+  const url = itemArray[0] || "";
   if (!url) return `${process.env.PUBLIC_URL}/images/placeholder.png`;
   if (/^https?:\/\//i.test(url)) return url;
+
   const cleaned = url.replace(/^\.?\/*/, "");
   return cleaned.startsWith("images/")
     ? `${process.env.PUBLIC_URL}/${cleaned}`
     : `${process.env.PUBLIC_URL}/images/${cleaned}`;
 };
 
-// 금액 포맷
 const formatPrice = (v) => {
-  const n =
-    typeof v === "number"
-      ? v
-      : Number(String(v).replace(/[^\d]/g, "")) || 0;
+  const n = typeof v === "number" ? v : Number(String(v).replace(/[^\d]/g, "")) || 0;
   return n.toLocaleString() + "원";
 };
 
-// productId 생성
+// const pidOf = (p, idx) => p?.itemKey ?? `cat-${idx}`;
 const pidOf = (p, idx) =>
-  p?.id ?? p?.code ?? p?.pid ?? `cat-${idx}`;
+  p?.productId ?? p?.code ?? p?.pid ?? `cat-${idx}`;
+
 
 export default function CategoryPage() {
   const location = useLocation();
@@ -44,191 +47,154 @@ export default function CategoryPage() {
   const categoryKey = pathParts[0];
   const subcategoryKey = pathParts[1] || "main";
 
-  const categoryData = CATEGORY_DATA[categoryKey];
-
-  const [activeTab, setActiveTab] = useState("");
+  const [activeTab, setActiveTab] = useState(subcategoryKey);
   const [products, setProducts] = useState([]);
   const [wishlist, setWishlist] = useState([]);
 
-  // set 으로 빠르게 체크
-  const wishSet = useMemo(
-    () => new Set(wishlist.map((it) => it.productId)),
-    [wishlist]
-  );
-
-  // 로그인 유저
+  const wishSet = useMemo(() => new Set(wishlist.map((it) => it.productId)), [wishlist]);
   const loginUser = JSON.parse(localStorage.getItem("loginUser") || "{}");
   const email = loginUser.email;
 
   // 페이지 입장 시 위시 불러오기
   useEffect(() => {
-    if (email) {
-      syncWishlistFromServer(email).then((list) => {
-        setWishlist(list);
-      });
-    } else {
-      setWishlist([]);
-    }
-  }, [email]);
+      if (email) {
+        syncWishlistFromServer(email).then(setWishlist);
+      } else {
+        setWishlist([]);
+      }
+    }, [email]);
 
-  // 카테고리 / 서브카테고리 로딩
+  // 카테고리/서브카테고리 상품 fetch
   useEffect(() => {
-    if (!categoryData) return;
-
-    const match = categoryData.subcategories.find(
-      (s) => s.path === pathname
-    );
-    setActiveTab(
-      match ? match.name : categoryData.subcategories[0].name
-    );
-
-    setProducts(getProductsByCategory(categoryKey, subcategoryKey) || []);
-  }, [pathname, categoryKey, subcategoryKey, categoryData]);
-
+    const fetchItems = async () => {
+      try {
+        const query = subcategoryKey !== "main" ? `?subcategory=${subcategoryKey}` : "";
+        const res = await fetch(`http://localhost:8080/api/items/category/${categoryKey}${query}`);
+        if (res.ok) {
+          const data = await res.json();
+          setProducts(data);
+        }
+      } catch (e) {
+        console.error("상품 fetch error:", e);
+      }
+    };
+    fetchItems();
+  }, [categoryKey, subcategoryKey]);
 
   const handleWishlistClick = async (p, id) => {
-    // if (!email) {
-    //   alert("로그인 후 이용해주세요.");
-    //   navigate("/login");
-    //   return;
-    // }
-    //로그인 필수 기능 넣을 시 다시 활성화
+      if (!email) {
+        alert("로그인 후 이용해주세요.");
+        navigate("/login");
+        return;
+      }
+      //로그인 필수 기능 넣을 시 다시 활성화
 
-    const normalized = {
-      id,
-      name: p.name || "",
-      brand: p.brand || p.brandName || "",
-      image: p.image || p.img || "",
-      price:
-        typeof p.price === "string"
-          ? Number(p.price.replace(/[^\d]/g, "")) || 0
-          : Number(p.price || 0),
-      priceOri:
-        p.originalPrice
-          ? Number(String(p.originalPrice).replace(/[^\d]/g, ""))
-          : 0,
+      const normalized = {
+        id,
+        name: p.itemContent || "",
+        brand: p.itemBrand || "",
+        image: (() => {
+            try {
+              const list = JSON.parse(p.itemList || "[]");
+              return list[0] || "";
+            } catch (e) {
+              console.error("itemList parse error:", e, p.itemList);
+              return "";
+            }
+          })(),
+        price:
+          typeof p.itemPrice === "string"
+            ? Number(p.itemPrice.replace(/[^\d]/g, "")) || 0
+            : Number(p.itemPrice || 0),
+        priceOri:
+          p.originalPrice
+            ? Number(String(p.originalPrice).replace(/[^\d]/g, ""))
+            : 0,
+      };
+
+      const current = [...wishlist];
+      const exists = current.some((it) => it.productId === id);
+
+      // 1) 즉시 화면 반영 (optimistic update)
+      let next;
+      if (!exists) {
+        next = [
+          ...current,
+          {
+            email,
+            productId: id,
+            productName: normalized.name,
+            productBrand: normalized.brand,
+            productImage: normalized.image,
+            productPrice: normalized.price,
+            productPriceOri: normalized.priceOri,
+          },
+        ];
+      } else {
+        next = current.filter((it) => it.productId !== id);
+      }
+
+      setWishlist(next);
+
+      localStorage.setItem("wishlist_local", JSON.stringify(next));
+      window.dispatchEvent(new Event("wishlistUpdated"));
+
+      try {
+        await toggleWishlistServer(email, normalized);
+      } catch (e) {
+        console.error("Category wishlist toggle error:", e);
+        const real = await syncWishlistFromServer(email);
+        setWishlist(real);
+      }
     };
 
-    const current = [...wishlist];
-    const exists = current.some((it) => it.productId === id);
-
-    // 1) 즉시 화면 반영 (optimistic update)
-    let next;
-    if (!exists) {
-      next = [
-        ...current,
-        {
-          email,
-          productId: id,
-          productName: normalized.name,
-          productBrand: normalized.brand,
-          productImage: normalized.image,
-          productPrice: normalized.price,
-          productPriceOri: normalized.priceOri,
-        },
-      ];
-    } else {
-      next = current.filter((it) => it.productId !== id);
-    }
-
-    setWishlist(next);
-
-    localStorage.setItem("wishlist_local", JSON.stringify(next));
-    window.dispatchEvent(new Event("wishlistUpdated"));
-
-    try {
-      await toggleWishlistServer(email, normalized);
-    } catch (e) {
-      console.error("Category wishlist toggle error:", e);
-      const real = await syncWishlistFromServer(email);
-      setWishlist(real);
-    }
-  };
-  
   const goToProductDetail = (p, idx) => {
+    let imageUrl = "";
+    try {
+      const list = JSON.parse(p.itemList || "[]");
+      imageUrl = list[0] || "";
+    } catch (e) {
+      console.error("itemList 파싱 오류:", e);
+    }
+
     const normalized = {
-      id: pidOf(p, idx),
-      name: p.name || "상품명 없음",
-      image: p.image || p.img || "",
-      price:
-        typeof p.price === "string"
-          ? Number(p.price.replace(/[^\d]/g, "")) || 0
-          : Number(p.price || 0),
-      desc: p.desc || "",
-      brand: p.brand || p.brandName || "",
+      id: p.itemKey,
+      productId : p.productId,
+      name: p.itemName || "상품명 없음",
+      image: imageUrl,
+      price: p.itemPrice || 0,
+      desc: p.itemContent || "",
+      brand: p.itemBrand || "",
     };
+
     localStorage.setItem("lastProduct", JSON.stringify(normalized));
-    navigate(`/product/${normalized.id}`, {
-      state: { product: normalized },
-    });
+    navigate(`/product/${normalized.id}`, { state: { product: normalized } });
   };
 
-  if (!categoryData) {
-    return (
-      <div className="category-page">
-        <div className="container">
-          <h1>카테고리를 찾을 수 없습니다</h1>
-          <Link to="/">홈으로 돌아가기</Link>
-        </div>
-      </div>
-    );
-  }
 
-  const pageData =
-    categoryData.pages[subcategoryKey] ||
-    categoryData.pages.main;
-  const isMainCategory = subcategoryKey === "main";
-
-  const breadcrumbItems = [{ name: "Home", path: "/" }];
-  breadcrumbItems.push({
-    name: categoryData.name,
-    path: `/${categoryKey}`,
-  });
-  if (!isMainCategory && pageData)
-    breadcrumbItems.push({
-      name: pageData.title,
-      path: pathname,
-    });
+  // UI용 서브카테고리 가져오기
+  const tabs = CATEGORY_DATA[categoryKey]?.subcategories || [];
 
   return (
     <div className="category-page">
-      <div className="breadcrumb">
-        <div className="container">
-          {breadcrumbItems.map((item, idx) => (
-            <React.Fragment key={idx}>
-              {idx === breadcrumbItems.length - 1 ? (
-                <span className="current">{item.name}</span>
-              ) : (
-                <>
-                  <Link to={item.path}>{item.name}</Link>
-                  <span className="separator">&gt;</span>
-                </>
-              )}
-            </React.Fragment>
-          ))}
-        </div>
-      </div>
-
       <div className="container">
         <div className="page-header">
           <h1 className="page-title">
-            {pageData.title}{" "}
-            <span className="count">{pageData.count}개 상품</span>
+            {CATEGORY_DATA[categoryKey]?.name || categoryKey}{" "}
+            <span className="count">{products.length}개 상품</span>
           </h1>
         </div>
 
-        {/* 탭 */}
+        {/* 카테고리 탭 */}
         <div className="category-tabs">
-          {categoryData.subcategories.map((subcat) => (
+          {tabs.map((tab, idx) => (
             <Link
-              key={subcat.name}
-              to={subcat.path}
-              className={`tab ${
-                activeTab === subcat.name ? "active" : ""
-              }`}
-              onClick={() => setActiveTab(subcat.name)}
+              key={idx}
+              to={tab.path}
+              className={`tab ${activeTab === tab.path.split("/")[1] ? "active" : ""}`}
+              onClick={() => setActiveTab(tab.path.split("/")[1])}
             >
-              {subcat.name}
+              {tab.name}
             </Link>
           ))}
         </div>
@@ -242,42 +208,30 @@ export default function CategoryPage() {
               return (
                 <div
                   className="product-card"
-                  key={id}
+//                   key={id}
                   onClick={() => goToProductDetail(p, idx)}
                 >
                   <div className="thumb">
                     <img
                       src={srcOf(p)}
-                      alt={p.name}
+                      alt={p.itemName}
                       className="thumb-img"
                       loading="lazy"
                       onError={(e) => {
-                        e.currentTarget.src =
-                          `${process.env.PUBLIC_URL}/images/placeholder.png`;
+                        e.currentTarget.src = `${process.env.PUBLIC_URL}/images/placeholder.png`;
                       }}
                     />
-
-                    {/* 하트 버튼 */}
                     <button
-                      className={`wishlist-btn ${
-                        wished ? "active" : ""
-                      }`}
+                      className={`wishlist-btn ${wished ? "active" : ""}`}
                       aria-pressed={wished}
-                      aria-label={
-                        wished ? "위시에서 제거" : "위시에 추가"
-                      }
+                      aria-label={wished ? "위시에서 제거" : "위시에 추가"}
                       onClick={(e) => {
                         e.stopPropagation();
                         handleWishlistClick(p, id);
                       }}
                       title={wished ? "위시에 담김" : "위시에 담기"}
                     >
-                      <svg
-                        width="20"
-                        height="20"
-                        viewBox="0 0 24 24"
-                        fill={wished ? "currentColor" : "none"}
-                      >
+                      <svg width="20" height="20" viewBox="0 0 24 24" fill={wished ? "currentColor" : "none"}>
                         <path
                           d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78L12 21.23l8.84-8.84a5.5 5.5 0 0 0 0-7.78z"
                           stroke="currentColor"
@@ -285,30 +239,13 @@ export default function CategoryPage() {
                         />
                       </svg>
                     </button>
-
-                    {p.discountLabel && (
-                      <span className="discount-badge">
-                        {p.discountLabel}
-                      </span>
-                    )}
                   </div>
-
                   <div className="product-info">
-                    <span className="brand">
-                      {p.brand || p.brandName}
-                    </span>
-                    <h3 className="product-name">{p.name}</h3>
+                    <span className="brand">{p.itemBrand}</span>
+                    <h3 className="product-name">{p.itemName}</h3>
                     <div className="price">
-                      {p.originalPrice && (
-                        <span className="original-price">
-                          {formatPrice(p.originalPrice)}
-                        </span>
-                      )}
-                      <span className="current-price">
-                        {p.priceLabel
-                          ? p.priceLabel
-                          : formatPrice(p.price)}
-                      </span>
+                      {p.itemSale > 0 && <span className="original-price">{formatPrice(p.itemSale)}</span>}
+                      <span className="current-price">{formatPrice(p.itemPrice)}</span>
                     </div>
                   </div>
                 </div>

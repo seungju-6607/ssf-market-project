@@ -4,8 +4,10 @@ import com.ssf.project.dto.AdminOrderPageDto;
 import com.ssf.project.dto.AdminOrderRowDto;
 import com.ssf.project.dto.MonthlyRevenuePointDto;
 import com.ssf.project.dto.OrderDetailResponseDto;
+import com.ssf.project.repository.JpaCouponRepository;
 import com.ssf.project.repository.JpaOrderRepository;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.sql.Timestamp;
 import java.time.LocalDate;
@@ -23,11 +25,14 @@ public class AdminOrderServiceImpl implements AdminOrderService {
 
     private final JpaOrderRepository jpaOrderRepository;
     private final OrderService orderService;
+    private final JpaCouponRepository jpaCouponRepository;
 
     public AdminOrderServiceImpl(JpaOrderRepository jpaOrderRepository,
-                                 OrderService orderService) {
+                                 OrderService orderService,
+                                 JpaCouponRepository jpaCouponRepository) {
         this.jpaOrderRepository = jpaOrderRepository;
         this.orderService = orderService;
+        this.jpaCouponRepository = jpaCouponRepository;
     }
 
     @Override
@@ -96,7 +101,8 @@ public class AdminOrderServiceImpl implements AdminOrderService {
         String ordererName = (String) row[2];
         String receiverName = (String) row[3];
         int price = toInt(row[4]);
-        return new AdminOrderRowDto(orderId, orderedAt, ordererName, receiverName, price);
+        String orderStatus = row[5] != null ? (String) row[5] : "S";
+        return new AdminOrderRowDto(orderId, orderedAt, ordererName, receiverName, price, orderStatus);
     }
 
     //DB에서 받아온 number 객체를 int로 변환해줌
@@ -121,16 +127,59 @@ public class AdminOrderServiceImpl implements AdminOrderService {
     //올해, 작년 매출 금액
     @Override
     public Map<String, Integer> getTotalRevenue() {
-        Object[] revenue = jpaOrderRepository.sumRevenueThisAndLastYear();
-
-        Integer thisYear = ((Number)revenue[0]).intValue();
-        Integer lastYear = ((Number)revenue[1]).intValue();
+        List<Object[]> revenueList = jpaOrderRepository.sumRevenueThisAndLastYear();
+        Object[] revenue = revenueList.get(0);
+        Number thisYear = (Number)revenue[0];
+        Number lastYear = (Number)revenue[1];
 
         Map<String, Integer> result = new HashMap<>();
-        result.put("thisYear",  thisYear);
-        result.put("lastYear", lastYear);
+        result.put("thisYear",  thisYear.intValue());
+        result.put("lastYear", lastYear.intValue());
 
         return result;
+    }
+
+    @Override
+    @Transactional
+    public boolean cancelOrder(String orderId) {
+        if (orderId == null || orderId.isBlank()) {
+            return false;
+        }
+
+        // 1. 주문의 사용자 키와 할인 금액 조회 (주문 취소 전에 조회)
+        String userKey = jpaOrderRepository.findUserKeyByOrderId(orderId);
+        if (userKey == null || userKey.isBlank()) {
+            return false;
+        }
+
+        // 2. 주문 상태를 'C'로 변경
+        int updated = jpaOrderRepository.cancelOrder(orderId);
+        if (updated == 0) {
+            return false;
+        }
+
+        // 3. 해당 주문에서 사용된 쿠폰 찾기 (최근 사용된 쿠폰)
+        String usedCouponId = jpaCouponRepository.findLatestUsedCouponId(userKey);
+        if (usedCouponId != null && !usedCouponId.isBlank()) {
+            try {
+                // 4. 쿠폰 사용 취소 시도 (used_yn을 'N'으로 변경)
+                int restored = jpaCouponRepository.restoreCoupon(userKey, usedCouponId);
+                if (restored == 0) {
+                    // 사용 취소 실패 시 새로운 쿠폰 발급
+                    jpaCouponRepository.insertCouponUsed(usedCouponId, userKey);
+                }
+            } catch (Exception e) {
+                // 쿠폰 복원 실패 시에도 새 쿠폰 발급 시도
+                try {
+                    jpaCouponRepository.insertCouponUsed(usedCouponId, userKey);
+                } catch (Exception ex) {
+                    // 쿠폰 재발급 실패는 로그만 남기고 주문 취소는 성공으로 처리
+                    System.err.println("쿠폰 재발급 실패: " + ex.getMessage());
+                }
+            }
+        }
+
+        return true;
     }
 }
 

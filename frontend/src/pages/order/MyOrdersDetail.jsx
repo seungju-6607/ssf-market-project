@@ -1,8 +1,9 @@
 import React, { useEffect, useMemo, useState } from "react";
 import { useDispatch } from "react-redux";
+import { useSelector } from "react-redux";
 import { useLocation, useNavigate } from "react-router-dom";
 import { fetchOrderDetail } from "../../feature/order/orderAPI.js";
-import { fetchAdminOrderDetail } from "../../feature/admin/adminOrdersAPI.js";
+import { fetchAdminOrderDetail, cancelOrder } from "../../feature/admin/adminOrdersAPI.js";
 import "./MyOrdersDetail.css";
 
 const formatKRW = (n) => `₩${Number(n || 0).toLocaleString()}`;
@@ -48,6 +49,8 @@ export default function MyOrdersDetail() {
   const navigate = useNavigate();
   const location = useLocation();
   const dispatch = useDispatch();
+  const authState = useSelector((state) => state.auth);
+  const isAdminUser = (authState?.role || "").toLowerCase() === "admin";
 
   const user = useMemo(() => {
     try {
@@ -62,6 +65,7 @@ export default function MyOrdersDetail() {
   const [detail, setDetail] = useState(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
+  const [cancelling, setCancelling] = useState(false);
 
   useEffect(() => {
     if (!fullOrderId || (!isAdmin && !user?.email)) {
@@ -144,6 +148,30 @@ export default function MyOrdersDetail() {
   const shipping = detail.shipping || {};
   const amounts = detail.amounts || {};
   const items = detail.items || [];
+  const orderStatus = detail.orderStatus || "S";
+  const isCancelled = orderStatus === "C";
+
+  const handleCancelOrder = async () => {
+    if (!window.confirm("정말 주문을 취소하시겠습니까?")) {
+      return;
+    }
+
+    setCancelling(true);
+    try {
+      await cancelOrder(fullOrderId);
+      // 주문 상세 정보 다시 불러오기
+      const updatedDetail = isAdmin
+        ? await fetchAdminOrderDetail(fullOrderId)
+        : await dispatch(fetchOrderDetail(fullOrderId));
+      setDetail(updatedDetail);
+      alert("주문이 취소되었습니다.");
+    } catch (e) {
+      console.error("주문 취소 실패:", e);
+      alert("주문 취소에 실패했습니다.");
+    } finally {
+      setCancelling(false);
+    }
+  };
 
   return (
     <div className="order-detail-page">
@@ -151,7 +179,7 @@ export default function MyOrdersDetail() {
         <section className="detail-greeting">
           <div className="detail-avatar" aria-hidden />
           <div className="detail-greeting-text">
-            <p className="detail-greeting-title">{greetingName}님, 안녕하세요.</p>
+            <p className="detail-greeting-title">{greetingName} 님의 주문 내역</p>
             <p className="detail-greeting-sub">{totalPurchaseText}</p>
           </div>
           <div className="detail-badge">
@@ -201,9 +229,21 @@ export default function MyOrdersDetail() {
                   </div>
                 </div>
                 <div className="detail-item-status">
-                  <button type="button" className="detail-ghost-btn">
-                    결제완료
-                  </button>
+                  {isCancelled ? (
+                    <button 
+                      type="button" 
+                      className="detail-cancel-btn"
+                    >
+                      주문취소
+                    </button>
+                  ) : (
+                    <button 
+                      type="button" 
+                      className="detail-ghost-btn"
+                    >
+                      결제완료
+                    </button>
+                  )}
                 </div>
               </div>
             );
@@ -279,6 +319,16 @@ export default function MyOrdersDetail() {
         </section>
 
         <div className="detail-actions">
+          {isAdminUser && !isCancelled && (
+            <button 
+              type="button" 
+              onClick={handleCancelOrder}
+              className="detail-cancel-outline-btn"
+              disabled={cancelling}
+            >
+              주문취소
+            </button>
+          )}
           <button type="button" onClick={() => navigate(-1)} className="detail-outline-btn">
             목록으로
           </button>

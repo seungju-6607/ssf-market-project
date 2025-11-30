@@ -6,6 +6,7 @@ import com.ssf.project.dto.OrderDetailResponseDto;
 import com.ssf.project.service.AdminOrderService;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PatchMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
@@ -53,6 +54,15 @@ public class AdminOrderController {
     public ResponseEntity<Map<String, Integer>> totalRevenue() {
         Map<String, Integer> revenue = adminOrderService.getTotalRevenue();
         return ResponseEntity.ok(revenue);
+    }
+
+    @PatchMapping("/{orderId}/cancel")
+    public ResponseEntity<?> cancelOrder(@PathVariable String orderId) {
+        boolean success = adminOrderService.cancelOrder(orderId);
+        if (success) {
+            return ResponseEntity.ok().build();
+        }
+        return ResponseEntity.badRequest().build();
     }
 }
 

@@ -22,6 +22,7 @@ public class WishlistController {
 
     @PostMapping("/toggle")
     public boolean toggle(@RequestBody WishlistItemDto dto) {
+        System.out.println("dto 확인 : "+ dto);
         return wishlistService.toggleWishlist(dto);
     }
 

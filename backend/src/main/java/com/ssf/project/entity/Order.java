@@ -21,7 +21,7 @@ public class Order {
     private String order_name;      // 받는 사람 이름
     private String order_zipcode;
     private String order_tel;
-    private String order_status = "S";    // R: 환불, S: 성공
+    private String order_status = "S";    // C: 취소, S: 성공
     private String order_req;
     private Integer order_price;    // 총 상품 금액
     private String order_addr;

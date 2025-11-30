@@ -13,6 +13,7 @@ public interface AdminOrderService {
     List<MonthlyRevenuePointDto> getMonthlyRevenue(int year);
     OrderDetailResponseDto getOrderDetail(String orderId);
     Map<String, Integer> getTotalRevenue();
+    boolean cancelOrder(String orderId);
 }
 
 

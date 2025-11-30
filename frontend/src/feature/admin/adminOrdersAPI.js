@@ -1,4 +1,4 @@
-import { axiosGet } from "../../utils/dataFetch.js";
+import { axiosGet, axiosPatch } from "../../utils/dataFetch.js";
 
 /*
 * 관리자 페이지에서 주문 목록 조회
@@ -24,10 +24,15 @@ export const fetchMonthlyRevenue = async (year) => {
   return axiosGet(`/admin/orders/revenue?year=${year}`);
 };
 
-//기간 조건없이 전체 매출 조회용
+//매출 조회용
 export const fetchTotalRevenue = async () => {
-    const response = await axiosGet(`/admin/orders/revenue/total`);
-    return response.data;
+    const data = await axiosGet(`/admin/orders/revenue/total`);
+    return data;
+}
+
+//주문 취소
+export const cancelOrder = async (orderId) => {
+  return axiosPatch(`/admin/orders/${orderId}/cancel`);
 }
 
 

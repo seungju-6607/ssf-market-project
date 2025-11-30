@@ -49,4 +49,34 @@ public interface JpaCouponRepository extends JpaRepository<Coupon, String> {
     int consumeCouponUpdate(@Param("userKey") String userKey,
                             @Param("couponId") String couponId);
 
+    @Query(value = """
+        SELECT cu.coupon_id
+        FROM ssf_coupon_used cu
+        WHERE cu.user_key = :userKey
+          AND cu.used_yn = 'Y'
+        ORDER BY cu.id DESC
+        LIMIT 1
+        """, nativeQuery = true)
+    String findLatestUsedCouponId(@Param("userKey") String userKey);
+
+    @Modifying
+    @Transactional
+    @Query(value = """
+        UPDATE ssf_coupon_used
+        SET used_yn = 'N'
+        WHERE id = (
+            SELECT id FROM (
+                SELECT id
+                FROM ssf_coupon_used
+                WHERE user_key = :userKey
+                  AND coupon_id = :couponId
+                  AND used_yn = 'Y'
+                ORDER BY id DESC
+                LIMIT 1
+            ) AS temp
+        )
+        """, nativeQuery = true)
+    int restoreCoupon(@Param("userKey") String userKey,
+                      @Param("couponId") String couponId);
+
 }

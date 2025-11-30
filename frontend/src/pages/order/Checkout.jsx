@@ -146,7 +146,7 @@ export default function Checkout() {
   const addressList = useSelector(state => state.order.addressList);
 
   const items = useMemo(() => getCheckoutPayload(location), [location]);
-  
+
   // 로그인 사용자 정보
   const loginUser = useMemo(() => {
     return JSON.parse(localStorage.getItem("loginUser") || "{}");

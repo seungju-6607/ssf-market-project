@@ -16,6 +16,7 @@ public class AdminOrderRowDto {
     private final String ordererName;
     private final String receiverName;
     private final int orderPrice;
+    private final String orderStatus;
 }
 
 

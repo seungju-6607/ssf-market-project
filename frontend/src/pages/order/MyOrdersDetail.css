@@ -150,6 +150,57 @@
   background: var(--primary-color);
   color: #fafafa;
   font-weight: bold;
+  border: none;
+  cursor: pointer;
+}
+
+.detail-ghost-btn:hover:not(:disabled) {
+  opacity: 0.9;
+}
+
+.detail-ghost-btn:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+}
+
+.detail-cancel-btn {
+  padding: 6px 12px;
+  border-radius: 6px;
+  background: #dc2626;
+  color: #fff;
+  font-weight: bold;
+  border: none;
+  cursor: pointer;
+}
+
+.detail-cancel-btn:hover:not(:disabled) {
+  background: #b91c1c;
+}
+
+.detail-cancel-btn:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+}
+
+.detail-cancel-outline-btn {
+  padding: 10px 20px;
+  border-radius: 6px;
+  background: #fff;
+  color: #dc2626;
+  font-weight: 700;
+  border: 1px solid #dc2626;
+  cursor: pointer;
+}
+
+.detail-cancel-outline-btn:hover:not(:disabled) {
+  background: #fef2f2;
+}
+
+.detail-cancel-outline-btn:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+  background: #fff;
+  color: #dc2626;
 }
 
 .detail-grid {
@@ -223,7 +274,10 @@
 }
 
 .detail-actions {
-  text-align: right;
+  display: flex;
+  justify-content: flex-end;
+  align-items: center;
+  gap: 10px;
 }
 
 .detail-outline-btn {
