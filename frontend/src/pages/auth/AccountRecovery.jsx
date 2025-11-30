@@ -1,10 +1,12 @@
 import React, { useEffect, useState } from "react";
+import { useLocation } from "react-router-dom";
 import { useDispatch } from "react-redux";
 import { getFindId, getFindPwd, updatePwd } from "../../feature/auth/authAPI.js";
 import "../../styles/Auth.css";
 
 export default function AccountRecovery() {
   const dispatch = useDispatch();
+  const location = useLocation();
 
   const [mode, setMode] = useState("id");
   const [nameForId, setNameForId] = useState("");
@@ -17,6 +19,12 @@ export default function AccountRecovery() {
   const [count, setCount] = useState(5);
   const [newPass, setNewPass] = useState("");
   const [newPassCheck, setNewPassCheck] = useState("");
+
+  useEffect(() => {
+      if(location.state?.mode) {
+        setMode(location.state.mode);
+      }
+  }, [location.state]);
 
   const maskEmail = (v) => {
     if (!v || !v.includes("@")) return v || "";
@@ -171,7 +179,7 @@ export default function AccountRecovery() {
             <form className="auth-form" onSubmit={handleChangePassword}>
               <div>
                 <label>새 비밀번호</label>
-                <input type="password" value={newPass} onChange={(e) => setNewPass(e.target.value)} placeholder="6자 이상" />
+                <input type="password" value={newPass} onChange={(e) => setNewPass(e.target.value)} placeholder="4자 이상" />
               </div>
               <div>
                 <label>비밀번호 확인</label>

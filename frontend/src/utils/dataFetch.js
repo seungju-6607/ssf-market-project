@@ -28,6 +28,17 @@ export const axiosPost = async (url, formData) => {
 }
 
 /**
+ *  axiosPatch 함수를 이용하여 백엔드 연동 처리
+ */
+export const axiosPatch = async (url, formData = null) => {
+    const config = { headers: { "Content-Type" : "application/json" } };
+    const response = formData 
+        ? await axios.patch(url, formData, config)
+        : await axios.patch(url, null, config);
+    return response.data;
+}
+
+/**
  *  axios 함수를 이용하여 데이터 가져오기
  */
 export const axiosData = async (url) => {

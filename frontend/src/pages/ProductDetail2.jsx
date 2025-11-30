@@ -94,24 +94,35 @@ export default function ProductDetail() {
   const [wishOn, setWishOn] = useState(false);
   const [wishPending, setWishPending] = useState(false);
 
+  const DIRECT_ITEM_KEY = 10001;
+
   const [ratingInfo, setRatingInfo] = useState({ average: 0, count: 0 });
   const [reviews, setReviews] = useState([]);
   const [newReview, setNewReview] = useState({ rating: 5, content: "" });
   const [submittingReview, setSubmittingReview] = useState(false);
   const [currentPage, setCurrentPage] = useState(1);
 
-  const product = useMemo(() => fromState, [fromState]);
+  const product = useMemo(() => {
+    if (fromState && fromState.id) return fromState;
+    try {
+      return JSON.parse(localStorage.getItem("lastProduct")) || null;
+    } catch {
+      return null;
+    }
+  }, [fromState, id]);
 
   const clampQty = (v) => (v < 1 ? 1 : v > 99 ? 99 : v);
 
-  const normalizedPrice = Number(product?.price || 0);
+  const normalizedPrice =
+    typeof product?.price === "string"
+      ? Number(product.price.replace(/[^\d]/g, "")) || 0
+      : Number(product?.price || 0);
 
   // 진입 시 현재 위시 여부
    useEffect(() => {
     if (!product) return;
     setWishOn(isInWishlist(product));
   }, [product]);
-
   const handleWishClick = async () => {
     if (!product) return;
 
@@ -165,7 +176,7 @@ export default function ProductDetail() {
       alert("사이즈를 선택해 주세요.");
       return;
     }
-    dispatch(addCart(product.id, size));
+    dispatch(addCart(DIRECT_ITEM_KEY, size));
   };
 
   const goCheckout = () => {
@@ -177,7 +188,7 @@ export default function ProductDetail() {
 
     const payload = {
       product: {
-        id: product.id,
+        id: DIRECT_ITEM_KEY,
         code: product.id,
         name: product.name,
         image: product.image || product.img,
@@ -345,9 +356,9 @@ export default function ProductDetail() {
           <div className="product-price">
             ₩{normalizedPrice.toLocaleString()}
           </div>
-{/*           <div className="product-price"> */}
-{/*             ₩{normalizedPrice.toLocaleString()} */}
-{/*           </div> */}
+          <div className="product-price">
+            ₩{normalizedPrice.toLocaleString()}
+          </div>
 
           {/* 옵션 선택 */}
           <div className="product-form-container">

@@ -145,7 +145,8 @@ public interface JpaOrderRepository extends JpaRepository<Order, Integer> {
                 i.item_list as itemList,
                 d.order_detail_price as itemPrice,
                 d.order_detail_cnt as itemQty,
-                d.order_detail_size as itemSize
+                d.order_detail_size as itemSize,
+                o.order_status as orderStatus
             from ssf_order o
             join ssf_user u on u.user_key = o.user_key
             join ssf_order_detail d on o.order_uuid = d.order_uuid
@@ -191,7 +192,8 @@ public interface JpaOrderRepository extends JpaRepository<Order, Integer> {
                 i.item_list as itemList,
                 d.order_detail_price as itemPrice,
                 d.order_detail_cnt as itemQty,
-                d.order_detail_size as itemSize
+                d.order_detail_size as itemSize,
+                o.order_status as orderStatus
             from ssf_order o
             join ssf_user u on u.user_key = o.user_key
             join ssf_order_detail d on o.order_uuid = d.order_uuid
@@ -216,7 +218,8 @@ public interface JpaOrderRepository extends JpaRepository<Order, Integer> {
                 o.order_date  as orderedAt,
                 u.username    as ordererName,
                 o.order_name  as receiverName,
-                o.order_price as orderPrice
+                o.order_price as orderPrice,
+                o.order_status as orderStatus
             from ssf_order o
             join ssf_user u on u.user_key = o.user_key
             where (:start is null or date(o.order_date) >= :start)
@@ -224,7 +227,7 @@ public interface JpaOrderRepository extends JpaRepository<Order, Integer> {
             order by o.order_key desc
             limit :limit offset :offset
             """, nativeQuery = true)
-    java.util.List<Object[]> findOrdersForAdmin(@Param("start") java.time.LocalDate start,
+    List<Object[]> findOrdersForAdmin(@Param("start") java.time.LocalDate start,
                                                 @Param("end") java.time.LocalDate end,
                                                 @Param("limit") int limit,
                                                 @Param("offset") int offset);
@@ -238,7 +241,7 @@ public interface JpaOrderRepository extends JpaRepository<Order, Integer> {
             group by month(o.order_date)
             order by month(o.order_date)
             """, nativeQuery = true)
-    java.util.List<Object[]> findMonthlyRevenue(@Param("year") int year);
+    List<Object[]> findMonthlyRevenue(@Param("year") int year);
 
 
     @Query(value = """
@@ -247,5 +250,20 @@ public interface JpaOrderRepository extends JpaRepository<Order, Integer> {
                 coalesce(sum(case when year(order_date) = year(now()) - 1 then order_price else 0 end), 0) as lastYearSales
             from ssf_order;
             """, nativeQuery = true)
-    Object[] sumRevenueThisAndLastYear();
+    List<Object[]> sumRevenueThisAndLastYear();
+
+    @Modifying
+    @Query(value = """
+            update ssf_order
+            set order_status = 'C'
+            where order_uuid = :orderId
+            """, nativeQuery = true)
+    int cancelOrder(@Param("orderId") String orderId);
+
+    @Query(value = """
+            select user_key
+            from ssf_order
+            where order_uuid = :orderId
+            """, nativeQuery = true)
+    String findUserKeyByOrderId(@Param("orderId") String orderId);
 }

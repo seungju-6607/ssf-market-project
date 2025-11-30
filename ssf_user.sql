@@ -90,21 +90,24 @@ CREATE TABLE ssf_addr (
 * 작성자 : 박도윤
 * 수정이력 : 
 	2025-11-06	최초 생성
+    2025-11-28  item_brand 컬럼 추가, PRIMARY KEY 변경 (김소현)
 * 사용예시 : desc ssf_item;
 ****************************************/
 use ssf;
 show tables;
 
 CREATE TABLE ssf_category (
-	category_key		INT		AUTO_INCREMENT		NOT NULL		COMMENT '카테고리고유번호',
-	category_key2		INT							NULL			COMMENT '카테고리고유번호2',
-	category_name		VARCHAR(150)				NOT NULL		COMMENT '카테고리명',
-    PRIMARY KEY (category_key)
+	category_id			varchar(5)				NOT NULL		COMMENT '카테고리구분키',
+	category_key		INT						NOT NULL		COMMENT '카테고리고유번호',
+	category_key2		INT						NOT NULL		COMMENT '카테고리고유번호2',
+	category_name		VARCHAR(150)			NOT NULL		COMMENT '카테고리명',
+    PRIMARY KEY (category_id)
 );
 
 CREATE TABLE ssf_item (
 	item_key			INT			AUTO_INCREMENT				NOT NULL		COMMENT '상품고유번호',
-	category_key		INT										NOT NULL		COMMENT '카테고리고유번호',
+	category_id			varchar(5)								NOT NULL		COMMENT '카테고리구분키',
+    product_id     		VARCHAR(100) 							NOT NULL 		COMMENT '상품 id',
 	item_name			VARCHAR(150)							NOT NULL		COMMENT '상품명',
 	item_list			JSON									NOT NULL		COMMENT '이미지리스트',
 	item_content		VARCHAR(1000)							NULL			COMMENT '상품상세',
@@ -113,8 +116,11 @@ CREATE TABLE ssf_item (
 	item_rdate			DATETIME	DEFAULT CURRENT_TIMESTAMP	NULL			COMMENT '등록일',
 	item_cnt			INT										NOT NULL		COMMENT '재고',
     item_deleted		VARCHAR(1)	DEFAULT 'N'					NULL			COMMENT '삭제여부',
+    item_brand			VARCHAR(100)							NOT NULL		COMMENT '상품브랜드',
+    item_category		VARCHAR(150)							NOT NULL		COMMENT '대분류카테고리',
+    item_subcategory	VARCHAR(150)							NOT NULL		COMMENT '중분류카테고리',
     PRIMARY KEY (item_key),
-    CONSTRAINT fk_ssf_item_ssf_category FOREIGN KEY(category_key)	references ssf_category(category_key)
+    CONSTRAINT fk_ssf_item_ssf_category_new FOREIGN KEY(category_id)	references ssf_category(category_id)
 );
 
 
@@ -206,6 +212,7 @@ CREATE TABLE ssf_order (
     order_addr_detail	VARCHAR(300)								NOT NULL					COMMENT '상세주소',
     order_tel			VARCHAR(15)									NOT NULL					COMMENT '받는분전화번호',
 	order_req			VARCHAR(100)								NULL						COMMENT '배송시요청사항',
+    order_date			DATETIME	 DEFAULT CURRENT_TIMESTAMP		NOT NULL					COMMENT '주문날짜',
     PRIMARY KEY (order_key),
     CONSTRAINT fk_ssf_order_ssf_user FOREIGN KEY(user_key)	references ssf_user(user_key),
     UNIQUE (order_uuid)
@@ -220,6 +227,7 @@ CREATE TABLE ssf_order_detail (
 	item_key			INT											NOT NULL					COMMENT '상품고유번호',
     order_detail_price	INT											NULL						COMMENT '가격',
     order_detail_cnt	INT				DEFAULT 1					NULL						COMMENT '개수',
+    order_detail_size	VARCHAR(10)									NOT NULL					COMMENT '사이즈',
     PRIMARY KEY (order_detail_key),
     CONSTRAINT fk_ssf_order_detail_ssf_order FOREIGN KEY(order_uuid) references ssf_order(order_uuid),
     CONSTRAINT fk_ssf_order_detail_ssf_item FOREIGN KEY(item_key)	references ssf_item(item_key)
@@ -259,6 +267,7 @@ CREATE TABLE flea_market (
     CONSTRAINT fk_flea_market_ssf_user FOREIGN KEY(user_key)	references ssf_user(user_key)
 );
 
+
 /****************************************
 * 작업내용 : flea_messages 테이블 생성
 * 작성자 : 김소현
@@ -280,16 +289,12 @@ CREATE TABLE flea_messages (
     CONSTRAINT fk_flea_messages_flea_market FOREIGN KEY(flea_key) REFERENCES flea_market(flea_key) ON DELETE CASCADE
 );
 
-update ssf_user set userpwd = ? where email = ?;
-
-delete from ssf_user where username = "9999";
-
-select * from flea_market;
-select user_key, email, username, userpwd, banned, signout, signin, snsprov, snsid, referralId, phone, role from ssf_user;
+select * from view_cartlist;
+select * from ssf_wishlist;
 
 use ssf;
 show tables;
-desc ssf_user;
+desc ssf_order_detail;
 set SQL_SAFE_UPDATES = 0;
 drop table flea_messages;
 

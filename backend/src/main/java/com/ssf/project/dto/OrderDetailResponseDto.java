@@ -13,6 +13,7 @@ public record OrderDetailResponseDto(
         int totalPurchase,
         int couponCount,
         int pointBalance,
+        String orderStatus,
         Buyer buyer,
         Shipping shipping,
         Amounts amounts,

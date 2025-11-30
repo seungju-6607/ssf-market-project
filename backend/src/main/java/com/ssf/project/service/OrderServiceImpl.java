@@ -195,6 +195,7 @@ public class OrderServiceImpl implements OrderService {
         );
 
         // 위에서 담은 정보를 리턴
+        String orderStatus = head.getOrderStatus() != null ? head.getOrderStatus() : "S";
         return new OrderDetailResponseDto(
                 head.getOrderId(),
                 toLocalDateTime(head.getOrderedAt()),
@@ -204,6 +205,7 @@ public class OrderServiceImpl implements OrderService {
                 optionalInt(head.getTotalPurchase()).orElse(0),
                 optionalInt(head.getCouponCount()).orElse(0),
                 optionalInt(head.getPointBalance()).orElse(0),
+                orderStatus,
                 buyer,
                 shipping,
                 amounts,

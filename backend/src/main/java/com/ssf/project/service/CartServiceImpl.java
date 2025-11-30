@@ -73,7 +73,6 @@ public class CartServiceImpl implements CartService {
        } else {
            cartItem.setCheckQty(0L);
        }
-
        return cartItem;
    }
 

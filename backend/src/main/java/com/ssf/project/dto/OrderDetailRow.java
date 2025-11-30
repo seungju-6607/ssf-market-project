@@ -27,5 +27,6 @@ public interface OrderDetailRow {
     Integer getItemPrice();
     Integer getItemQty();
     String getItemSize();
+    String getOrderStatus();
 }
 

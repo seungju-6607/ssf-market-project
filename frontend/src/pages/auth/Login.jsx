@@ -160,7 +160,7 @@ export default function Login() {
 
         <div className="auth-links-box">
           <Link to="/account/recovery">아이디 찾기</Link>
-          <Link to="/account/recovery">비밀번호 찾기</Link>
+          <Link to="/account/recovery" state={{ mode: "pw" }}>비밀번호 찾기</Link>
           <Link to="/signup">회원가입</Link>
         </div>
 

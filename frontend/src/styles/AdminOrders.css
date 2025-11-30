@@ -1,3 +1,8 @@
+.admin-order-btn {
+    padding: 8px 10px !important;
+    font-weight: bold !important;
+}
+
 .admin-orders-page {
   padding: 24px 32px 40px;
   background: #f7f8fb;
@@ -32,18 +37,18 @@
   display: flex;
   flex-direction: column;
   align-items: flex-end;
-  gap: 6px;
 }
 
 .metric-label {
-  font-size: 13px;
+  font-size: 14px;
   color: #94a3b8;
+  font-weight: 500;
 }
 
 .metric-value {
   font-size: 32px;
   font-weight: 800;
-  color: #0f172a;
+  color: var(--primary-color);
 }
 
 .metric-pill {
@@ -69,12 +74,15 @@
 .metric-sub {
   font-size: 12px;
   color: #a0aec0;
+  font-weight: 600;
+  margin-top: 6px;
 }
 
 .orders-hero-actions {
-  display: flex;
-  justify-content: flex-end;
-  gap: 10px;
+    display: flex;
+    justify-content: flex-end;
+    align-self: flex-start;
+    gap: 10px;
 }
 
 .orders-tab-bar {
@@ -129,7 +137,7 @@
 
 .orders-date-picker button {
   border: none;
-  background: #ff5622;
+  background: var(--primary-color);
   color: #fff;
   font-weight: 600;
   padding: 6px 16px;
@@ -154,8 +162,9 @@
 
 .panel-period {
   font-size: 14px;
-  color: #a0aec0;
+  color: #fffee;
   margin-bottom: 6px;
+  font-weight: 500;
 }
 
 .orders-panel-head h2 {
@@ -182,8 +191,8 @@
 }
 
 .meta-chip.active {
-  background: #ffe9df;
-  color: #f97316;
+  background: #E9D7FF;
+  color: var(--primary-color);
 }
 
 .meta-chip.ghost {
@@ -198,7 +207,7 @@
 }
 
 .dot-orange {
-  background: #ff5b2e;
+  background: #6c2fc3;
 }
 
 .dot-gray {
@@ -219,11 +228,14 @@
 .orders-chart-shell {
   width: 100%;
   overflow-x: auto;
+  overflow-y: visible;
+  padding-left: 0;
 }
 
 .orders-chart {
   width: 100%;
-  min-width: 720px;
+  max-width: 100%;
+  min-width: 600px;
   height: auto;
   display: block;
 }
@@ -231,6 +243,7 @@
 .orders-chart-gridline line {
   stroke: rgba(15, 23, 42, 0.08);
   stroke-dasharray: 4 6;
+  stroke-width: 0.75;
 }
 
 .orders-chart-axis {
@@ -245,15 +258,47 @@
 }
 
 .orders-chart-point circle {
-  fill: #fff;
-  stroke: #ff6333;
-  stroke-width: 3;
+  fill: #C8A8FF;
+  stroke: none;
+  r: 2;
+  cursor: pointer;
+  transition: r 0.2s ease;
+}
+
+.orders-chart-point circle:hover {
+  r: 6;
 }
 
 .orders-chart-point text {
   fill: #94a3b8;
   font-size: 12px;
   font-weight: 600;
+}
+
+.orders-chart-tooltip {
+  z-index: 1000;
+}
+
+.tooltip-content {
+  background: #0f172a;
+  color: #fff;
+  padding: 8px 12px;
+  border-radius: 8px;
+  font-size: 12px;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+  white-space: nowrap;
+}
+
+.tooltip-month {
+  font-weight: 600;
+  margin-bottom: 4px;
+  color: #cbd5e1;
+}
+
+.tooltip-value {
+  font-weight: 700;
+  font-size: 14px;
+  color: #fff;
 }
 
 .admin-table-wrap {
@@ -275,6 +320,10 @@
 
 .admin-table tbody tr:hover {
   background: rgba(248, 250, 252, 0.6);
+}
+
+.btn admin-order-btn {
+  font-weight: 500 !important;
 }
 
 .orders-people {
@@ -301,11 +350,12 @@
   background: #f1f5f9;
   color: #64748b;
   font-size: 12px;
-  font-weight: 600;
+  font-weight: 500;
 }
 
 .orders-person strong {
   font-size: 14px;
+  font-weight: 500;
   color: #0f172a;
 }
 
@@ -321,7 +371,52 @@
   display: flex;
   align-items: center;
   justify-content: center;
-  gap: 16px;
+  gap: 8px;
+  position: relative;
+}
+
+.order-status-cancelled {
+  color: #dc2626;
+  font-weight: 600;
+}
+
+.admin-paging-prev,
+.admin-paging-next {
+  min-width: 60px;
+  height: 40px;
+}
+
+.admin-page-numbers {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  flex: 0 0 auto;
+}
+
+.admin-page-numbers .btn {
+  min-width: 40px;
+  height: 40px;
+  border-radius: 8px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  font-weight: 600;
+  color: #475569;
+  background: #f1f5f9;
+  border: 1px solid rgba(15, 23, 42, 0.08);
+  transition: all 0.2s ease;
+}
+
+.admin-page-numbers .btn:hover {
+  background: #e2e8f0;
+  color: #0f172a;
+}
+
+.admin-page-numbers .btn.is-active {
+  background: var(--primary-color);
+  color: #fff;
+  border-color: var(--primary-color);
 }
 
 .admin-page-info {
