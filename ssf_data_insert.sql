@@ -203,7 +203,7 @@ SELECT
     jt.category,
     jt.subcategory
 FROM JSON_TABLE(
-    CAST(LOAD_FILE('C:/ProgramData/MySQL/MySQL Server 8.0/Uploads/productData.json') AS CHAR CHARACTER SET utf8mb4),
+    CAST(LOAD_FILE('C:/ProgramData/MySQL/MySQL Server 8.0/Uploads/rankingData.json') AS CHAR CHARACTER SET utf8mb4),
     "$[*]" COLUMNS (
 		id VARCHAR(100) PATH "$.id",
         category VARCHAR(50) PATH "$.category",
@@ -299,7 +299,7 @@ show tables;
 desc ssf_item;
 set SQL_SAFE_UPDATES = 0;
 -- drop table ssf_item;
-delete from table ssf_wishlist;
+delete from ssf_category;
 
-select * from ssf_wishlist;
-select * from ssf_category;
+select count(*) from ssf_item;
+select * from ssf_category where category_key = 9;

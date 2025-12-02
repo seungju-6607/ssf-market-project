@@ -85,18 +85,21 @@ public interface JpaFleamarketRepository extends JpaRepository<Fleamarket, Integ
     /* 구매자 문의 내용 조회 */
     @Query("""
             select new com.ssf.project.dto.FleamarketMsgDto(
-                v.msgId,
-                v.fleaKey,
-                v.buyerId,
-                v.sellerId,
-                v.senderId,
-                v.senderName,
-                v.inquiryMsg,
-                v.createdAt,
-                v.readFlag
+                m.msgId,
+                m.fleaKey,
+                m.buyerId,
+                m.sellerId,
+                m.senderId,
+                m.senderName,
+                m.inquiryMsg,
+                m.createdAt,
+                m.readFlag
             )
-            from Message v
-            where v.fleaKey = :fleaKey and v.buyerId = :buyerId and v.sellerId = :sellerId
+            from Message m
+            where m.fleaKey = :fleaKey
+              and m.buyerId = :buyerId
+              and m.sellerId = :sellerId
+            order by m.createdAt asc
             """)
     List<FleamarketMsgDto> findMsgByBuyer(@Param("fleaKey") Integer fleaKey,
                                           @Param("buyerId") String buyerId,
