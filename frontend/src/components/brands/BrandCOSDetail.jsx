@@ -239,7 +239,7 @@ export default function BrandCosDetail() {
               <Link to="/signup" className="btn primary">
                 회원가입
               </Link>
-              <Link to="/coupon" className="btn ghost">
+              <Link to="/mypage/coupons" className="btn ghost">
                 쿠폰함
               </Link>
             </div>

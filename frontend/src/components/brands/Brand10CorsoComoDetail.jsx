@@ -20,30 +20,30 @@ const SIZES = ["S", "M", "L", "XL"];
 const hotItems = [
   {
     id: "cc-shirt",
-    name: "10 CORSO COMO 프린팅 셔츠",
-    price: 239000,
-    img: "https://images.unsplash.com/photo-1520975916090-3105956dac38?auto=format&fit=crop&w=1200&q=80",
+    name: "Cozy Arco Jacket - Brown",
+    price: 2150000,
+    img: "https://img.ssfshop.com/cmd/LB_750x1000/src/https://img.ssfshop.com/goods/CCPB/25/10/21/GM0025102182299_0_THNAIL_ORGINL_20251024163054094.jpg",
     badges: ["NEW"],
   },
   {
     id: "cc-bag",
-    name: "10 CORSO COMO 토트백",
-    price: 159000,
-    img: "https://images.unsplash.com/photo-1542838132-92c53300491e?auto=format&fit=crop&w=1200&q=80",
+    name: "Cozy Michlin - Blue",
+    price: 2750000,
+    img: "https://img.ssfshop.com/cmd/LB_750x1000/src/https://img.ssfshop.com/goods/CCPB/25/10/21/GM0025102182296_0_THNAIL_ORGINL_20251024163051091.jpg",
     badges: ["BEST"],
   },
   {
     id: "cc-mug",
-    name: "10 CORSO COMO 로고 머그컵",
-    price: 59000,
-    img: "https://images.unsplash.com/photo-1534791547709-33b0c2d3a1de?auto=format&fit=crop&w=1200&q=80",
+    name: "Jack Knit - Grey",
+    price: 1750000,
+    img: "https://img.ssfshop.com/cmd/LB_750x1000/src/https://img.ssfshop.com/goods/CCPB/25/11/14/GM0025111408086_0_THNAIL_ORGINL_20251118154926282.jpg",
     badges: ["HOT"],
   },
   {
     id: "cc-book",
-    name: "10 CORSO COMO 아트북 컬렉션",
-    price: 99000,
-    img: "https://images.unsplash.com/photo-1544716278-ca5e3f4abd8c?auto=format&fit=crop&w=1200&q=80",
+    name: "America - Purple",
+    price: 375000,
+    img: "https://img.ssfshop.com/cmd/LB_750x1000/src/https://img.ssfshop.com/goods/CCPB/25/11/25/GM0025112572538_0_THNAIL_ORGINL_20251127122124539.jpg",
   },
 ];
 
@@ -58,6 +58,29 @@ export default function Brand10CorsoComoDetail() {
   const navigate = useNavigate();
   const [openSku, setOpenSku] = useState(null);
   const [picked, setPicked] = useState({});
+  const name = "더좋은강남아카데미";
+  const floor = "4층";
+  const address = `${name} ${floor}`;
+  const encoded = useMemo(() => encodeURIComponent(address), [address]);
+  const [copied, setCopied] = useState(false);
+  const copyAddr = async () => {
+      try {
+        await navigator.clipboard.writeText(address);
+        setCopied(true);
+        setTimeout(() => setCopied(false), 1500);
+      } catch {
+      
+        const el = document.createElement("textarea");
+        el.value = address;
+        document.body.appendChild(el);
+        el.select();
+        document.execCommand("copy");
+        document.body.removeChild(el);
+        setCopied(true);
+        setTimeout(() => setCopied(false), 1500);
+      }
+    };
+   
 
   const openPicker = (sku) => setOpenSku((v) => (v === sku ? null : sku));
   const onPick = (sku, s) => setPicked((p) => ({ ...p, [sku]: s }));
@@ -125,9 +148,6 @@ export default function Brand10CorsoComoDetail() {
       <section className="cc-section">
         <div className="cc-head">
           <h2>지금 주목받는 아이템</h2>
-          <Link to="/category?brand=10corsoComo" className="link-more">
-            더보기
-          </Link>
         </div>
 
         <div className="cc-grid">
@@ -157,9 +177,7 @@ export default function Brand10CorsoComoDetail() {
                   <div className="cc-name">{p.name}</div>
                   <div className="cc-price">{fmt(p.price)}</div>
                   <div className="cc-actions">
-                    <Link to={`/product/${p.id}`} className="btn ghost">
-                      자세히
-                    </Link>
+                  
                     <button
                       type="button"
                       className="btn primary"
@@ -222,7 +240,7 @@ export default function Brand10CorsoComoDetail() {
               <Link to="/signup" className="btn primary">
                 회원가입
               </Link>
-              <Link to="/coupon" className="btn ghost">
+              <Link to="/mypage/coupons" className="btn ghost">
                 쿠폰함
               </Link>
             </div>
@@ -262,6 +280,77 @@ export default function Brand10CorsoComoDetail() {
           ))}
         </div>
       </section>
+
+      {/* 오프라인 매장 */}
+      <section className="brandbk-section">
+        <div className="store-card-head2">
+          <div className="store-name2">
+            <strong>{name}</strong>
+            <span className="store-floor">{floor}</span>
+          </div>
+        </div>
+
+        <div className="store-info-grid">
+          <div className="store-info">
+            <div className="info-row">
+              <span className="info-key">주소</span>
+              <span className="info-val">{address}</span>
+              <button className="mini-btn" onClick={copyAddr}>
+                {copied ? "복사됨!" : "주소복사"}
+              </button>
+            </div>
+
+            <div className="info-row">
+              <span className="info-key">영업시간</span>
+              <span className="info-val">평일 10:00 ~ 19:00 (주말/공휴일 휴무)</span>
+            </div>
+
+            <div className="cta-wrap">
+              <a
+                className="cta-btn naver"
+                href={`https://map.naver.com/p/search/${encoded}`}
+                target="_blank" rel="noopener noreferrer"
+              >
+                네이버 지도로 길찾기
+              </a>
+              <a
+                className="cta-btn kakao"
+                href={`https://map.kakao.com/?q=${encoded}`}
+                target="_blank" rel="noopener noreferrer"
+              >
+                카카오맵으로 길찾기
+              </a>
+              <a
+                className="cta-btn google"
+                href={`https://www.google.com/maps/search/?api=1&query=${encoded}`}
+                target="_blank" rel="noopener noreferrer"
+              >
+                구글 지도로 길찾기
+              </a>
+            </div>
+          </div>
+
+          <div className="store-map">
+            {/*구글 지도*/}
+            <iframe
+              title="map"
+              src={`https://www.google.com/maps?q=${encoded}&output=embed`}
+              loading="lazy"
+              referrerPolicy="no-referrer-when-downgrade"
+            />
+          </div>
+        </div>
+
+        <div className="store-tips">
+          🚗 자차 이용 시 목적지를 <b>{address}</b>로 설정해주세요.  
+          대중교통 이용 시, 네이버/카카오 길찾기에서 실시간 환승 정보를 확인할 수 있어요.
+        </div>
+      </section>
+
+
+
+
+
     </div>
   );
 }

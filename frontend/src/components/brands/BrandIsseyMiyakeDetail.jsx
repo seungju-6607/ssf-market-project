@@ -230,7 +230,7 @@ export default function BrandIsseyMiyakeDetail() {
             </div>
             <div className="benefit-cta">
               <Link to="/signup" className="btn b-solid">회원가입</Link>
-              <Link to="/coupon" className="btn b-ghost">쿠폰함</Link>
+              <Link to="/mypage/coupons" className="btn b-ghost">쿠폰함</Link>
             </div>
           </div>
 

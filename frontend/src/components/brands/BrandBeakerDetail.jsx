@@ -14,34 +14,34 @@ const srcOf = (raw) => {
 const sampleProducts = [
   {
     id: "bk_001",
-    name: "BEAKER 클래식 싱글 코트",
-    price: 279000,
+    name: "BEAKER ORIGINAL Women Knit Collar Boucle Half Outer - Ash",
+    price: 489250,
     image:
-      "https://images.unsplash.com/photo-1544441893-675973e31985?w=900&q=80&auto=format&fit=crop",
+      "https://img.ssfshop.com/cmd/LB_750x1000/src/https://img.ssfshop.com/goods/MCBR/25/10/30/GM0025103069001_0_THNAIL_ORGINL_20251120105146972.jpg",
     tag: "NEW",
   },
   {
     id: "bk_002",
-    name: "BEAKER 캐시미어 가디건",
-    price: 149000,
+    name: "Daisy Fleece Jacket - Navy",
+    price: 216600,
     image:
-      "https://images.unsplash.com/photo-1520975918318-7bcd4294b26f?w=900&q=80&auto=format&fit=crop",
+      "https://img.ssfshop.com/cmd/LB_750x1000/src/https://img.ssfshop.com/goods/MCBR/25/11/21/GM0025112164994_0_THNAIL_ORGINL_20251127155010589.jpg",
     tag: "BEST",
   },
   {
     id: "bk_003",
-    name: "BEAKER 스트라이프 셔츠",
-    price: 89000,
+    name: "Men Dobby Denim Work Blouson - Ash",
+    price: 603250,
     image:
-      "https://images.unsplash.com/photo-1509631179647-0177331693ae?w=900&q=80&auto=format&fit=crop",
+      "https://img.ssfshop.com/cmd/LB_750x1000/src/https://img.ssfshop.com/goods/MCBR/25/11/18/GM0025111835852_0_THNAIL_ORGINL_20251126113949401.jpg",
     tag: "HOT",
   },
   {
     id: "bk_004",
-    name: "BEAKER 울 머플러",
+    name: "Nerd House Sweatpants Grey - Grey",
     price: 69000,
     image:
-      "https://images.unsplash.com/photo-1516826957135-700dedea698c?w=900&q=80&auto=format&fit=crop",
+      "https://img.ssfshop.com/cmd/LB_750x1000/src/https://img.ssfshop.com/goods/MCBR/25/11/19/GM0025111942572_0_THNAIL_ORGINL_20251124142715446.jpg",
     tag: "FW",
   },
 ];
@@ -58,7 +58,28 @@ const SIZES = ["XS", "S", "M", "L", "XL"];
 
 export default function BrandBeakerDetail() {
   const navigate = useNavigate();
-
+  const name = "더좋은강남아카데미";
+  const floor = "4층";
+  const address = `${name} ${floor}`;
+  const encoded = useMemo(() => encodeURIComponent(address), [address]);
+  const [copied, setCopied] = useState(false);
+ const copyAddr = async () => {
+    try {
+      await navigator.clipboard.writeText(address);
+      setCopied(true);
+      setTimeout(() => setCopied(false), 1500);
+    } catch {
+    
+      const el = document.createElement("textarea");
+      el.value = address;
+      document.body.appendChild(el);
+      el.select();
+      document.execCommand("copy");
+      document.body.removeChild(el);
+      setCopied(true);
+      setTimeout(() => setCopied(false), 1500);
+    }
+  };
   const total = useMemo(
     () => sampleProducts.reduce((a, c) => a + (c.price || 0), 0),
     []
@@ -133,9 +154,6 @@ export default function BrandBeakerDetail() {
       <section className="brandbk-section">
         <div className="brandbk-section-head">
           <h2>지금 핫한 아이템</h2>
-          <Link to="/category?brand=beaker" className="brandbk-more">
-            더 보기
-          </Link>
         </div>
 
         <div className="brandbk-grid">
@@ -157,10 +175,6 @@ export default function BrandBeakerDetail() {
                   </div>
 
                   <div className="brandbk-actions">
-                    <Link to={`/product/${p.id}`} className="brandbk-small-btn">
-                      자세히
-                    </Link>
-
                     {/* 바로구매 → 사이즈 선택 열기 */}
                     <button
                       type="button"
@@ -237,7 +251,7 @@ export default function BrandBeakerDetail() {
             <Link to="/signup" className="brandbk-btn brandbk-btn-primary">
               회원가입
             </Link>
-            <Link to="/coupon" className="brandbk-btn brandbk-btn-ghost">
+            <Link to="/mypage/coupons" className="brandbk-btn brandbk-btn-ghost">
               쿠폰함
             </Link>
           </div>
@@ -277,30 +291,67 @@ export default function BrandBeakerDetail() {
 
       {/* 오프라인 매장 */}
       <section className="brandbk-section">
-        <div className="brandbk-section-head">
-          <h2>BEAKER 오프라인</h2>
-        </div>
-        <div className="brandbk-store">
-          <div className="store-text">
-            <h3>더좋은 강남 아카데미 4층 팝업</h3>
-            <p>비이커의 감각적인 라인을 현장에서 직접 경험해보세요.</p>
-            <a
-              className="brandbk-btn brandbk-btn-ghost"
-              href="https://map.naver.com/"
-              target="_blank"
-              rel="noreferrer"
-            >
-              길찾기
-            </a>
+        <div className="store-card-head2">
+          <div className="store-name2">
+            <strong>{name}</strong>
+            <span className="store-floor">{floor}</span>
           </div>
+        </div>
+
+        <div className="store-info-grid">
+          <div className="store-info">
+            <div className="info-row">
+              <span className="info-key">주소</span>
+              <span className="info-val">{address}</span>
+              <button className="mini-btn" onClick={copyAddr}>
+                {copied ? "복사됨!" : "주소복사"}
+              </button>
+            </div>
+
+            <div className="info-row">
+              <span className="info-key">영업시간</span>
+              <span className="info-val">평일 10:00 ~ 19:00 (주말/공휴일 휴무)</span>
+            </div>
+
+            <div className="cta-wrap">
+              <a
+                className="cta-btn naver"
+                href={`https://map.naver.com/p/search/${encoded}`}
+                target="_blank" rel="noopener noreferrer"
+              >
+                네이버 지도로 길찾기
+              </a>
+              <a
+                className="cta-btn kakao"
+                href={`https://map.kakao.com/?q=${encoded}`}
+                target="_blank" rel="noopener noreferrer"
+              >
+                카카오맵으로 길찾기
+              </a>
+              <a
+                className="cta-btn google"
+                href={`https://www.google.com/maps/search/?api=1&query=${encoded}`}
+                target="_blank" rel="noopener noreferrer"
+              >
+                구글 지도로 길찾기
+              </a>
+            </div>
+          </div>
+
           <div className="store-map">
-            <img
-              src={srcOf(
-                "https://images.unsplash.com/photo-1509631179647-0177331693ae?w=1200&q=80&auto=format&fit=crop"
-              )}
-              alt="store"
+            {/*구글 지도*/}
+            <iframe
+              title="map"
+              src={`https://www.google.com/maps?q=${encoded}&output=embed`}
+              loading="lazy"
+              referrerPolicy="no-referrer-when-downgrade"
             />
           </div>
+        </div>
+
+        <div className="store-tips">
+          🚗 자차 이용 시 목적지를 <b>{address}</b>로 설정해주세요.  
+          대중교통 이용 시, 네이버/카카오 길찾기에서 실시간 환승 정보를 확인할 수 있어요.
         </div>
       </section>
     </div>

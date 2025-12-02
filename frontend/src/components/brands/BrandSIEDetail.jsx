@@ -250,7 +250,7 @@ export default function BrandSIEDetail() {
               회원가입
             </Link>
             <Link
-              to="/event/coupon"
+              to="/mypage/coupons"
               className="brandsie-btn brandsie-btn-ghost brandsie-benefit-btn"
             >
               자세히 보기
