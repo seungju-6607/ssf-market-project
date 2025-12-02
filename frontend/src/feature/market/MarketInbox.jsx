@@ -6,6 +6,7 @@ import { useMarketAuth } from "./authBridge.js";
 import { messageAPI } from "./messageAPI.js";
 import { Link, useLocation } from "react-router-dom";
 import "./market.css";
+import InquiryPanelSeller from "./InquiryPanelSeller.jsx";
 
 function useQuery() {
   const { search } = useLocation();
@@ -17,29 +18,33 @@ export default function MarketInbox() {
   const { isAuthenticated, user } = useMarketAuth();
   const { items, loading } = useSelector((s) => s.market);
   const [rows, setRows] = useState([]);
+  const [selectedChat, setSelectedChat] = useState(null);
+
   const q = useQuery();
   const filterListingId = q.get("listing") || null;
-console.log("filterListingId -> ", filterListingId);
-  useEffect(() => {
-    if (!items || items.length === 0) dispatch(fetchListings({}));
-  }, [dispatch]);
 
-  const myListings = useMemo(() => {
-    if (!isAuthenticated) return [];
-    const me = user.id || user.email;
-    return (items || []).filter((x) => x.fleaId === me)
-  }, [items, isAuthenticated, user.id, user.email]);
-console.log("items", items);
+  const me = useMemo(() => {
+    if (!isAuthenticated) return null;
+    return user?.id || user?.email;
+  }, [isAuthenticated, user]);
 
   useEffect(() => {
+    if (!isAuthenticated || !me) return;
+
     (async () => {
-      if (!isAuthenticated) return;
-      const me = user.id || user.email;
       const data = await messageAPI.listBySeller(me, { fleaKey : filterListingId || undefined });
-       console.log("data : ", data);
       setRows(data);
     })();
-  }, [isAuthenticated, user.id, user.email, filterListingId]);
+  }, [isAuthenticated, me, filterListingId]);
+
+  useEffect(() => {
+    if (!items || items.length === 0) dispatch(fetchListings({}));
+  }, [dispatch, items]);
+
+  const myListings = useMemo(() => {
+    if (!isAuthenticated || !me) return [];
+    return (items || []).filter((x) => x.fleaId === me)
+  }, [items, isAuthenticated, me]);
 
   if (!isAuthenticated) {
     return <div className="mk-container"><div className="mk-empty">로그인이 필요합니다.</div></div>;
@@ -54,37 +59,56 @@ console.log("items", items);
   }
 
   return (
-    <div className="mk-container">
-      <div className="mk-head">
-        <h2>문의 인박스 </h2>
-      </div>
-
-      {!rows.length ? (
-        <div className="mk-empty">받은 문의가 없습니다.</div>
-      ) : (
-        <div className="mk-inbox">
-          {rows.map((row, idx) => {
-            console.log("row : ", row);
-            const item = myListings.find((x) => x.fleaKey === row.fleaKey);
-            console.log("item : ", item);
-            return (
-              <Link key={idx} to={`/market/${row.fleaKey}`} className="mk-inbox-row">
-                <div className="mk-inbox-left">
-                  <div className="mk-inbox-title">{item?.fleaTitle || row.fleaKey}</div>
-                  <div className="mk-inbox-meta">{new Date(row.last.createdAt).toLocaleString()}</div>
-                </div>
-                <div className="mk-inbox-right">
-                  <div className="mk-inbox-last">
-                    <b>{row.senderName}</b>
-                    <div className="mk-inbox-snippet">{row.last.inquiryMsg}</div>
-                  </div>
-                  <div className="mk-inbox-count">{row.count}</div>
-                </div>
-              </Link>
-            );
-          })}
+      <div className="mk-container">
+        <div className="mk-head">
+          <h2>문의 인박스 </h2>
         </div>
-      )}
-    </div>
+
+        {!rows.length ? (
+          <div className="mk-empty">받은 문의가 없습니다.</div>
+        ) : (
+          <div className="mk-inbox">
+            {rows.map((row, idx) => {
+              const item = myListings.find((x) => x.fleaKey === row.fleaKey);
+              const isSelected = selectedChat === idx;  // 선택된 대화인지 체크
+
+              return (
+                <div key={idx}>
+                  {/* 클릭된 row에 대한 표시 */}
+                  <div
+                    className={`mk-inbox-row ${isSelected ? "selected" : ""}`}
+                    onClick={() => setSelectedChat(isSelected ? null : idx)}
+                  >
+                    <div className="mk-inbox-left">
+                      <div className="mk-inbox-title">{item?.fleaTitle || row.fleaKey}</div>
+                      <div className="mk-inbox-meta">
+                        {new Date(row.last.createdAt).toLocaleString()}
+                      </div>
+                    </div>
+                    <div className="mk-inbox-right">
+                      <div className="mk-inbox-last">
+                        <b>{row.senderName}</b>
+                        <div className="mk-inbox-snippet">{row.last.inquiryMsg}</div>
+                      </div>
+                      <div className="mk-inbox-count">{row.count}</div>
+                    </div>
+                  </div>
+
+                  {/* 선택된 대화창을 해당 row 밑에 표시 */}
+                  {isSelected && (
+                    <div style={{ marginTop: 12 }}>
+                      <InquiryPanelSeller
+                        fleaKey={row.fleaKey}
+                        buyerId={row.buyerId}
+                        onClose={() => setSelectedChat(null)} // 대화창 닫기
+                      />
+                    </div>
+                  )}
+                </div>
+              );
+            })}
+          </div>
+        )}
+      </div>
   );
 }

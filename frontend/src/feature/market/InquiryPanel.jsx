@@ -9,15 +9,14 @@ export default function InquiryPanel({ fleaKey, sellerId, fleaName, onClose }) {
 
   const [thread, setThread] = useState([]);
   const [text, setText] = useState("");
-  const [guestName, setGuestName] = useState("");
-  const [guestEmail, setGuestEmail] = useState("");
 
   const boxRef = useRef(null);
-  const buyerId = isAuthenticated ? (user.id || user.email) : `guest:${guestEmail || "anon"}`;
-  const buyerName = isAuthenticated ? (user.name || user.email?.split("@")[0] || "USER") : (guestName || "GUEST");
+  const userId = isAuthenticated ? (user.id || user.email) : null;
+  const userName = isAuthenticated ? (user.name || user.email?.split("@")[0] || "USER") : "GUEST";
 
   const load = async () => {
-    const t = await messageAPI.getConversation({ fleaKey, buyerId, sellerId });
+    if (!isAuthenticated) return; // 비회원 막음
+    const t = await messageAPI.getConversation({ fleaKey, buyerId: userId, sellerId });
     setThread(t);
     setTimeout(() => boxRef.current?.scrollTo({ top: 999999, behavior: "smooth" }), 0);
   };
@@ -28,22 +27,19 @@ export default function InquiryPanel({ fleaKey, sellerId, fleaName, onClose }) {
     e.preventDefault();
     const body = String(text || "").trim();
     if (!body) return;
-    if (!isAuthenticated && !guestEmail.trim()) {
-      alert("비로그인 문의는 이메일이 필요합니다.");
-      return;
-    }
+
     await messageAPI.send({
       fleaKey,
-      buyerId,
+      buyerId: userId, // 서버에서는 buyerId 기준
       sellerId,
-      senderId: buyerId,
-      senderName: buyerName,
+      senderId: userId,
+      senderName: userName,
       inquiryMsg: body,
     });
     setText("");
     await load();
   };
-
+console.log("thread : ", thread)
   return (
     <div className="mk-inquiry-wrap">
       <div className="mk-inquiry-head">
@@ -51,23 +47,12 @@ export default function InquiryPanel({ fleaKey, sellerId, fleaName, onClose }) {
         <button className="mk-btn" onClick={onClose}>닫기</button>
       </div>
 
-      {!isAuthenticated && (
-        <div className="mk-inquiry-guest">
-          <label>이름
-            <input value={guestName} onChange={(e) => setGuestName(e.target.value)} placeholder="예) 손님" />
-          </label>
-          <label>이메일(필수)
-            <input type="email" value={guestEmail} onChange={(e) => setGuestEmail(e.target.value)} placeholder="예) guest@example.com" />
-          </label>
-        </div>
-      )}
-
       <div ref={boxRef} className="mk-inquiry-thread">
         {thread.length === 0 ? (
           <div className="mk-empty">첫 메시지를 남겨보세요.</div>
         ) : (
           thread.map((m) => {
-            const mine = m.senderId === buyerId;
+            const mine = m.senderId === userId;
             return (
               <div key={m.msgId} className={`mk-bubble ${mine ? "mine" : ""}`}>
                 <div className="mk-bubble-meta">
