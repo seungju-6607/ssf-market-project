@@ -248,7 +248,7 @@ export default function BrandBeanpoleDetail() {
             <Link to="/signup" className="brandbp-btn brandbp-btn-primary">
               회원가입
             </Link>
-            <Link to="/coupon" className="brandbp-btn brandbp-btn-ghost">
+            <Link to="/mypage/coupons" className="brandbp-btn brandbp-btn-ghost">
               쿠폰함
             </Link>
           </div>

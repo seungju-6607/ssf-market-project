@@ -247,7 +247,7 @@ export default function Brand8SecondsDetail() {
             <Link to="/signup" className="brand8s-btn brand8s-btn-primary">
               회원가입
             </Link>
-            <Link to="/coupon" className="brand8s-btn brand8s-btn-ghost">
+            <Link to="/mypage/coupons" className="brand8s-btn brand8s-btn-ghost">
               쿠폰함
             </Link>
           </div>

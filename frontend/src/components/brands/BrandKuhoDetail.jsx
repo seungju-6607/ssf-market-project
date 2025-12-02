@@ -237,7 +237,7 @@ export default function BrandKuhoDetail() {
             <Link to="/signup" className="brandkh-btn brandkh-btn-primary">
               회원가입
             </Link>
-            <Link to="/coupon" className="brandkh-btn brandkh-btn-ghost">
+            <Link to="/mypage/coupons" className="brandkh-btn brandkh-btn-ghost">
               쿠폰함
             </Link>
           </div>

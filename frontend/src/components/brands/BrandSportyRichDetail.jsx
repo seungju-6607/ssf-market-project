@@ -239,7 +239,7 @@ export default function BrandSportyRichDetail() {
               <Link to="/signup" className="sr-btn sr-btn-primary">
                 회원가입
               </Link>
-              <Link to="/coupon" className="sr-btn sr-btn-ghost">
+              <Link to="/mypage/coupons" className="sr-btn sr-btn-ghost">
                 쿠폰함
               </Link>
             </div>

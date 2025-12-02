@@ -152,6 +152,95 @@
   object-fit:cover; display:block;
 }
 
+.store-card-head2 {
+  margin-top: 20px;
+  background:
+    radial-gradient(600px 200px at 20% 0%, #d8c9ff 0%, transparent 60%),
+    radial-gradient(600px 200px at 80% 0%, #c6f8e3 0%, transparent 60%),
+    #fff;
+
+  border: 1px solid #eee;
+  border-radius: 22px;
+
+  padding: 40px 20px;
+  box-shadow: 0 10px 24px rgba(0,0,0,.04);
+
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  text-align: center;
+}
+
+.store-name2 {
+  font-size: 24px;
+  font-weight: 700;
+}
+
+
+.store-floor {
+  font-size: 18px;
+  color: #666;
+}
+
+
+
+/* ===========================
+   매장 정보 카드
+=========================== */
+.store-info-grid {
+  margin-top: 20px;
+}
+
+.store-info {
+  background: #fff;
+  border-radius: 18px;
+  border: 1px solid #eee;
+
+  padding: 24px 22px;
+  box-shadow: 0 10px 24px rgba(0,0,0,.04);
+}
+
+
+/* ===========================
+   정보 행 (주소, 영업시간)
+=========================== */
+.info-row {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  margin-bottom: 16px;
+  flex-wrap: wrap;
+}
+
+.info-key {
+  font-weight: 700;
+  min-width: 70px;
+}
+
+.info-val {
+  flex: 1;
+  color: #555;
+}
+
+
+/* 주소복사 버튼 */
+.mini-btn {
+  background: #f5f5ff;
+  border: 1px solid #d9d6ff;
+  border-radius: 10px;
+  padding: 6px 12px;
+  font-size: 13px;
+  cursor: pointer;
+  transition: 0.2s ease;
+}
+
+.mini-btn:hover {
+  background: #eceaff;
+}
+
+
+
 /* ===== Offline Store ===== */
 .brandbk-store{
   display:grid; grid-template-columns: 1fr 1fr;
