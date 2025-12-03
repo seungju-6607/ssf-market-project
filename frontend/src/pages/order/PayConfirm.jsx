@@ -35,11 +35,14 @@ export default function PayConfirm() {
         localStorage.removeItem("orderSource");
     }, [orderId, dispatch]);
 
-    // 총액 계산
-    const totalPrice = orderList?.reduce(
-      (sum, i) => sum + toNumber(i.itemPrice) * i.itemQty,
-      0
-    ) || 0;
+    // 총액 계산 - 실제 결제 금액 사용 (쿠폰 할인 적용된 금액)
+    // orderList의 첫 번째 항목에서 totalPrice를 가져오거나, 없으면 개별 상품 가격 합계 사용
+    const totalPrice = firstOrder?.totalPrice 
+      ? toNumber(firstOrder.totalPrice)
+      : (orderList?.reduce(
+          (sum, i) => sum + toNumber(i.itemPrice) * i.itemQty,
+          0
+        ) || 0);
 
     // 썸네일 대표이미지 추출
     const extractThumb = (itemList) => {

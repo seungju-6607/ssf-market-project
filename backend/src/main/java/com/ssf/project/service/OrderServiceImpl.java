@@ -38,8 +38,14 @@ public class OrderServiceImpl implements OrderService {
     public int saveOrder(KakaoPayDto kakaoPayDto, String email) {
         int result = 0;
 
+        // kakaoPayDto.getPaymentInfo().getTotalAmount()); vs kakaoPayDto.getTotalAmount());
+
         //Step 1 : 결제 후 Orders 테이블 저장
-        int row = jpaOrderRepository.saveOrder(new Order(kakaoPayDto), email);
+        int finalAmount = Integer.parseInt(kakaoPayDto.getTotalAmount());
+        Order order = new Order(kakaoPayDto);
+        order.setOrder_price(finalAmount);
+
+        int row = jpaOrderRepository.saveOrder(order, email);
         if(row == 0) new Exception("step1 주문 테이블 저장 실패!");
 
         List<Integer> cartKeys = kakaoPayDto.getCidList();

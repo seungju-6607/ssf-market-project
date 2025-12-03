@@ -374,22 +374,6 @@ export default function Checkout() {
 
   const handlePayment = async() => {
 
-      //쿠폰 사용
-      if(selectedCoupon && loginUser?.email) {
-        const result = await consumeCoupon({
-           email: loginUser.email,
-           couponId: selectedCoupon.couponId,
-        });
-      }
-
-       //mount시 set한 쿠폰번호 = 사용할 쿠폰번호 => 사용된 쿠폰으로 상태변경
-       setCouponInfo((prev) =>
-         prev && prev.couponId === selectedCoupon.couponId
-           ? { ...prev, couponYn: "N", usedYn: "Y" }
-           : prev
-       );
-       setCouponId("");
-
        //결제 로직 시작
        const receiver = {
          name: name,
@@ -412,22 +396,33 @@ export default function Checkout() {
 
        const orderSource = localStorage.getItem("orderSource") || "cart";
        const result = await getPayment(receiver, paymentInfo, items, total, orderSource);
-  }
 
-  const handleCouponConsume = async () => {
-    if (!selectedCoupon || !loginUser?.email) return;
-    try {
-      await consumeCoupon({ email: loginUser.email, couponId: selectedCoupon.couponId });
-      setCouponInfo((prev) =>
-        prev && prev.couponId === selectedCoupon.couponId
-          ? { ...prev, couponYn: "N" }
-          : prev
-      );
-      setCouponId("");
-    } catch (error) {
-      console.error("쿠폰 사용 처리 실패:", error);
-    }
-  };
+       // 결제 완료가 확인되면
+       if(result.success) {
+
+          //쿠폰 사용
+          if(selectedCoupon && loginUser?.email) {
+            try {
+                const couponResult = await consumeCoupon({
+                   email: loginUser.email,
+                   couponId: selectedCoupon.couponId,
+                });
+            } catch (e) {
+                console.error("쿠폰 사용 처리 실패:", e);
+            }
+          }
+
+           //mount시 set한 쿠폰번호 = 사용할 쿠폰번호 => 사용된 쿠폰으로 상태변경
+           if (selectedCoupon) {
+               setCouponInfo((prev) =>
+                 prev && prev.couponId === selectedCoupon.couponId
+                   ? { ...prev, couponYn: "N", usedYn: "Y" }
+                   : prev
+               );
+           }
+           setCouponId("");
+       }
+  }
 
   if (!items || items.length === 0) {
     return (

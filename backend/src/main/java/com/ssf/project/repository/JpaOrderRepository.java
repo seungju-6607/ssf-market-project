@@ -117,7 +117,10 @@ public interface JpaOrderRepository extends JpaRepository<Order, Integer> {
                 o.order_date as orderedAt,
                 o.order_price as orderPrice,
                 2500 as shippingFee,
-                coalesce(i.item_price - i.item_sale, 0) as discountAmount,
+                coalesce(
+                    sum(i.item_price * d.order_detail_cnt) over(partition by o.order_uuid) - o.order_price,
+                    0
+                ) as discountAmount,
                 o.order_name as receiverName,
                 o.order_tel as receiverPhone,
                 o.order_zipcode as receiverZipcode,
@@ -164,7 +167,10 @@ public interface JpaOrderRepository extends JpaRepository<Order, Integer> {
                 o.order_date as orderedAt,
                 o.order_price as orderPrice,
                 2500 as shippingFee,
-                coalesce(i.item_price - i.item_sale, 0) as discountAmount,
+                coalesce(
+                    sum(i.item_price * d.order_detail_cnt) over(partition by o.order_uuid) - o.order_price,
+                    0
+                ) as discountAmount,
                 o.order_name as receiverName,
                 o.order_tel as receiverPhone,
                 o.order_zipcode as receiverZipcode,
@@ -208,6 +214,7 @@ public interface JpaOrderRepository extends JpaRepository<Order, Integer> {
             from ssf_order o
             where (:start is null or date(o.order_date) >= :start)
               and (:end   is null or date(o.order_date) <= :end)
+              and order_status = 's'
             """, nativeQuery = true)
     long countOrdersForAdmin(@Param("start") java.time.LocalDate start,
                              @Param("end") java.time.LocalDate end);
@@ -238,6 +245,7 @@ public interface JpaOrderRepository extends JpaRepository<Order, Integer> {
                 sum(o.order_price)  as totalAmount
             from ssf_order o
             where year(o.order_date) = :year
+            and o.order_status = 'S'
             group by month(o.order_date)
             order by month(o.order_date)
             """, nativeQuery = true)
@@ -248,7 +256,8 @@ public interface JpaOrderRepository extends JpaRepository<Order, Integer> {
             select
                 coalesce(sum(case when year(order_date) = year(now()) then order_price else 0 end), 0) as thisYearSales,
                 coalesce(sum(case when year(order_date) = year(now()) - 1 then order_price else 0 end), 0) as lastYearSales
-            from ssf_order;
+            from ssf_order
+            where order_status = 's';
             """, nativeQuery = true)
     List<Object[]> sumRevenueThisAndLastYear();
 
