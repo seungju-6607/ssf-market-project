@@ -131,6 +131,13 @@ public class KakaoPayController {
         KakaoApproveResponse approve = kakaoPayService.approve(tid, userId, orderId, pgToken);
         System.out.println("Kakao Approve Success --> " + approve);
 
+        // 2-1. 실제 카카오 결제 성공 후 리턴되는 금액을 payInfo에 반영
+        if (approve != null && approve.getAmount() != null && approve.getAmount().getTotal() != null) {
+            int actualPaidAmount = approve.getAmount().getTotal();
+            payInfo.setTotalAmount(String.valueOf(actualPaidAmount));
+            System.out.println("실제 결제 금액 반영: " + actualPaidAmount);
+        }
+
         // 3. 결제 완료 처리 (DB 상태 업데이트 등)
         //DB 상태 업데이트 - 주문상품을 order, order_detail 테이블에 저장, cart에서는 삭제
         String email = payInfo.getUserId();

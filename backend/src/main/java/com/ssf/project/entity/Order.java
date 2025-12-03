@@ -5,11 +5,14 @@ import com.ssf.project.dto.OrderDto;
 import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
+import lombok.Setter;
+
 import java.time.LocalDateTime;
 
 @Entity
 @Table(name = "ssf_order")
 @Getter
+@Setter
 @NoArgsConstructor
 public class Order {
 
@@ -57,10 +60,9 @@ public class Order {
         this.order_addr = dto.getReceiver().getAddress1();
         this.order_addr_detail = dto.getReceiver().getAddress2();
         this.order_req = dto.getReceiver().getMemo();
-
         this.shipping_fee = dto.getPaymentInfo().getShippingFee();
         this.discount_amount = dto.getPaymentInfo().getDiscountAmount();
-        this.order_price = dto.getPaymentInfo().getTotalAmount(); // 총 주문금액
+        this.order_price = Integer.parseInt(dto.getTotalAmount()); // 총 주문금액
         this.odate = LocalDateTime.now();
     }
 }
