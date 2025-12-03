@@ -6,7 +6,9 @@ import java.util.List;
 import java.util.Optional;
 
 public interface MemberRepository {
+    List<MemberDto> findAll();
     int updatePwd(MemberDto member);
+    int deleteByEmail(MemberDto member);
     MemberDto findId(MemberDto member);
     Long findPwd(MemberDto member);
     Long countById(String id);

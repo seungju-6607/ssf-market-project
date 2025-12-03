@@ -6,7 +6,9 @@ import com.ssf.project.dto.MemberDto;
 import java.util.List;
 
 public interface MemberService {
+    List<MemberDto> findAll();
     int updatePwd(MemberDto member);
+    int deleteByEmail(MemberDto member);
     MemberDto findId(MemberDto member);
     boolean findPwd(MemberDto member);
     boolean idCheck(String id);

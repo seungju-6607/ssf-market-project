@@ -37,7 +37,7 @@
 .mk-detail { display:grid; grid-template-columns: 1.1fr .9fr; gap:24px; }
 @media (max-width: 980px) { .mk-detail { grid-template-columns: 1fr; } }
 .mk-detail-gallery { display:grid; grid-template-columns: repeat(auto-fill, minmax(200px,1fr)); gap:8px; }
-.mk-detail-gallery img { width:100%; border-radius:12px; border:1px solid #eee; height: 200px; object-fit: cover; }
+.mk-detail-gallery img { width:100%; border-radius:12px; border:1px solid #eee; height: 270px; object-fit: cover; }
 .mk-detail-info .mk-detail-price { font-size:28px; font-weight:700; margin:8px 0 6px; }
 .mk-detail-meta { color:#777; font-size:14px; margin-bottom:16px; }
 .mk-detail-desc { line-height:1.6; white-space:pre-wrap; margin-bottom:16px; }

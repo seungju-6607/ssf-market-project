@@ -33,12 +33,23 @@ public class MemberServiceImpl implements MemberService{    // MemberService mem
     }
 
     @Override
+    public List<MemberDto> findAll() {
+        return memberRepository.findAll();
+    };
+
+    @Override
     public int updatePwd(MemberDto member){
         // 패스워드 인코딩
         String encodePwd = passwordEncoder.encode(member.getUserpwd());
         member.setUserpwd(encodePwd);
 
         return memberRepository.updatePwd(member);
+    };
+
+    @Override
+    public int deleteByEmail(MemberDto member){
+        member.setSignout("Y");
+        return memberRepository.deleteByEmail(member);
     };
 
     @Override

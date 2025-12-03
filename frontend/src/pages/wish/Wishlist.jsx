@@ -233,8 +233,8 @@ function Wishlist() {
                 </div>
 
                 {/* ---------------- 옵션 선택 ---------------- */}
-                <div style={{ display: "grid", gap: "8px", margin: "12px 0", width: "100%", maxWidth: "320px" }}>
-                  <label style={{ display: "grid", gap: "4px", fontSize: "13px" }}>
+                <div style={{ padding: "16px", display: "grid", gap: "8px", margin: "12px 0", width: "100%", maxWidth: "320px" }}>
+                  <label style={{ display: "grid", gap: "4px", fontSize: "13px"}}>
                     사이즈
                     <select
                       value={item.selectedSize || ""}
@@ -283,7 +283,7 @@ function Wishlist() {
                         const data = await fetchItemKey(item.productId);
                         const payload = {
                             product: {
-                              id: data.itemKey,
+                              id: data,
                               name: item.productName,
                               image: item.productImage,
                               price: item.productPrice,
