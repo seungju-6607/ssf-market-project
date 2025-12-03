@@ -105,7 +105,7 @@ export default function BrandAmiDetail() {
           </p>
 
           <div className="ami-hero-cta">
-            <Link to="/category?brand=ami" className="btn primary hero-btn">
+            <Link to="/brands" className="btn primary hero-btn">
               전체 상품 보기
             </Link>
             <a href="#ami-benefits" className="btn ghost hero-btn">

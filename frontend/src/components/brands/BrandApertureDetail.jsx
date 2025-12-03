@@ -103,7 +103,7 @@ export default function BrandApertureDetail() {
           </p>
 
           <div className="apt-hero-cta">
-            <Link to="/category?brand=aperture" className="btn primary">
+            <Link to="/brands" className="btn primary">
               전체 상품 보기
             </Link>
             <a href="#apt-benefits" className="btn ghost">
