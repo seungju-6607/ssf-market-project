@@ -52,9 +52,19 @@ public class MemberController {
         this.couponService = couponService;
     }
 
+    @PostMapping("/findAll")
+    public List<MemberDto> findAll() {
+        return memberService.findAll();
+    }
+
     @PostMapping("/updatePwd")
     public int updatePwd(@RequestBody MemberDto member) {
         return memberService.updatePwd(member);
+    }
+
+    @PostMapping("/deleteByEmail")
+    public int deleteByEmail(@RequestBody MemberDto member) {
+        return memberService.deleteByEmail(member);
     }
 
     @PostMapping("/findPwd")

@@ -1,6 +1,6 @@
 import React, { useEffect, useMemo, useState } from "react";
 import { useSelector, useDispatch } from "react-redux";
-import { getLogout } from "../../feature/auth/authAPI";
+import { getLogout, getFindAll, deleteMember } from "../../feature/auth/authAPI";
 import { Link, useNavigate } from "react-router-dom";
 import "../../styles/AdminDashboard.css";
 
@@ -8,12 +8,25 @@ export default function AdminDashboard() {
   const navigate = useNavigate();
   const dispatch = useDispatch();
   const [q, setQ] = useState("");
-  const [users, setUsers] = useState(() => {
-    try { return JSON.parse(localStorage.getItem("users")) || []; } catch { return []; }
-  });
-
+  const [users, setUsers] = useState([]);
   const authState = useSelector((state) => state.auth);
   const isAdmin = (authState?.role || "").toLowerCase() === "admin";
+
+  useEffect(() => {
+    (async () => {
+      try {
+        const data = await dispatch(getFindAll());
+        setUsers(data);
+      } catch (err) {
+        console.error("회원 조회 실패:", err);
+        setUsers([]);
+      }
+    })();
+  }, []);
+
+  useEffect(() => {
+    refresh();
+  }, []);
 
   useEffect(() => {
     if (!authState?.isLogin || !isAdmin) {
@@ -21,19 +34,30 @@ export default function AdminDashboard() {
     }
   }, [authState, isAdmin, navigate]);
 
-  const refresh = () => {
-    try { setUsers(JSON.parse(localStorage.getItem("users")) || []); } catch { setUsers([]); }
+  const refresh = async () => {
+    try {
+      const data = await dispatch(getFindAll());
+      setUsers(data);
+      setQ(""); // 검색창 초기화!
+    } catch (error) {
+      console.error("회원 목록 새로고침 실패:", error);
+      setUsers([]);
+      setQ("");
+    }
   };
 
-  const onDelete = (email) => {
-    const next = users.filter(u => u.email !== email);
-    localStorage.setItem("users", JSON.stringify(next));
-    if (authState?.user?.email === email) {
-      localStorage.setItem("isLogin", "false");
-      localStorage.removeItem("loginUser");
+  const onDelete = async (email) => {
+    try {
+      // 1. DB에 email로 삭제 요청
+      await dispatch(deleteMember(email));
+
+      // 2. DB에서 최신 목록 다시 가져오기!!
+      await refresh();
+      alert("회원이 삭제되었습니다.");
+    } catch (error) {
+      console.error(error);
+      alert("회원 삭제 중 오류가 발생했습니다.");
     }
-    setUsers(next);
-    alert("회원이 삭제되었습니다.");
   };
 
   const onLogout = async () => {
@@ -111,7 +135,7 @@ export default function AdminDashboard() {
                     <td>{i + 1}</td>
                     <td>{u.email}</td>
                     <td>{u.name}</td>
-                    <td>{formatDate(u.joinedAt)}</td>
+                    <td>{formatDate(u.signin)}</td>
                     <td>{u.role || "user"}</td>
                     <td>
                       <button className="btn-danger" onClick={() => onDelete(u.email)}>탈퇴</button>

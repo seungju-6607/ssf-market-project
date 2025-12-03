@@ -6,6 +6,21 @@ import { resetCartCount } from '../../feature/cart/cartSlice.js';
 import { createCsrfToken, refreshCsrfToken } from '../csrf/manageCsrfToken.js';
 import { validateFormCheck, validateSignupFormCheck } from '../../utils/validate.js';
 
+/** 전체 회원 검색 */
+export const getFindAll = () => async (dispatch) => {
+    const url = "/member/findAll";
+    const result = await axiosPost(url, {});
+    return result;
+};
+
+/** 회원 탈퇴 */
+export const deleteMember = (email) => async (dispatch) => {
+    const payload = { "email" : email };
+    const url = "/member/deleteByEmail";
+    const result = await axiosPost(url, payload);
+    return result;
+};
+
 /** 아이디 찾기 */
 export const getFindId = (payload) => async (dispatch) => {
     const url = "/member/findId";

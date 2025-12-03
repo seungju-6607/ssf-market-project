@@ -61,7 +61,7 @@ public class SecurityConfig {
 
                 .authorizeHttpRequests(authorize -> authorize
                         .requestMatchers("/csrf/**", "/member/signup", "/member/apiSignup", "/member/login", "/member/logout", 
-                        "/member/idcheck", "/member/findId", "/member/findPwd", "/member/updatePwd",                                
+                        "/member/idcheck", "/member/findId", "/member/findPwd", "/member/updatePwd", "/member/findAll", "/member/deleteByEmail",
                         "/market/**", "/uploads/**", "/wishlist/**", "/api/**").permitAll()
                         .anyRequest().authenticated()
                 );

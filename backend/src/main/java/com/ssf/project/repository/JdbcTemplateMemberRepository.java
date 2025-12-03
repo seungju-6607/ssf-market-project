@@ -38,6 +38,27 @@ public class JdbcTemplateMemberRepository implements MemberRepository {
     }
 
     @Override
+    public int deleteByEmail(MemberDto member) {
+        String sql = " update ssf_user set signout = ? where email = ?" ;  // 보안 이슈로 prepareStatement
+        Object[] param = {  member.getSignout(), member.getEmail() };
+
+        try {
+            int rows = jdbcTemplate.update(sql, param);
+            System.out.println("rows ==> " + rows);
+            return rows;
+        } catch (DataAccessException e) {
+            e.printStackTrace();
+            return 0; // 예외 발생 시 0 반환
+        }
+    }
+
+    @Override
+    public List<MemberDto> findAll() {
+        String sql = "select user_key, email, username, userpwd, banned, signout, signin, snsprov, snsid, referralId, phone, role from ssf_user where signout = ? ";
+        return jdbcTemplate.query(sql, new BeanPropertyRowMapper<>(MemberDto.class), "N");
+    }
+
+    @Override
     public MemberDto findId(MemberDto member) {
         String sql = "select user_key, email, username, userpwd, banned, signout, signin, snsprov, snsid, referralId, phone, role from ssf_user where username = ? and phone = ?";
         try {
