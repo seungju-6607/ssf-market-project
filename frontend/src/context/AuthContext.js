@@ -1,8 +1,8 @@
 // src/context/AuthContext.js
 import React, { createContext, useContext, useEffect, useMemo, useState } from "react";
+import { syncWishlistFromServer } from "../hooks/useWishlist.js";   
 
 const AuthContext = createContext(null);
-
 
 const USER_KEYS = [
   "loginUser", "ssf_user", "currentUser", "member", "user", "account", "profile", "loginInfo"
@@ -15,13 +15,12 @@ function normalizeUser(any) {
     any.id ?? any.userId ?? any.memberId ?? any.uid ?? any.username ?? any.loginId ?? any.email ?? null;
   const email = any.email ?? any.userEmail ?? "";
   const name = any.name ?? any.userName ?? any.nickname ?? (email ? email.split("@")[0] : "USER");
-  return id ? { id, email, name, ...any } : { email, name, ...any }; // id 없어도 일단 유지
+  return id ? { id, email, name, ...any } : { email, name, ...any };
 }
 
 function safeParse(raw) {
   try { return JSON.parse(raw); } catch { return null; }
 }
-
 
 function loadAndMigrateUser() {
   const primaryRaw = localStorage.getItem(PRIMARY_KEY);
@@ -35,7 +34,6 @@ function loadAndMigrateUser() {
     const parsed = normalizeUser(safeParse(raw));
     if (parsed) {
       localStorage.setItem(PRIMARY_KEY, JSON.stringify(parsed));
-      // 선택: 옛 키는 정리
       localStorage.removeItem(k);
       return parsed;
     }
@@ -47,32 +45,37 @@ export function AuthProvider({ children }) {
   const [user, setUser] = useState(() => loadAndMigrateUser());
   const [ready, setReady] = useState(false);
 
-
   useEffect(() => {
     setUser(loadAndMigrateUser());
     setReady(true);
   }, []);
 
-  const login = (nextUser) => {
+  const login = async (nextUser) => {
     const u = normalizeUser(nextUser);
     if (!u) return;
+
     localStorage.setItem(PRIMARY_KEY, JSON.stringify(u));
     setUser(u);
-  
+
+    if (u.email) {
+      await syncWishlistFromServer(u.email);
+    }
+
     window.dispatchEvent(new Event("auth:changed"));
   };
 
   const logout = () => {
     localStorage.removeItem(PRIMARY_KEY);
+    localStorage.removeItem("wishlist"); //로컬 초기화
+    window.dispatchEvent(new Event("wishlistUpdated"));
     setUser(null);
     window.dispatchEvent(new Event("auth:changed"));
   };
 
- 
   useEffect(() => {
     const sync = () => setUser(loadAndMigrateUser());
-    window.addEventListener("storage", sync);     
-    window.addEventListener("auth:changed", sync); 
+    window.addEventListener("storage", sync);
+    window.addEventListener("auth:changed", sync);
     return () => {
       window.removeEventListener("storage", sync);
       window.removeEventListener("auth:changed", sync);

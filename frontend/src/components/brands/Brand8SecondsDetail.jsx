@@ -109,7 +109,7 @@ export default function Brand8SecondsDetail() {
 
           <div className="brand8s-cta">
             <Link
-              to="/category?brand=8seconds"
+              to="/brands"
               className="brand8s-btn brand8s-btn-primary"
             >
               전체 상품 보기

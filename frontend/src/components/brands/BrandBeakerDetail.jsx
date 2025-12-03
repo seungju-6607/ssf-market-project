@@ -123,7 +123,7 @@ export default function BrandBeakerDetail() {
 
           <div className="brandbk-cta">
             <Link
-              to="/category?brand=beaker"
+              to="/brands"
               className="brandbk-btn brandbk-btn-primary"
             >
               전체 상품 보기

@@ -119,7 +119,7 @@ export default function Brand10CorsoComoDetail() {
           </p>
 
           <div className="cc-hero-cta">
-            <Link to="/category?brand=10corsoComo" className="btn primary">
+            <Link to="/brands" className="btn primary">
               전체 상품 보기
             </Link>
             <a href="#cc-benefits" className="btn ghost">
