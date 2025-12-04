@@ -1,8 +1,9 @@
 .ranking-page {
   max-width: 1280px;
-  margin: 0 auto;
+  margin-left: 130px;
   padding: 48px 24px 80px;
   background: #fafafa;
+
 }
 
 .ranking-tabs {
@@ -10,6 +11,7 @@
   flex-wrap: wrap;
   gap: 10px;
   margin-bottom: 28px;
+  margin-left: 120px;
 }
 
 .rank-tab {
