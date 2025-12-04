@@ -12,4 +12,5 @@ public class OrderDto {
     private String name;
     private String addr;
     private String addrDetail;
+    private String couponid;
 }

@@ -4,7 +4,6 @@ import com.ssf.project.dto.KakaoPayDto;
 import com.ssf.project.dto.OrderDetailItemDto;
 import com.ssf.project.dto.OrderDetailResponseDto;
 import com.ssf.project.dto.OrderDetailRow;
-import com.ssf.project.dto.OrderDto;
 import com.ssf.project.dto.OrderHistoryDto;
 import com.ssf.project.dto.OrderListResponseDto;
 import com.ssf.project.entity.Order;
@@ -37,8 +36,6 @@ public class OrderServiceImpl implements OrderService {
     @Override
     public int saveOrder(KakaoPayDto kakaoPayDto, String email) {
         int result = 0;
-
-        // kakaoPayDto.getPaymentInfo().getTotalAmount()); vs kakaoPayDto.getTotalAmount());
 
         //Step 1 : 결제 후 Orders 테이블 저장
         int finalAmount = Integer.parseInt(kakaoPayDto.getTotalAmount());

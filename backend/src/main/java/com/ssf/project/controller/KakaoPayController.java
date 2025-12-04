@@ -3,6 +3,8 @@ package com.ssf.project.controller;
 import com.ssf.project.dto.KakaoApproveResponse;
 import com.ssf.project.dto.KakaoReadyResponse;
 import com.ssf.project.dto.OrderListResponseDto;
+import com.ssf.project.service.CouponService;
+import com.ssf.project.service.CouponServiceImpl;
 import com.ssf.project.service.KakaoPayService;
 import com.ssf.project.service.OrderService;
 import com.ssf.project.dto.KakaoPayDto;
@@ -35,14 +37,17 @@ public class KakaoPayController {
     private final OrderService orderService;
     private KakaoPayDto payInfo = null; //KaKaoPay DTO 클래스를 전역으로 선언
     private final UserDetailsService userDetailsService;
+    private final CouponService couponService;
 
     @Autowired
     public KakaoPayController(KakaoPayService kakaoPayService,
                               OrderService orderService,
-                              UserDetailsService userDetailsService) {
+                              UserDetailsService userDetailsService,
+                              CouponService couponService) {
         this.kakaoPayService = kakaoPayService;
         this.orderService = orderService;
         this.userDetailsService = userDetailsService;
+        this.couponService = couponService;
     }
 
     /**
@@ -142,6 +147,13 @@ public class KakaoPayController {
         //DB 상태 업데이트 - 주문상품을 order, order_detail 테이블에 저장, cart에서는 삭제
         String email = payInfo.getUserId();
         int result = orderService.saveOrder(payInfo, email);
+
+        //쿠폰 사용 처리
+        String couponId = payInfo.getCouponId();
+        if (couponId != null && !couponId.isBlank()) {
+            boolean couponUsed = couponService.consumeCoupon(email, couponId);
+            System.out.println("쿠폰 사용 처리 완료: " + couponUsed);
+        }
 
         System.out.println("kakaopay ::: result========>> " + result);
 

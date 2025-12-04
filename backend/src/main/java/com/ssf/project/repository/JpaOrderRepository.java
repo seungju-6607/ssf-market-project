@@ -19,12 +19,12 @@ public interface JpaOrderRepository extends JpaRepository<Order, Integer> {
             insert into ssf_order (
                   order_uuid, user_key, order_price, order_status, order_name,
                  order_zipcode, order_addr, order_addr_detail, order_tel,
-                 order_req, order_date
+                 order_req, order_date, order_couponid
             )
             select
                 :#{#order.order_code}, u.user_key, :#{#order.order_price}, :#{#order.order_status}, :#{#order.order_name},
                  :#{#order.order_zipcode}, :#{#order.order_addr}, :#{#order.order_addr_detail}, :#{#order.order_tel},
-                 :#{#order.order_req}, NOW()
+                 :#{#order.order_req}, NOW(), :#{#order.order_couponid}
             from ssf_user u
             where u.email = :email
             """, nativeQuery = true)
@@ -118,7 +118,8 @@ public interface JpaOrderRepository extends JpaRepository<Order, Integer> {
                 o.order_price as orderPrice,
                 2500 as shippingFee,
                 coalesce(
-                    sum(i.item_price * d.order_detail_cnt) over(partition by o.order_uuid) - o.order_price,
+                    ( sum(i.item_price * d.order_detail_cnt) over(partition by o.order_uuid) + 2500 )
+                    - o.order_price,
                     0
                 ) as discountAmount,
                 o.order_name as receiverName,
@@ -168,7 +169,8 @@ public interface JpaOrderRepository extends JpaRepository<Order, Integer> {
                 o.order_price as orderPrice,
                 2500 as shippingFee,
                 coalesce(
-                    sum(i.item_price * d.order_detail_cnt) over(partition by o.order_uuid) - o.order_price,
+                    ( sum(i.item_price * d.order_detail_cnt) over(partition by o.order_uuid) + 2500 )
+                    - o.order_price,
                     0
                 ) as discountAmount,
                 o.order_name as receiverName,

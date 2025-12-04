@@ -50,14 +50,16 @@ public interface JpaCouponRepository extends JpaRepository<Coupon, String> {
                             @Param("couponId") String couponId);
 
     @Query(value = """
-        SELECT cu.coupon_id
-        FROM ssf_coupon_used cu
-        WHERE cu.user_key = :userKey
-          AND cu.used_yn = 'Y'
-        ORDER BY cu.id DESC
+        SELECT o.order_couponid
+        FROM ssf_order o
+        WHERE o.user_key = :userKey
+          AND o.order_uuid = :orderId
+          AND o.order_couponid IS NOT NULL
+        ORDER BY o.order_date DESC
         LIMIT 1
         """, nativeQuery = true)
-    String findLatestUsedCouponId(@Param("userKey") String userKey);
+    String findLatestUsedCouponId(@Param("userKey") String userKey,
+                                  @Param("orderId") String orderId);
 
     @Modifying
     @Transactional
