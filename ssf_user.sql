@@ -213,8 +213,9 @@ CREATE TABLE ssf_order (
     order_tel			VARCHAR(15)									NOT NULL					COMMENT '받는분전화번호',
 	order_req			VARCHAR(100)								NULL						COMMENT '배송시요청사항',
     order_date			DATETIME	 DEFAULT CURRENT_TIMESTAMP		NOT NULL					COMMENT '주문날짜',
+    order_couponid		VARCHAR(50)									NULL						COMMENT '쿠폰아이디',
     PRIMARY KEY (order_key),
-    CONSTRAINT fk_ssf_order_ssf_user FOREIGN KEY(user_key)	references ssf_user(user_key),
+    CONSTRAINT fk_ssf_order_ssf_user FOREIGN KEY(user_key)	references ssf_user(user_key),    
     UNIQUE (order_uuid)
 );
 

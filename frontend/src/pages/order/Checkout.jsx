@@ -395,33 +395,7 @@ export default function Checkout() {
        }));
 
        const orderSource = localStorage.getItem("orderSource") || "cart";
-       const result = await getPayment(receiver, paymentInfo, items, total, orderSource);
-
-       // 결제 완료가 확인되면
-       if(result.success) {
-
-          //쿠폰 사용
-          if(selectedCoupon && loginUser?.email) {
-            try {
-                const couponResult = await consumeCoupon({
-                   email: loginUser.email,
-                   couponId: selectedCoupon.couponId,
-                });
-            } catch (e) {
-                console.error("쿠폰 사용 처리 실패:", e);
-            }
-          }
-
-           //mount시 set한 쿠폰번호 = 사용할 쿠폰번호 => 사용된 쿠폰으로 상태변경
-           if (selectedCoupon) {
-               setCouponInfo((prev) =>
-                 prev && prev.couponId === selectedCoupon.couponId
-                   ? { ...prev, couponYn: "N", usedYn: "Y" }
-                   : prev
-               );
-           }
-           setCouponId("");
-       }
+       const result = await getPayment(receiver, paymentInfo, items, total, orderSource, selectedCoupon?.couponId);
   }
 
   if (!items || items.length === 0) {

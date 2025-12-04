@@ -15,6 +15,7 @@ public class KakaoPayDto {
     private PaymentInfo paymentInfo;
     private List<Integer> cidList;
     private List<DirectItem> directItems;
+    private String couponId;
 
     @Data
     public static class Receiver {

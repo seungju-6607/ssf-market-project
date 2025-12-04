@@ -29,6 +29,7 @@ public class Order {
     private Integer order_price;    // 총 상품 금액
     private String order_addr;
     private String order_addr_detail;
+    private String order_couponid;
 
     // 카카오페이
     private String order_code;      // KakaoPay 주문 ID
@@ -49,6 +50,7 @@ public class Order {
         this.order_addr = dto.getAddr();
         this.order_addr_detail = dto.getAddrDetail();
         this.odate = LocalDateTime.now();
+        this.order_couponid = dto.getCouponid();
     }
 
     // KakaoPayDto 생성자
@@ -64,5 +66,6 @@ public class Order {
         this.discount_amount = dto.getPaymentInfo().getDiscountAmount();
         this.order_price = Integer.parseInt(dto.getTotalAmount()); // 총 주문금액
         this.odate = LocalDateTime.now();
+        this.order_couponid = dto.getCouponId();
     }
 }

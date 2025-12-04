@@ -159,7 +159,7 @@ public class AdminOrderServiceImpl implements AdminOrderService {
         }
 
         // 3. 해당 주문에서 사용된 쿠폰 찾기 (최근 사용된 쿠폰)
-        String usedCouponId = jpaCouponRepository.findLatestUsedCouponId(userKey);
+        String usedCouponId = jpaCouponRepository.findLatestUsedCouponId(userKey, orderId);
         if (usedCouponId != null && !usedCouponId.isBlank()) {
             try {
                 // 4. 쿠폰 사용 취소 시도 (used_yn을 'N'으로 변경)

@@ -1,7 +1,7 @@
 import { axiosPost } from '../../utils/dataFetch.js';
 import { setOrderList } from './paymentSlice.js';
 
-export const getPayment = async (receiver, paymentInfo, cartList, total, orderSource = "cart") => {
+export const getPayment = async (receiver, paymentInfo, cartList, total, orderSource = "cart", couponId) => {
     const { email } = JSON.parse(localStorage.getItem("loginUser") || "{}");
     const safeList = Array.isArray(cartList) ? cartList : [];
     const isDirectOrder = orderSource === "direct";
@@ -27,7 +27,8 @@ export const getPayment = async (receiver, paymentInfo, cartList, total, orderSo
         "receiver": receiver,
         "paymentInfo": paymentInfo,
         "cidList": cidList,
-        "directItems": directItems
+        "directItems": directItems,
+        "couponId": couponId,
     }
 
     try {
