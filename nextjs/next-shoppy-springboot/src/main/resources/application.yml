@@ -1,0 +1,63 @@
+# Project name
+spring:
+  application:
+    name: next-shoppy-springboot
+
+# Port
+server:
+  port: 9000
+
+## KAKAO PAY
+kakao:
+  pay:
+    host: https://kapi.kakao.com
+    admin-key: 2436af8c2f0ccbba06897dc572b288e1 # 실제 발급받은 관리자 키
+    cid: TC0ONETIME                   #가맹점 코드 (테스트용), 코드작성 ❌
+    ready-path: /payment/ready        #카카오페이 호출 주소, 코드작성 ❌
+    approve-path: /payment/approve    #카카오페이 인증 주소, 코드작성 ❌
+
+#DB info
+#datasource:
+#  urL: jdbc:mysql://localhost:3306/shoppy
+#  username: root
+#  password: mysql1234
+#  driver-class-name: com.mysql.cj.jdbc.Driver
+
+#JPA
+jpa:
+  show-sql: true
+
+logging:
+  level:
+    org:
+      hibernate:
+        SQL: DEBUG
+        type:
+          descriptor:
+            sql: TRACE
+    # 특정 패키지의 로그 레벨을 DEBUG로 설정
+    com.yourproject.security: DEBUG
+
+    # Spring Security의 필터 작동을 자세히 보고 싶다면
+    org.springframework.security: DEBUG
+
+    # 예시: 루트(기본) 로그 레벨 설정 (설정이 없다면 보통 INFO)
+    root: INFO
+
+    # 예시: Redis 관련 로그를 보고 싶다면
+    org.springframework.data.redis: DEBUG
+
+
+
+## Hibernate 네이밍 규칙 변경
+#spring:
+#  jpa:
+#    hibernate:
+#      naming:
+#        physical-strategy: org.hibernate.boot.model.naming.PhysicalNamingStrategyStandardImpl
+
+
+# JWT 기본키 등록
+# Base64 키 생성시 명령어 => 터미널> openssl rand -base64 32
+jwt:
+  secret: "RndmS2V5MkBNa1N1cGVyU2VjcmV0S2V5MTIzNDU2Nzg5MA=="
