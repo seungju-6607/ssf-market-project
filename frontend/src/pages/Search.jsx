@@ -40,7 +40,6 @@ export default function Search() {
     });
   }, [all, q]);
 
-  // ✅ 반드시 image 키에 절대경로로 채움
   const normalized = useMemo(
     () =>
       results.map((p) => ({
