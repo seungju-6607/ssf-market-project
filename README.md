@@ -1,5 +1,5 @@
 # ssf-market-project
-[🎬 프로젝트 시연 영상 보기](https://github.com/ssojja/ssf-market-project/blob/main/ssf-market-project.mp4)
+[🎬 프로젝트 시연 영상 보기](https://github.com/seungju-6607/ssf-market-project/blob/main/ssf-market-project.video.mp4)
 
 &nbsp;
 SSF Shop을 벤치마킹한 **풀스택 쇼핑몰 프로젝트** (React + Redux + Spring Boot)
