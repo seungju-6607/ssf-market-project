@@ -1,5 +1,5 @@
 // src/App.js
-import React, { useEffect } from "react";
+import React, { useEffect, useState } from "react";
 import { useDispatch } from "react-redux";
 import { fetchCurrentUser } from "./feature/auth/authAPI.js";
 import { Route, Routes } from "react-router-dom";
@@ -20,7 +20,6 @@ import SpecialDetail from "./pages/special/SpecialDetail.jsx";
 import EventList from "./pages/event/EventList.jsx";
 import EventDetail from "./pages/event/EventDetail.jsx";
 
-
 import Login from "./pages/auth/Login.jsx";
 import Signup from "./pages/auth/Signup.jsx";
 import AccountRecovery from "./pages/auth/AccountRecovery.jsx";
@@ -37,7 +36,7 @@ import ProductDetail from "./pages/ProductDetail.jsx";
 import ProductList from "./pages/ProductList.jsx";
 import Search from "./pages/Search.jsx";
 
-// ✅ 결제 라우트
+// 결제
 import PaySelect from "./pages/order/PaySelect.jsx";
 import PayConfirm from "./pages/order/PayConfirm.jsx";
 
@@ -50,48 +49,12 @@ import CartPage from "./pages/cart/CartPage.jsx";
 // 카테고리
 import CategoryPage from "./pages/CategoryPage.jsx";
 
-
 // 마이페이지
 import MyPage from "./pages/mypage/MyPage.jsx";
 import MyCoupons from "./pages/mypage/MyCoupons.jsx";
 
-// 브랜드 
-import Brand8SecondsDetail from "./components/brands/Brand8SecondsDetail.jsx";
-import BrandBeanpoleDetail from "./components/brands/BrandBeanpoleDetail.jsx";
-import BrandBeakerDetail from "./components/brands/BrandBeakerDetail.jsx";
-import BrandKuhoDetail from "./components/brands/BrandKuhoDetail.jsx";
-import BrandIsseyMiyakeDetail from "./components/brands/BrandIsseyMiyakeDetail.jsx";
-import BrandMaisonKitsuneDetail from "./components/brands/BrandMaisonKitsuneDetail.jsx";
-import BrandTheoryDetail from "./components/brands/BrandTheoryDetail.jsx";
-import BrandKuhoPlusDetail from "./components/brands/BrandKuhoPlusDetail.jsx";
-import BrandCommeDetail from "./components/brands/BrandCommeDetail.jsx";
-import BrandPatagoniaDetail from "./components/brands/BrandPatagoniaDetail.jsx";
-import BrandSportyRichDetail from "./components/brands/BrandSportyRichDetail.jsx";
-import BrandSIEDetail from "./components/brands/BrandSIEDetail.jsx";
-import BrandInewGolfDetail from "./components/brands/BrandInewGolfDetail.jsx";
-import BrandGeneralIdeaDetail from "./components/brands/BrandGeneralIdeaDetail.jsx";
-import BrandLeMoutonDetail from "./components/brands/BrandLeMoutonDetail.jsx";
-import BrandAmiDetail from "./components/brands/BrandAmiDetail.jsx";
-import BrandJuunJDetail from "./components/brands/BrandJuunJDetail.jsx";
-import BrandRogadisDetail from "./components/brands/BrandRogadisDetail.jsx";
-import BrandDantonDetail from "./components/brands/BrandDantonDetail.jsx";
-import Brand10CorsoComoDetail from "./components/brands/Brand10CorsoComoDetail.jsx";
-import BrandApertureDetail from "./components/brands/BrandApertureDetail.jsx";
-import BrandCOSDetail from "./components/brands/BrandCOSDetail.jsx";
-import BrandSaintJamesDetail from "./components/brands/BrandSaintJamesDetail.jsx";
-import BrandTommyHilfigerDetail from "./components/brands/BrandTommyHilfigerDetail.jsx";
-import BrandCanadaGooseDetail from "./components/brands/BrandCanadaGooseDetail.jsx";
-import BrandHeraDetail from "./components/brands/BrandHeraDetail.jsx";
-import BrandGalaxyLifestyleDetail from "./components/brands/BrandGalaxyLifestyleDetail.jsx";
-import BrandRebaigeDetail from "./components/brands/BrandRebaigeDetail.jsx";
-import BrandToryBurchDetail from "./components/brands/BrandToryBurchDetail.jsx";
-import BrandGalaxyDetail from "./components/brands/BrandGalaxyDetail.jsx";
-import Lemaire from "./components/brands/BrandLemaireDetail.jsx";
-import BrandFitflop from "./components/brands/BrandFitflop.jsx";
-import BrandGanni from "./components/brands/BrandGanni.jsx";
-import BrandRagBone from "./components/brands/BrandRagBone.jsx";
-import BrandSandSound from "./components/brands/BrandSandSound.jsx";
-import BrandsAll from "./components/brands/BrandsAll.jsx";
+// 위시리스트
+import Wishlist from "./pages/wish/Wishlist.jsx";
 
 // 고객센터/회사/정책
 import HelpPage from "./pages/help/HelpPage.jsx";
@@ -103,10 +66,11 @@ import StoreFinder from "./pages/store/StoreFinder.jsx";
 import NoticeEvents from "./pages/board/NoticeEvents.jsx";
 import BulkOrder from "./pages/help/BulkOrder.jsx";
 
-// 위시리스트
-import Wishlist from "./pages/wish/Wishlist.jsx";
+// 브랜드
+import Brand8SecondsDetail from "./components/brands/Brand8SecondsDetail.jsx";
+import BrandsAll from "./components/brands/BrandsAll.jsx";
 
-//플리마켓
+// 플리마켓
 import MarketHome from "./feature/market/MarketHome.jsx";
 import MarketNew from "./feature/market/MarketNew.jsx";
 import MarketDetail from "./feature/market/MarketDetail.jsx";
@@ -116,15 +80,45 @@ import MarketInbox from "./feature/market/MarketInbox.jsx";
 
 function App() {
   const dispatch = useDispatch();
+
+  // 🔥 백엔드 호출 예시용 상태
+  const [products, setProducts] = useState([]);
+
   useEffect(() => {
+    // 로그인한 유저 정보 불러오기
     dispatch(fetchCurrentUser());
+
+    // 🔥 백엔드 API 직접 호출
+    fetch("https://ssf-market-project-tm3y.vercel.app/api/products")
+      .then((res) => res.json())
+      .then((data) => {
+        setProducts(data);
+      })
+      .catch((err) => console.error("API 호출 실패:", err));
   }, [dispatch]);
+
   return (
     <AuthProvider>
       <Header />
 
+      {/* 🔥 테스트용 간단 표시 (발표/디버깅용) */}
+      <div style={{ padding: "20px", background: "#f9f9f9" }}>
+        <h2>백엔드 연동 테스트</h2>
+        <ul>
+          {products && products.length > 0 ? (
+            products.map((p) => (
+              <li key={p.id}>
+                {p.name} — {p.price}원
+              </li>
+            ))
+          ) : (
+            <li>상품 데이터가 없습니다.</li>
+          )}
+        </ul>
+      </div>
+
+      {/* 실제 라우트 */}
       <Routes>
-        {/* 홈/메뉴 */}
         <Route path="/" element={<Home />} />
         <Route path="/menu" element={<Menu />} />
         <Route path="/ranking" element={<Ranking />} />
@@ -135,20 +129,38 @@ function App() {
         <Route path="/event" element={<EventList />} />
         <Route path="/event/:id" element={<EventDetail />} />
 
-        {/* 로그인/회원가입 */}
         <Route path="/login" element={<Login />} />
         <Route path="/signup" element={<Signup />} />
         <Route path="/account/recovery" element={<AccountRecovery />} />
         <Route path="/naver-callback" element={<NaverCallback />} />
         <Route path="/kakao-callback" element={<KakaoCallback />} />
 
-        {/* 마이페이지 */}
-        <Route path="/mypage" element={<PrivateRoute><MyPage /></PrivateRoute>} />
-        <Route path="/mypage/coupons" element={<PrivateRoute><MyCoupons /></PrivateRoute>} />
+        <Route path="/product/:id" element={<ProductDetail />} />
+        <Route path="/product" element={<ProductDetail />} />
+        <Route path="/search/:keyword" element={<Search />} />
+        <Route path="/list" element={<ProductList />} />
 
-        {/* 주문/장바구니/결제 */}
-        <Route path="/orders" element={<PrivateRoute><MyOrders /></PrivateRoute>} />
-        <Route path="/mypage/orders/detail" element={<PrivateRoute><MyOrdersDetail /></PrivateRoute>} />
+        <Route path="/cart" element={<CartPage />} />
+        <Route path="/checkout" element={<Checkout />} />
+        <Route path="/order/success" element={<OrderSuccess />} />
+
+        <Route
+          path="/mypage"
+          element={<PrivateRoute><MyPage /></PrivateRoute>}
+        />
+        <Route
+          path="/mypage/coupons"
+          element={<PrivateRoute><MyCoupons /></PrivateRoute>}
+        />
+
+        <Route
+          path="/orders"
+          element={<PrivateRoute><MyOrders /></PrivateRoute>}
+        />
+        <Route
+          path="/mypage/orders/detail"
+          element={<PrivateRoute><MyOrdersDetail /></PrivateRoute>}
+        />
         <Route path="/cart" element={<PrivateRoute><CartPage /></PrivateRoute>} />
         <Route path="/checkout" element={<PrivateRoute><Checkout /></PrivateRoute>} />
         <Route path="/order/success" element={<OrderSuccess />} />
