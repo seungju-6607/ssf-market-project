@@ -1,4 +1,4 @@
-package com.springboot.next_shoppy_springboot.config;
+package com.ssf.project;
 
 import lombok.RequiredArgsConstructor;
 import org.springframework.context.annotation.Bean;
