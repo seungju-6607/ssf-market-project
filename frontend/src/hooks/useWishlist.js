@@ -1,8 +1,9 @@
 // src/hooks/useWishlist.js
 import axios from "../feature/csrf/axiosSetup.js";
 
-const API_BASE = "http://localhost:8080";
+// ❌ 삭제: const API_BASE = "http://localhost:8080";
 const LOCAL_KEY = "wishlist";
+
 const readLocal = () => {
   try {
     return JSON.parse(localStorage.getItem(LOCAL_KEY)) || [];
@@ -28,7 +29,7 @@ export const syncWishlistFromServer = async (email) => {
   if (!email) return readLocal();
   try {
     const res = await axios.get(
-      `${API_BASE}/wishlist/list?email=${encodeURIComponent(email)}`
+      `/wishlist/list?email=${encodeURIComponent(email)}`
     );
     const list = Array.isArray(res.data) ? res.data : [];
     writeLocal(list);
@@ -39,7 +40,7 @@ export const syncWishlistFromServer = async (email) => {
   }
 };
 
-// 로컬 즉시 
+// 로컬 즉시
 export const toggleWishlistServer = async (email, rawProduct) => {
   if (!email) {
     alert("로그인 후 찜 기능을 이용해 주세요.");
@@ -60,9 +61,7 @@ export const toggleWishlistServer = async (email, rawProduct) => {
       rawProduct.image ??
       rawProduct.img ??
       "",
-    productPrice: toNumber(
-      rawProduct.productPrice ?? rawProduct.price
-    ),
+    productPrice: toNumber(rawProduct.productPrice ?? rawProduct.price),
     productPriceOri: toNumber(
       rawProduct.productPriceOri ??
         rawProduct.priceOri ??
@@ -72,19 +71,17 @@ export const toggleWishlistServer = async (email, rawProduct) => {
   };
 
   try {
-    const res = await axios.post(`${API_BASE}/wishlist/toggle`, dto, {
+    const res = await axios.post(`/wishlist/toggle`, dto, {
       headers: { "Content-Type": "application/json" },
     });
 
     const on =
       typeof res?.data === "boolean"
         ? res.data
-        : !!res?.data?.on ?? !!res?.data?.liked;
+        : (!!res?.data?.on ?? !!res?.data?.liked);
 
     const current = readLocal();
-    const exists = current.some(
-      (it) => it.productId === dto.productId
-    );
+    const exists = current.some((it) => it.productId === dto.productId);
 
     let next;
     if (on) {
@@ -112,7 +109,7 @@ export const clearWishlistOnServer = async (email) => {
   if (!email) return readLocal();
   try {
     await axios.post(
-      `${API_BASE}/wishlist/clear`,
+      `/wishlist/clear`,
       { email },
       { headers: { "Content-Type": "application/json" } }
     );
@@ -123,6 +120,7 @@ export const clearWishlistOnServer = async (email) => {
     return readLocal();
   }
 };
+
 export const isInWishlist = (product) => {
   const key = productKey(product);
   const list = readLocal();
