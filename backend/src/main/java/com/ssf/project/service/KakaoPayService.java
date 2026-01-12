@@ -34,11 +34,11 @@ public class KakaoPayService {
     @Value("${kakao.pay.approve-path}")
     private String APPROVE_PATH;            // /payment/approve
 
-    // ✅ 백엔드 base url (Render / local) - (approve API 호출용 등)
+    // ✅ 백엔드 base url (Render / local) - (카카오가 콜백으로 때리는 주소)
     @Value("${app.base-url}")
     private String APP_BASE_URL;
 
-    // ✅ 프론트 base url (Vercel / local) - (카카오 리다이렉트 받는 콜백용)
+    // ✅ 프론트 base url (Vercel / local) - (승인 완료 후 프론트로 보내는 주소)
     @Value("${app.front-base-url}")
     private String FRONT_BASE_URL;
 
@@ -76,12 +76,6 @@ public class KakaoPayService {
         if (orderId == null || orderId.isBlank()) throw new IllegalArgumentException("orderId is required");
         if (userId == null || userId.isBlank()) throw new IllegalArgumentException("userId is required");
 
-        // ✅ 카카오 리다이렉트는 "프론트"로 받는 게 정석 (도메인 불일치(-799) 방지)
-        String front = trimTrailingSlash(FRONT_BASE_URL);
-
-        // (참고) 백엔드 base url은 필요하면 다른 곳에서 사용 가능
-        // String backend = trimTrailingSlash(APP_BASE_URL);
-
         MultiValueMap<String, String> params = new LinkedMultiValueMap<>();
         params.add("cid", CID);
         params.add("partner_order_id", orderId);
@@ -91,18 +85,21 @@ public class KakaoPayService {
         params.add("total_amount", String.valueOf(kakaoPay.getTotalAmount()));
         params.add("tax_free_amount", "0");
 
-        /**
-         * ✅ 카카오가 돌아올 URL (프론트 콜백)
-         * - 카카오페이 콘솔 Redirect URL에 아래 경로가 등록되어 있어야 함:
-         *   https://ssf-market-project.vercel.app/kakao-callback
-         *
-         * - 결제 완료 후:
-         *   front/kakao-callback?orderId=...&pg_token=...
-         *   (cancel/fail은 status로 구분)
-         */
-        params.add("approval_url", front + "/kakao-callback?orderId=" + enc(orderId));
-        params.add("cancel_url",   front + "/kakao-callback?orderId=" + enc(orderId) + "&status=cancel");
-        params.add("fail_url",     front + "/kakao-callback?orderId=" + enc(orderId) + "&status=fail");
+        // ✅ 카카오가 돌아올 URL (카카오 → 백엔드 콜백)
+        // - 카카오페이 콘솔 Redirect URL에 아래 3개가 등록되어 있어야 함:
+        //   {APP_BASE_URL}/payment/qr/success
+        //   {APP_BASE_URL}/payment/qr/cancel
+        //   {APP_BASE_URL}/payment/qr/fail
+        //
+        // - 결제 완료 후 카카오가 백엔드로 리다이렉트:
+        //   {APP_BASE_URL}/payment/qr/success?orderId=...&pg_token=...
+        //
+        // 그 다음 백엔드가 프론트(payConfirm)로 302 리다이렉트 시켜줌.
+        String backend = trimTrailingSlash(APP_BASE_URL);
+
+        params.add("approval_url", backend + "/payment/qr/success?orderId=" + enc(orderId));
+        params.add("cancel_url",   backend + "/payment/qr/cancel?orderId=" + enc(orderId));
+        params.add("fail_url",     backend + "/payment/qr/fail?orderId=" + enc(orderId));
 
         HttpEntity<MultiValueMap<String, String>> body = new HttpEntity<>(params, getHeaders());
 
@@ -124,16 +121,8 @@ public class KakaoPayService {
         }
     }
 
-    public String findByTid(String orderId) {
-        return tidStore.get(orderId);
-    }
-
-    public String findByUserId(String orderId) {
-        return userIdStore.get(orderId);
-    }
-
     // ----------------------------------------------------
-    // 2) 최종 승인 (Approve)
+    // 2) 승인(Approve)
     // ----------------------------------------------------
     public KakaoApproveResponse approve(String tid, String userId, String orderId, String pgToken) {
 
@@ -150,6 +139,7 @@ public class KakaoPayService {
         params.add("pg_token", pgToken);
 
         HttpEntity<MultiValueMap<String, String>> body = new HttpEntity<>(params, getHeaders());
+
         String url = KAKAO_PAY_HOST + "/v1" + APPROVE_PATH;
 
         try {
@@ -158,6 +148,15 @@ public class KakaoPayService {
             System.err.println("Kakao Approve error: " + e.getRawStatusCode() + " " + e.getResponseBodyAsString());
             throw e;
         }
+    }
+
+    // tid / userId 조회
+    public String findByTid(String orderId) {
+        return tidStore.get(orderId);
+    }
+
+    public String findByUserId(String orderId) {
+        return userIdStore.get(orderId);
     }
 
     // ----------------------------------------------------
