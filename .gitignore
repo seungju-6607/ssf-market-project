@@ -74,3 +74,5 @@ scripts/insert_ssf_items_to_db.py
 scripts/ssf_items.json
 scripts/insert_ssf_items_to_db.py
 scripts/ssf_items.json
+scripts/insert_ssf_items_to_db-py.txt
+scripts/*.txt
