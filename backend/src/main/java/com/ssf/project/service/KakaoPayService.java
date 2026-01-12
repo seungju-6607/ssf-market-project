@@ -34,11 +34,11 @@ public class KakaoPayService {
     @Value("${kakao.pay.approve-path}")
     private String APPROVE_PATH;            // /payment/approve
 
-    // ✅ 백엔드(카카오 콜백) base url (Render / local)
+    // ✅ 백엔드 base url (Render / local) - (approve API 호출용 등)
     @Value("${app.base-url}")
     private String APP_BASE_URL;
 
-    // ✅ 프론트(payConfirm) base url (Vercel / local)
+    // ✅ 프론트 base url (Vercel / local) - (카카오 리다이렉트 받는 콜백용)
     @Value("${app.front-base-url}")
     private String FRONT_BASE_URL;
 
@@ -76,7 +76,11 @@ public class KakaoPayService {
         if (orderId == null || orderId.isBlank()) throw new IllegalArgumentException("orderId is required");
         if (userId == null || userId.isBlank()) throw new IllegalArgumentException("userId is required");
 
-        String baseUrl = trimTrailingSlash(APP_BASE_URL);
+        // ✅ 카카오 리다이렉트는 "프론트"로 받는 게 정석 (도메인 불일치(-799) 방지)
+        String front = trimTrailingSlash(FRONT_BASE_URL);
+
+        // (참고) 백엔드 base url은 필요하면 다른 곳에서 사용 가능
+        // String backend = trimTrailingSlash(APP_BASE_URL);
 
         MultiValueMap<String, String> params = new LinkedMultiValueMap<>();
         params.add("cid", CID);
@@ -87,10 +91,18 @@ public class KakaoPayService {
         params.add("total_amount", String.valueOf(kakaoPay.getTotalAmount()));
         params.add("tax_free_amount", "0");
 
-        // ✅ 카카오가 돌아올 백엔드 콜백 (Render/Local)
-        params.add("approval_url", baseUrl + "/payment/qr/success?orderId=" + enc(orderId));
-        params.add("cancel_url",   baseUrl + "/payment/qr/cancel?orderId=" + enc(orderId));
-        params.add("fail_url",     baseUrl + "/payment/qr/fail?orderId=" + enc(orderId));
+        /**
+         * ✅ 카카오가 돌아올 URL (프론트 콜백)
+         * - 카카오페이 콘솔 Redirect URL에 아래 경로가 등록되어 있어야 함:
+         *   https://ssf-market-project.vercel.app/kakao-callback
+         *
+         * - 결제 완료 후:
+         *   front/kakao-callback?orderId=...&pg_token=...
+         *   (cancel/fail은 status로 구분)
+         */
+        params.add("approval_url", front + "/kakao-callback?orderId=" + enc(orderId));
+        params.add("cancel_url",   front + "/kakao-callback?orderId=" + enc(orderId) + "&status=cancel");
+        params.add("fail_url",     front + "/kakao-callback?orderId=" + enc(orderId) + "&status=fail");
 
         HttpEntity<MultiValueMap<String, String>> body = new HttpEntity<>(params, getHeaders());
 
