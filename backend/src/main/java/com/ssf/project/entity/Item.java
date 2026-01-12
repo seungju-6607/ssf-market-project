@@ -11,13 +11,14 @@ import java.time.LocalDateTime;
 @AllArgsConstructor
 @Builder
 public class Item {
+
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "item_key")
     private Long itemKey;
 
-    @Column(name = "category_id", length = 5, nullable = false)
-    private String categoryId;
+    // ❌ category_id 컬럼은 DB에 없으니 제거한다.
+    // private String categoryId;
 
     @Column(name = "product_id", length = 100, nullable = false)
     private String productId;
@@ -50,9 +51,9 @@ public class Item {
     @Column(name = "item_brand", length = 100)
     private String itemBrand;
 
-    @Column(name = "item_category", length = 150)
+    @Column(name = "item_category", length = 150, nullable = false)
     private String itemCategory;
 
-    @Column(name = "item_subcategory", length = 150)
+    @Column(name = "item_subcategory", length = 150, nullable = false)
     private String itemSubcategory;
 }
