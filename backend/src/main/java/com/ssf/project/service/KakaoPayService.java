@@ -51,7 +51,7 @@ public class KakaoPayService {
     private HttpHeaders getHeaders() {
         HttpHeaders headers = new HttpHeaders();
         headers.setContentType(MediaType.APPLICATION_FORM_URLENCODED);
-        headers.set("Authorization", "KakaoAK " + ADMIN_KEY);
+        headers.set("Authorization" + ADMIN_KEY);
         headers.setAccept(MediaType.parseMediaTypes("application/json;charset=UTF-8"));
         return headers;
     }
