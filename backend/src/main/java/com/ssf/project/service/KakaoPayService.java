@@ -4,12 +4,8 @@ import com.ssf.project.dto.KakaoApproveResponse;
 import com.ssf.project.dto.KakaoPayDto;
 import com.ssf.project.dto.KakaoReadyResponse;
 import org.springframework.beans.factory.annotation.Value;
-import org.springframework.http.HttpEntity;
-import org.springframework.http.HttpHeaders;
-import org.springframework.http.MediaType;
+import org.springframework.http.*;
 import org.springframework.stereotype.Service;
-import org.springframework.util.LinkedMultiValueMap;
-import org.springframework.util.MultiValueMap;
 import org.springframework.web.client.RestClientResponseException;
 import org.springframework.web.client.RestTemplate;
 
@@ -21,26 +17,28 @@ import java.util.concurrent.ConcurrentHashMap;
 @Service
 public class KakaoPayService {
 
-    @Value("${kakao.pay.host}")
-    private String KAKAO_PAY_HOST;          // https://kapi.kakao.com
+    // ✅ open-api host (application.yml의 kakaopay.host)
+    @Value("${kakaopay.host}")
+    private String KAKAOPAY_HOST; // https://open-api.kakaopay.com
 
-    @Value("${kakao.pay.admin-key}")
-    private String ADMIN_KEY;               // ✅ (실제로는 카카오페이 Secret key 값이 들어감)
+    // ✅ 카카오페이 Developers의 Secret key(dev)
+    @Value("${kakaopay.secret-key}")
+    private String SECRET_KEY;
 
-    @Value("${kakao.pay.cid}")
-    private String CID;                     // TC0ONETIME
+    @Value("${kakaopay.cid}")
+    private String CID; // TC0ONETIME
 
-    @Value("${kakao.pay.ready-path}")
-    private String READY_PATH;              // /payment/ready
+    @Value("${kakaopay.ready-path}")
+    private String READY_PATH; // /online/v1/payment/ready
 
-    @Value("${kakao.pay.approve-path}")
-    private String APPROVE_PATH;            // /payment/approve
+    @Value("${kakaopay.approve-path}")
+    private String APPROVE_PATH; // /online/v1/payment/approve
 
-    // ✅ 백엔드 base url (Render / local) - (카카오가 콜백으로 때리는 주소)
+    // ✅ 백엔드 base url (Render / local)
     @Value("${app.base-url}")
     private String APP_BASE_URL;
 
-    // ✅ 프론트 base url (Vercel / local) - (승인 완료 후 프론트로 보내는 주소)
+    // ✅ 프론트 base url (Vercel / local)
     @Value("${app.front-base-url}")
     private String FRONT_BASE_URL;
 
@@ -52,13 +50,14 @@ public class KakaoPayService {
 
     private HttpHeaders getHeaders() {
         HttpHeaders headers = new HttpHeaders();
-        headers.setContentType(MediaType.APPLICATION_FORM_URLENCODED);
 
-        // ✅ 카카오페이 결제 API: Secret key를 그대로 Authorization에 넣음 (KakaoAK 붙이면 401)
-        headers.set("Authorization", "KakaoAK " + ADMIN_KEY);
+        // ✅ open-api는 JSON으로 보내는 걸 기본으로
+        headers.setContentType(MediaType.APPLICATION_JSON);
 
+        // ✅ 핵심: SECRET_KEY 방식 (KakaoAK ❌)
+        headers.set("Authorization", "SECRET_KEY " + SECRET_KEY);
 
-        headers.setAccept(MediaType.parseMediaTypes("application/json;charset=UTF-8"));
+        headers.setAccept(MediaType.parseMediaTypes("application/json"));
         return headers;
     }
 
@@ -82,37 +81,34 @@ public class KakaoPayService {
         if (orderId == null || orderId.isBlank()) throw new IllegalArgumentException("orderId is required");
         if (userId == null || userId.isBlank()) throw new IllegalArgumentException("userId is required");
 
-        MultiValueMap<String, String> params = new LinkedMultiValueMap<>();
-        params.add("cid", CID);
-        params.add("partner_order_id", orderId);
-        params.add("partner_user_id", userId);
-        params.add("item_name", kakaoPay.getItemName());
-        params.add("quantity", String.valueOf(kakaoPay.getQty()));
-        params.add("total_amount", String.valueOf(kakaoPay.getTotalAmount()));
-        params.add("tax_free_amount", "0");
-
-        // ✅ 카카오가 돌아올 URL (카카오 → 백엔드 콜백)
-        // - 카카오페이 콘솔 Redirect URL에 아래 3개가 등록되어 있어야 함:
-        //   {APP_BASE_URL}/payment/qr/success
-        //   {APP_BASE_URL}/payment/qr/cancel
-        //   {APP_BASE_URL}/payment/qr/fail
-        //
-        // - 결제 완료 후 카카오가 백엔드로 리다이렉트:
-        //   {APP_BASE_URL}/payment/qr/success?orderId=...&pg_token=...
-        //
-        // 그 다음 백엔드가 프론트(payConfirm)로 302 리다이렉트 시켜줌.
         String backend = trimTrailingSlash(APP_BASE_URL);
 
-        params.add("approval_url", backend + "/payment/qr/success?orderId=" + enc(orderId));
-        params.add("cancel_url", backend + "/payment/qr/cancel?orderId=" + enc(orderId));
-        params.add("fail_url", backend + "/payment/qr/fail?orderId=" + enc(orderId));
+        // ✅ 리다이렉트 URL (카카오 → 백엔드 콜백)
+        String approvalUrl = backend + "/payment/qr/success?orderId=" + enc(orderId);
+        String cancelUrl   = backend + "/payment/qr/cancel?orderId=" + enc(orderId);
+        String failUrl     = backend + "/payment/qr/fail?orderId=" + enc(orderId);
 
-        HttpEntity<MultiValueMap<String, String>> body = new HttpEntity<>(params, getHeaders());
+        // ✅ JSON 바디 (필드명이 다르면 400으로 알려줌 -> 그때 맞추면 됨)
+        Map<String, Object> bodyMap = Map.of(
+                "cid", CID,
+                "partner_order_id", orderId,
+                "partner_user_id", userId,
+                "item_name", kakaoPay.getItemName(),
+                "quantity", kakaoPay.getQty(),
+                "total_amount", kakaoPay.getTotalAmount(),
+                "tax_free_amount", 0,
+                "approval_url", approvalUrl,
+                "cancel_url", cancelUrl,
+                "fail_url", failUrl
+        );
 
-        String url = KAKAO_PAY_HOST + "/v1" + READY_PATH;
+        HttpEntity<Map<String, Object>> entity = new HttpEntity<>(bodyMap, getHeaders());
+
+        // ✅ URL 조합: host + ready-path (중간에 /v1 붙이지 마!)
+        String url = KAKAOPAY_HOST + READY_PATH;
 
         try {
-            KakaoReadyResponse res = restTemplate.postForObject(url, body, KakaoReadyResponse.class);
+            KakaoReadyResponse res = restTemplate.postForObject(url, entity, KakaoReadyResponse.class);
             if (res == null || res.getTid() == null) {
                 throw new IllegalStateException("Kakao Pay Ready response is null");
             }
@@ -137,19 +133,20 @@ public class KakaoPayService {
         if (orderId == null || orderId.isBlank()) throw new IllegalArgumentException("orderId is required");
         if (pgToken == null || pgToken.isBlank()) throw new IllegalArgumentException("pgToken is required");
 
-        MultiValueMap<String, String> params = new LinkedMultiValueMap<>();
-        params.add("cid", CID);
-        params.add("tid", tid);
-        params.add("partner_order_id", orderId);
-        params.add("partner_user_id", userId);
-        params.add("pg_token", pgToken);
+        Map<String, Object> bodyMap = Map.of(
+                "cid", CID,
+                "tid", tid,
+                "partner_order_id", orderId,
+                "partner_user_id", userId,
+                "pg_token", pgToken
+        );
 
-        HttpEntity<MultiValueMap<String, String>> body = new HttpEntity<>(params, getHeaders());
+        HttpEntity<Map<String, Object>> entity = new HttpEntity<>(bodyMap, getHeaders());
 
-        String url = KAKAO_PAY_HOST + "/v1" + APPROVE_PATH;
+        String url = KAKAOPAY_HOST + APPROVE_PATH;
 
         try {
-            return restTemplate.postForObject(url, body, KakaoApproveResponse.class);
+            return restTemplate.postForObject(url, entity, KakaoApproveResponse.class);
         } catch (RestClientResponseException e) {
             System.err.println("Kakao Approve error: " + e.getRawStatusCode() + " " + e.getResponseBodyAsString());
             throw e;

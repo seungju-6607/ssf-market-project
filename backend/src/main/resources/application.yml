@@ -1,13 +1,12 @@
 # src/main/resources/application.yml
 
-kakao:
-  pay:
-    host: https://kapi.kakao.com
-    admin-key: ${KAKAO_ADMIN_KEY}   # Render 환경변수
-    cid: TC0ONETIME
-    ready-path: /payment/ready
-    approve-path: /payment/approve
+kakaopay:
+  host: https://open-api.kakaopay.com
+  secret-key: ${KAKAOPAY_SECRET_KEY}     # Render env (dev key)
+  cid: TC0ONETIME
+  ready-path: /online/v1/payment/ready
+  approve-path: /online/v1/payment/approve
 
 app:
-  base-url: ${APP_BASE_URL:http://localhost:8080}          # 백엔드 (카카오 콜백)
-  front-base-url: ${FRONT_BASE_URL:http://localhost:3000}  # 프론트 (payConfirm)
+  base-url: ${APP_BASE_URL:http://localhost:8080}
+  front-base-url: ${FRONT_BASE_URL:http://localhost:3000}
