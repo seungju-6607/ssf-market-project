@@ -55,7 +55,8 @@ public class KakaoPayService {
         headers.setContentType(MediaType.APPLICATION_FORM_URLENCODED);
 
         // ✅ 카카오페이 결제 API: Secret key를 그대로 Authorization에 넣음 (KakaoAK 붙이면 401)
-        headers.set("Authorization", ADMIN_KEY);
+        headers.set("Authorization", "KakaoAK " + ADMIN_KEY);
+
 
         headers.setAccept(MediaType.parseMediaTypes("application/json;charset=UTF-8"));
         return headers;
