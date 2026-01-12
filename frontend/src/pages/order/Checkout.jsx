@@ -146,6 +146,10 @@ const PaymentIcon = ({ method }) => {
   );
 };
 
+// ✅ orderId 생성 (프론트에서 한번 만들어서 백엔드에 넘김)
+const generateOrderId = () =>
+  `ORD-${Date.now()}-${Math.random().toString(36).slice(2, 8)}`;
+
 export default function Checkout() {
   const navigate = useNavigate();
   const location = useLocation();
@@ -190,6 +194,9 @@ export default function Checkout() {
   const [payMethod, setPayMethod] = useState("kakao");
   const [cardBrand, setCardBrand] = useState("");
   const [installment, setInstallment] = useState("일시불");
+
+  // ✅ 결제 중 중복 클릭 방지
+  const [isPaying, setIsPaying] = useState(false);
 
   // paymentMethods.json 파일에서 결제 방법 목록 로드
   useEffect(() => {
@@ -273,7 +280,7 @@ export default function Checkout() {
     return cards;
   }, [kakaoMethod]);
 
-  // 주소찾기 팝업 상태
+  // 주소찾기 팝업 상태 (현재 UI에서 따로 쓰진 않지만 기존 유지)
   const [isPostcodeOpen, setIsPostcodeOpen] = useState(false);
 
   // 배송지 선택 모달 상태
@@ -388,6 +395,8 @@ export default function Checkout() {
   );
 
   const handlePayment = async () => {
+    if (isPaying) return;
+
     const userEmail = loginUser?.email;
 
     // ✅ 로그인 체크: anonymousUser 방지
@@ -403,40 +412,55 @@ export default function Checkout() {
       return;
     }
 
-    const receiver = {
-      name,
-      phone,
-      zipcode: postcode,
-      address1: address,
-      address2: addressDetail,
-      memo,
-    };
+    if (payMethod !== "kakao") {
+      alert("현재는 카카오페이만 지원합니다.");
+      return;
+    }
 
-    // ✅ 주소 저장 (실패해도 결제 진행은 하게 하고 싶으면 try/catch로 감싸도 됨)
-    await dispatch(
-      saveAddress({
-        addrName: name,
-        addrTel: phone,
-        addrZipcode: postcode,
-        addrMain: address,
-        addrDetail: addressDetail,
-        addrReq: memo,
-        addrDef: saveAsDefault ? "Y" : "N",
-      })
-    );
+    setIsPaying(true);
 
-    const orderSource = localStorage.getItem("orderSource") || "cart";
+    try {
+      const receiver = {
+        name,
+        phone,
+        zipcode: postcode,
+        address1: address,
+        address2: addressDetail,
+        memo,
+      };
 
-    // ✅ 핵심: getPayment에 userEmail을 추가로 넘겨서 payload userId를 고정
-    await getPayment(
-      receiver,
-      paymentInfo,
-      items,
-      total,
-      orderSource,
-      selectedCoupon?.couponId,
-      userEmail
-    );
+      // ✅ 주소 저장 (실패해도 결제 진행은 하게 하려면 try/catch로 분리 가능)
+      await dispatch(
+        saveAddress({
+          addrName: name,
+          addrTel: phone,
+          addrZipcode: postcode,
+          addrMain: address,
+          addrDetail: addressDetail,
+          addrReq: memo,
+          addrDef: saveAsDefault ? "Y" : "N",
+        })
+      );
+
+      const orderSource = localStorage.getItem("orderSource") || "cart";
+      const orderId = generateOrderId(); // ✅ 핵심: orderId 프론트 생성
+
+      // ✅ 핵심: getPayment에 orderId + userEmail 넘김(anonymousUser/빈 orderId 방지)
+      await getPayment(
+        receiver,
+        paymentInfo,
+        items,
+        total,
+        orderSource,
+        selectedCoupon?.couponId,
+        orderId,   // ✅ 추가
+        userEmail  // ✅ 추가
+      );
+    } catch (e) {
+      console.error("결제 준비 실패:", e);
+      alert("결제 준비 중 오류가 발생했습니다. 잠시 후 다시 시도해 주세요.");
+      setIsPaying(false);
+    }
   };
 
   if (!items || items.length === 0) {
@@ -738,8 +762,8 @@ export default function Checkout() {
           <b>{formatKRW(total)}</b>
         </div>
 
-        <button className="pay-btn" onClick={handlePayment}>
-          결제하기
+        <button className="pay-btn" onClick={handlePayment} disabled={isPaying}>
+          {isPaying ? "결제 준비중..." : "결제하기"}
         </button>
       </section>
 
