@@ -1,159 +1,176 @@
 import { login, setUser, logout } from './authSlice.js';
 import { axiosPost } from '../../utils/dataFetch.js';
-import axios from '../csrf/axiosSetup.js';
+import axiosJWT from '../../api/axiosJWT.js';
 import { getCartCount } from '../../feature/cart/cartAPI.js';
 import { resetCartCount } from '../../feature/cart/cartSlice.js';
-import { createCsrfToken, refreshCsrfToken } from '../csrf/manageCsrfToken.js';
 import { validateFormCheck, validateSignupFormCheck } from '../../utils/validate.js';
 
-/** 전체 회원 검색 */
-export const getFindAll = () => async (dispatch) => {
+/** =========================
+ *  전체 회원 검색
+ * ========================= */
+export const getFindAll = () => async () => {
     const url = "/member/findAll";
-    const result = await axiosPost(url, {});
-    return result;
+    return await axiosPost(url, {});
 };
 
-/** 회원 탈퇴 */
-export const deleteMember = (email) => async (dispatch) => {
-    const payload = { "email" : email };
+/** =========================
+ *  회원 탈퇴
+ * ========================= */
+export const deleteMember = (email) => async () => {
+    const payload = { email };
     const url = "/member/deleteByEmail";
-    const result = await axiosPost(url, payload);
-    return result;
+    return await axiosPost(url, payload);
 };
 
-/** 아이디 찾기 */
-export const getFindId = (payload) => async (dispatch) => {
+/** =========================
+ *  아이디 찾기
+ * ========================= */
+export const getFindId = (payload) => async () => {
     const url = "/member/findId";
-    const result = await axiosPost(url, payload);
-    return result;
+    return await axiosPost(url, payload);
 };
 
-/** 비밀번호 찾기 */
-export const getFindPwd = (payload) => async (dispatch) => {
+/** =========================
+ *  비밀번호 찾기
+ * ========================= */
+export const getFindPwd = (payload) => async () => {
     const url = "/member/findPwd";
-    const result = await axiosPost(url, payload);
-    return result;
+    return await axiosPost(url, payload);
 };
 
-/** 비밀번호 변경 */
-export const updatePwd = (payload) => async (dispatch) => {
-    console.log("payload -> ", payload);
+/** =========================
+ *  비밀번호 변경
+ * ========================= */
+export const updatePwd = (payload) => async () => {
     const url = "/member/updatePwd";
-    const result = await axiosPost(url, payload);
-    return result;
+    return await axiosPost(url, payload);
 };
 
-/** email 중복 체크 */
-export const getIdCheck = (email) => async (dispatch) => {
-    const data = { "email" : email };
+/** =========================
+ *  이메일 중복 체크
+ * ========================= */
+export const getIdCheck = (email) => async () => {
+    const data = { email };
     const url = "/member/idcheck";
-    const result = await axiosPost(url, data);
-    return result;
-}
+    return await axiosPost(url, data);
+};
 
-/** Signup */
-export const getSignup = (formData, logInType) => async (dispatch) => {
-console.log("formData : ", formData);
-    let result = null;
-    if(logInType === "ssf"){
-        const url = "/member/signup";
-        result = await axiosPost(url, formData);
-    } else {
-        const url = "/member/apiSignup";
-        result = await axiosPost(url, formData);
+/** =========================
+ *  회원가입
+ * ========================= */
+export const getSignup = (formData, logInType) => async () => {
+    let url = "/member/signup";
+    if (logInType !== "ssf") {
+        url = "/member/apiSignup";
     }
-    return result;
-}
+    return await axiosPost(url, formData);
+};
 
-/** apiLogin */
-export const getApiLogin = (email) => async(dispatch) => {
-
-    const payload = { email: email, password: "api" };
+/** =========================
+ *  API 로그인 (카카오/소셜)
+ * ========================= */
+export const getApiLogin = (email) => async (dispatch) => {
+    const payload = { email, password: "api" };
     const url = "/member/login";
     const result = await axiosPost(url, payload);
 
-    await refreshCsrfToken();
-    try {
-        const me = await axios.post('/member/me');
+    if (result?.token) {
+        localStorage.setItem("accessToken", result.token);
+        localStorage.setItem("isLogin", "true");
+
+        const me = await axiosJWT.post("/member/me");
         const data = me.data || {};
-        const role = data.role || 'user';
-        dispatch(setUser({ authenticated: data.authenticated, email: data.email, role }));
+        const role = data.role || "user";
+
+        dispatch(setUser({
+            authenticated: true,
+            email: data.email,
+            role
+        }));
         dispatch(getCartCount(email));
-    } catch (e) {
-        dispatch(setUser({ authenticated: false }));
-    }
-    dispatch(login({"userId": email}));
-    return true;
-};
-
-/** Login */
-export const getLogin = (formData, param) => async(dispatch) => {
-
-    //관리자 계정 테스트
-    if(formData.id === "admin" && formData.password === "1234") {
-        dispatch(login({"userId": formData.id}));
-        dispatch(setUser({ authenticated: true, email: formData.id, role: 'admin' }));
+        dispatch(login({ userId: email }));
         return true;
     }
 
-    //유효성 체크 후 서버에 로그인 요청
-    if(validateFormCheck(param)) {
-        const payload = { email: formData.id?.trim(), password: formData.password };
-        const url = "/member/login";
-        const result = await axiosPost(url, payload);
+    return false;
+};
 
-        if(result.login) {
-            await refreshCsrfToken();
-            try {
-                const me = await axios.post('/member/me');
-                const data = me.data || {};
-                const role = data.role || 'user';
-                dispatch(setUser({ authenticated: data.authenticated, email: data.email, role }));
-                dispatch(getCartCount(formData.id));
-            } catch (e) {
-                dispatch(setUser({ authenticated: false }));
-            }
-            dispatch(login({"userId": formData.id}));
-            return true;
-        }
+/** =========================
+ *  일반 로그인
+ * ========================= */
+export const getLogin = (formData, param) => async (dispatch) => {
+
+    // 관리자 계정 테스트
+    if (formData.id === "admin" && formData.password === "1234") {
+        dispatch(login({ userId: formData.id }));
+        dispatch(setUser({
+            authenticated: true,
+            email: formData.id,
+            role: "admin"
+        }));
+        localStorage.setItem("isLogin", "true");
+        return true;
+    }
+
+    if (!validateFormCheck(param)) return false;
+
+    const payload = {
+        email: formData.id?.trim(),
+        password: formData.password
+    };
+
+    const url = "/member/login";
+    const result = await axiosPost(url, payload);
+
+    if (result?.token) {
+        localStorage.setItem("accessToken", result.token);
+        localStorage.setItem("isLogin", "true");
+
+        const me = await axiosJWT.post("/member/me");
+        const data = me.data || {};
+        const role = data.role || "user";
+
+        dispatch(setUser({
+            authenticated: true,
+            email: data.email,
+            role
+        }));
+        dispatch(getCartCount(formData.id));
+        dispatch(login({ userId: formData.id }));
+        return true;
     }
 
     return false;
-}
+};
 
+/** =========================
+ *  로그아웃
+ * ========================= */
+export const getLogout = () => async (dispatch) => {
+    localStorage.removeItem("accessToken");
+    localStorage.removeItem("isLogin");
 
-/** Logout */
-export const getLogout = () => async(dispatch) => {
-    const url = "/member/logout";
-    const result = await axiosPost(url, {});
+    dispatch(resetCartCount());
+    dispatch(setUser({ authenticated: false }));
+    dispatch(logout());
 
-    if(result) {
-            refreshCsrfToken();
-            dispatch(resetCartCount());
-            dispatch(setUser({ authenticated: false }));
-            dispatch(logout());
-        }
+    return true;
+};
 
-    return result;
-}
-
-/** 앱 초기화 시 현재 사용자 복원 */
-export const fetchCurrentUser = () => async(dispatch) => {
+/** =========================
+ *  앱 초기화 시 로그인 복원
+ * ========================= */
+export const fetchCurrentUser = () => async (dispatch) => {
     try {
-        // POST 요청에 필요한 CSRF 토큰 - 다른 페이지 넘어갈때 에러 방지지
-        await createCsrfToken();
-        
-        // 비로그인 상태면 /member/me 호출하지 않음
-        const isLogin = localStorage.getItem("isLogin") === "true";
-        if (!isLogin) {
+        const token = localStorage.getItem("accessToken");
+        if (!token) {
             dispatch(setUser({ authenticated: false }));
             return;
         }
-        
-        const me = await axios.post('/member/me');
+
+        const me = await axiosJWT.post("/member/me");
         dispatch(setUser(me.data));
-        
     } catch (e) {
         dispatch(setUser({ authenticated: false }));
     }
-}
+};

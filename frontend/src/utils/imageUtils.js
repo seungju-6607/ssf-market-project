@@ -1,3 +1,11 @@
+import axiosJWT from "../api/axiosJWT.js";
+
+/**
+ * 이미지 src 생성 유틸
+ * - 외부 URL 그대로
+ * - 상대경로는 PUBLIC_URL 기준
+ * - 한글 인코딩 처리
+ */
 export const srcOf = (item) => {
   const raw =
     typeof item === "string" ? item : item?.img || item?.image || "";
@@ -30,7 +38,7 @@ export const fileToBase64 = (file) =>
   });
 
 /**
- * 선택된 이미지 파일 배열을 서버에 업로드
+ * 선택된 이미지 파일 배열을 서버에 업로드 (JWT 인증)
  * @param {File[]} files
  * @returns {Promise<string[]>} 서버에서 반환한 key 배열
  */
@@ -40,22 +48,16 @@ export const uploadImagesToServer = async (files) => {
   const formData = new FormData();
   files.forEach((file) => formData.append("images", file));
 
- const csrfToken = document.cookie
-   .split('; ')
-   .find(row => row.startsWith('XSRF-TOKEN='))
-   ?.split('=')[1];
-
-  const res = await fetch("/market/upload", {
-    method: "POST",
-    body: formData,
-    credentials: "include", // 로그인 세션 쿠키 전달
+  // 🔑 axiosJWT 사용 → Authorization: Bearer 자동 첨부
+  const res = await axiosJWT.post("/market/upload", formData, {
     headers: {
-        "X-XSRF-TOKEN": csrfToken
-      }
+      "Content-Type": "multipart/form-data",
+    },
   });
 
-  if (!res.ok) throw new Error("이미지 업로드 실패..");
+  if (!res || res.status !== 200) {
+    throw new Error("이미지 업로드 실패");
+  }
 
-  const data = await res.json();
-  return data.keys || [];
+  return res.data?.keys || [];
 };

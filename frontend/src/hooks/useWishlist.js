@@ -1,9 +1,11 @@
 // src/hooks/useWishlist.js
-import axios from "../feature/csrf/axiosSetup.js";
+import axiosJWT from "../api/axiosJWT.js";
 
-// ❌ 삭제: const API_BASE = "http://localhost:8080";
 const LOCAL_KEY = "wishlist";
 
+/* =========================
+ * 로컬 스토리지 유틸
+ * ========================= */
 const readLocal = () => {
   try {
     return JSON.parse(localStorage.getItem(LOCAL_KEY)) || [];
@@ -17,6 +19,9 @@ const writeLocal = (list) => {
   window.dispatchEvent(new Event("wishlistUpdated"));
 };
 
+/* =========================
+ * 공통 유틸
+ * ========================= */
 export const productKey = (p) =>
   `${p?.productId ?? p?.id ?? p?.code ?? p?.pid ?? "unknown"}`;
 
@@ -25,10 +30,14 @@ const toNumber = (v) =>
     ? v
     : Number(String(v ?? "").replace(/[^\d]/g, "")) || 0;
 
+/* =========================
+ * 서버 → 로컬 동기화
+ * ========================= */
 export const syncWishlistFromServer = async (email) => {
   if (!email) return readLocal();
+
   try {
-    const res = await axios.get(
+    const res = await axiosJWT.get(
       `/wishlist/list?email=${encodeURIComponent(email)}`
     );
     const list = Array.isArray(res.data) ? res.data : [];
@@ -40,7 +49,9 @@ export const syncWishlistFromServer = async (email) => {
   }
 };
 
-// 로컬 즉시
+/* =========================
+ * 찜 토글 (서버 + 로컬 즉시 반영)
+ * ========================= */
 export const toggleWishlistServer = async (email, rawProduct) => {
   if (!email) {
     alert("로그인 후 찜 기능을 이용해 주세요.");
@@ -71,9 +82,7 @@ export const toggleWishlistServer = async (email, rawProduct) => {
   };
 
   try {
-    const res = await axios.post(`/wishlist/toggle`, dto, {
-      headers: { "Content-Type": "application/json" },
-    });
+    const res = await axiosJWT.post("/wishlist/toggle", dto);
 
     const on =
       typeof res?.data === "boolean"
@@ -105,14 +114,14 @@ export const toggleWishlistServer = async (email, rawProduct) => {
   }
 };
 
+/* =========================
+ * 찜 전체 삭제
+ * ========================= */
 export const clearWishlistOnServer = async (email) => {
   if (!email) return readLocal();
+
   try {
-    await axios.post(
-      `/wishlist/clear`,
-      { email },
-      { headers: { "Content-Type": "application/json" } }
-    );
+    await axiosJWT.post("/wishlist/clear", { email });
     writeLocal([]);
     return [];
   } catch (err) {
@@ -121,6 +130,9 @@ export const clearWishlistOnServer = async (email) => {
   }
 };
 
+/* =========================
+ * 로컬 체크 유틸
+ * ========================= */
 export const isInWishlist = (product) => {
   const key = productKey(product);
   const list = readLocal();

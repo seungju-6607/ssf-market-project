@@ -4,13 +4,15 @@ import { CATEGORY_DATA } from "../data/categoryData";
 import "./Page.css";
 import "../styles/CategoryPage.css";
 
+import axiosJWT from "../api/axiosJWT.js";
 import {
   toggleWishlistServer,
   syncWishlistFromServer,
 } from "../hooks/useWishlist.js";
 
-const API_BASE = process.env.REACT_APP_API_BASE_URL || ""; // ✅ 배포/개발 공통
-
+/* =========================
+ * 유틸
+ * ========================= */
 const srcOf = (p) => {
   let itemArray = [];
   try {
@@ -38,9 +40,12 @@ const formatPrice = (v) => {
   return n.toLocaleString() + "원";
 };
 
-// const pidOf = (p, idx) => p?.itemKey ?? `cat-${idx}`;
-const pidOf = (p, idx) => p?.productId ?? p?.code ?? p?.pid ?? `cat-${idx}`;
+const pidOf = (p, idx) =>
+  p?.productId ?? p?.code ?? p?.pid ?? `cat-${idx}`;
 
+/* =========================
+ * 컴포넌트
+ * ========================= */
 export default function CategoryPage() {
   const location = useLocation();
   const navigate = useNavigate();
@@ -62,7 +67,9 @@ export default function CategoryPage() {
   const loginUser = JSON.parse(localStorage.getItem("loginUser") || "{}");
   const email = loginUser.email;
 
-  // ✅ 페이지 입장 시 위시 불러오기
+  /* =========================
+   * 위시리스트 초기 동기화
+   * ========================= */
   useEffect(() => {
     if (email) {
       syncWishlistFromServer(email).then(setWishlist);
@@ -71,38 +78,32 @@ export default function CategoryPage() {
     }
   }, [email]);
 
-  // ✅ 카테고리/서브카테고리 상품 fetch (localhost 제거 / 환경변수 사용)
+  /* =========================
+   * 카테고리 상품 조회 (JWT)
+   * ========================= */
   useEffect(() => {
     const fetchItems = async () => {
       try {
-        if (!API_BASE) {
-          console.error("REACT_APP_API_BASE_URL 환경변수가 비어있음");
-          return;
-        }
-
         const query =
           subcategoryKey !== "main" ? `?subcategory=${subcategoryKey}` : "";
 
-        const url = `${API_BASE}/api/items/category/${categoryKey}${query}`;
+        const res = await axiosJWT.get(
+          `/api/items/category/${categoryKey}${query}`
+        );
 
-        const res = await fetch(url, {
-          credentials: "include",
-        });
-
-        if (res.ok) {
-          const data = await res.json();
-          setProducts(data);
-        } else {
-          console.error("상품 fetch 실패:", res.status, await res.text());
-        }
+        setProducts(Array.isArray(res.data) ? res.data : []);
       } catch (e) {
         console.error("상품 fetch error:", e);
+        setProducts([]);
       }
     };
 
     fetchItems();
   }, [categoryKey, subcategoryKey]);
 
+  /* =========================
+   * 위시리스트 토글
+   * ========================= */
   const handleWishlistClick = async (p, id) => {
     if (!email) {
       alert("로그인 후 이용해주세요.");
@@ -112,50 +113,46 @@ export default function CategoryPage() {
 
     const normalized = {
       id,
-      name: p.itemContent || "",
-      brand: p.itemBrand || "",
-      image: (() => {
+      productId: id,
+      productName: p.itemContent || "",
+      productBrand: p.itemBrand || "",
+      productImage: (() => {
         try {
           const list = JSON.parse(p.itemList || "[]");
           return list[0] || "";
-        } catch (e) {
-          console.error("itemList parse error:", e, p.itemList);
+        } catch {
           return "";
         }
       })(),
-      price:
+      productPrice:
         typeof p.itemPrice === "string"
           ? Number(p.itemPrice.replace(/[^\d]/g, "")) || 0
           : Number(p.itemPrice || 0),
-      priceOri: p.originalPrice
+      productPriceOri: p.originalPrice
         ? Number(String(p.originalPrice).replace(/[^\d]/g, ""))
         : 0,
     };
 
+    // optimistic update
     const current = [...wishlist];
     const exists = current.some((it) => it.productId === id);
 
-    // ✅ optimistic update
-    let next;
-    if (!exists) {
-      next = [
-        ...current,
-        {
-          email,
-          productId: id,
-          productName: normalized.name,
-          productBrand: normalized.brand,
-          productImage: normalized.image,
-          productPrice: normalized.price,
-          productPriceOri: normalized.priceOri,
-        },
-      ];
-    } else {
-      next = current.filter((it) => it.productId !== id);
-    }
+    const next = exists
+      ? current.filter((it) => it.productId !== id)
+      : [
+          ...current,
+          {
+            email,
+            productId: id,
+            productName: normalized.productName,
+            productBrand: normalized.productBrand,
+            productImage: normalized.productImage,
+            productPrice: normalized.productPrice,
+            productPriceOri: normalized.productPriceOri,
+          },
+        ];
 
     setWishlist(next);
-
     localStorage.setItem("wishlist_local", JSON.stringify(next));
     window.dispatchEvent(new Event("wishlistUpdated"));
 
@@ -168,14 +165,15 @@ export default function CategoryPage() {
     }
   };
 
+  /* =========================
+   * 상세 페이지 이동
+   * ========================= */
   const goToProductDetail = (p, idx) => {
     let imageUrl = "";
     try {
       const list = JSON.parse(p.itemList || "[]");
       imageUrl = list[0] || "";
-    } catch (e) {
-      console.error("itemList 파싱 오류:", e);
-    }
+    } catch {}
 
     const normalized = {
       id: p.itemKey,
@@ -191,9 +189,11 @@ export default function CategoryPage() {
     navigate(`/product/${normalized.id}`, { state: { product: normalized } });
   };
 
-  // UI용 서브카테고리 가져오기
   const tabs = CATEGORY_DATA[categoryKey]?.subcategories || [];
 
+  /* =========================
+   * 렌더
+   * ========================= */
   return (
     <div className="category-page">
       <div className="container">
@@ -229,8 +229,8 @@ export default function CategoryPage() {
 
               return (
                 <div
+                  key={id}
                   className="product-card"
-                  // key={id}
                   onClick={() => goToProductDetail(p, idx)}
                 >
                   <div className="thumb">
@@ -245,13 +245,11 @@ export default function CategoryPage() {
                     />
                     <button
                       className={`wishlist-btn ${wished ? "active" : ""}`}
-                      aria-pressed={wished}
-                      aria-label={wished ? "위시에서 제거" : "위시에 추가"}
                       onClick={(e) => {
                         e.stopPropagation();
                         handleWishlistClick(p, id);
                       }}
-                      title={wished ? "위시에 담김" : "위시에 담기"}
+                      aria-pressed={wished}
                     >
                       <svg
                         width="20"
