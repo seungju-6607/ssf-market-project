@@ -4,7 +4,9 @@ import com.ssf.project.dto.KakaoApproveResponse;
 import com.ssf.project.dto.KakaoPayDto;
 import com.ssf.project.dto.KakaoReadyResponse;
 import org.springframework.beans.factory.annotation.Value;
-import org.springframework.http.*;
+import org.springframework.http.HttpEntity;
+import org.springframework.http.HttpHeaders;
+import org.springframework.http.MediaType;
 import org.springframework.stereotype.Service;
 import org.springframework.util.LinkedMultiValueMap;
 import org.springframework.util.MultiValueMap;
@@ -23,7 +25,7 @@ public class KakaoPayService {
     private String KAKAO_PAY_HOST;          // https://kapi.kakao.com
 
     @Value("${kakao.pay.admin-key}")
-    private String ADMIN_KEY;               // KakaoAK {adminKey}
+    private String ADMIN_KEY;               // ✅ (실제로는 카카오페이 Secret key 값이 들어감)
 
     @Value("${kakao.pay.cid}")
     private String CID;                     // TC0ONETIME
@@ -51,7 +53,10 @@ public class KakaoPayService {
     private HttpHeaders getHeaders() {
         HttpHeaders headers = new HttpHeaders();
         headers.setContentType(MediaType.APPLICATION_FORM_URLENCODED);
-        headers.set("Authorization" + ADMIN_KEY);
+
+        // ✅ 카카오페이 결제 API: Secret key를 그대로 Authorization에 넣음 (KakaoAK 붙이면 401)
+        headers.set("Authorization", ADMIN_KEY);
+
         headers.setAccept(MediaType.parseMediaTypes("application/json;charset=UTF-8"));
         return headers;
     }
@@ -98,8 +103,8 @@ public class KakaoPayService {
         String backend = trimTrailingSlash(APP_BASE_URL);
 
         params.add("approval_url", backend + "/payment/qr/success?orderId=" + enc(orderId));
-        params.add("cancel_url",   backend + "/payment/qr/cancel?orderId=" + enc(orderId));
-        params.add("fail_url",     backend + "/payment/qr/fail?orderId=" + enc(orderId));
+        params.add("cancel_url", backend + "/payment/qr/cancel?orderId=" + enc(orderId));
+        params.add("fail_url", backend + "/payment/qr/fail?orderId=" + enc(orderId));
 
         HttpEntity<MultiValueMap<String, String>> body = new HttpEntity<>(params, getHeaders());
 
