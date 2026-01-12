@@ -5,6 +5,8 @@ import re
 import time
 import requests
 
+##
+
 HEADERS = {
     "User-Agent": "Mozilla/5.0 (compatible; SSFShopBot/1.0; +http://localhost)"
 }
