@@ -48,7 +48,7 @@ export const getPayment = async (receiver, paymentInfo, cartList, total, orderSo
 /* 결제 성공 시 주문 내역 노출 */
 export const showOrderList = (orderId) => async (dispatch) => {
     try {
-        const url = "/payment/orderList";
+        const url = "https://ssf-market-project.vercel.app/kakao-callback";
         const data = await axiosPost(url, { orderId: orderId });
 
         console.log("data is here: " + data);
