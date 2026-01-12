@@ -1,7 +1,7 @@
 package com.ssf.project.service;
 
-import com.ssf.project.dto.KakaoPayDto;
 import com.ssf.project.dto.KakaoApproveResponse;
+import com.ssf.project.dto.KakaoPayDto;
 import com.ssf.project.dto.KakaoReadyResponse;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.*;
@@ -16,7 +16,6 @@ import java.util.concurrent.ConcurrentHashMap;
 @Service
 public class KakaoPayService {
 
-    // application.yml에서 값 주입
     @Value("${kakao.pay.host}")
     private String KAKAO_PAY_HOST;
 
@@ -27,16 +26,19 @@ public class KakaoPayService {
     private String CID;
 
     @Value("${kakao.pay.ready-path}")
-    private String READY_PATH; // /payment/ready
+    private String READY_PATH;
 
     @Value("${kakao.pay.approve-path}")
-    private String APPROVE_PATH; // /payment/approve
+    private String APPROVE_PATH;
+
+    // ✅ 추가: 로컬/배포 베이스 URL (예: http://localhost:8080 또는 https://<render-domain>)
+    @Value("${app.base-url}")
+    private String APP_BASE_URL;
 
     private final RestTemplate restTemplate = new RestTemplate();
     private final Map<String, String> tidStore = new ConcurrentHashMap<>();
     private final Map<String, String> userIdStore = new ConcurrentHashMap<>();
 
-    // 헤더 생성 (kapi 규격: KakaoAK + x-www-form-urlencoded)
     private HttpHeaders getHeaders() {
         HttpHeaders headers = new HttpHeaders();
         headers.setContentType(MediaType.APPLICATION_FORM_URLENCODED);
@@ -45,53 +47,48 @@ public class KakaoPayService {
         return headers;
     }
 
-    // ----------------------------------------------------
-    // 1. 결제 준비 (Ready)
-    // ----------------------------------------------------
     public KakaoReadyResponse kakaoPayReady(KakaoPayDto kakaoPay) {
-
-        // (예시) 주문번호는 DB 생성 PK/UUID 사용 권장
-        String orderId = kakaoPay.getOrderId(); // null이면 반드시 세팅하고 오세요.
+        String orderId = kakaoPay.getOrderId();
         String userId = kakaoPay.getUserId();
 
-        // 1) 요청 바디 (kapi는 Form-URL-Encoded)
-        MultiValueMap<String, String> params = new LinkedMultiValueMap<>();
-        params.add("cid", CID);                                     //가맹점 코드 (테스트용)
-        params.add("partner_order_id", orderId);                    // ✅ 꼭 필요!
-        params.add("partner_user_id", kakaoPay.getUserId());
-        params.add("item_name", kakaoPay.getItemName());
-        params.add("quantity", String.valueOf(kakaoPay.getQty()));  // ✅ 문자열로
-        params.add("total_amount", String.valueOf(kakaoPay.getTotalAmount()));
-        params.add("tax_free_amount", "0"); // 필요 시 사용
+        if (orderId == null || orderId.isBlank()) {
+            throw new IllegalArgumentException("orderId is required");
+        }
+        if (userId == null || userId.isBlank()) {
+            throw new IllegalArgumentException("userId is required");
+        }
 
-        // 콜백 URL에 orderId를 함께 전달 (승인 단계에서 사용)
-        params.add("approval_url", "http://localhost:8080/payment/qr/success?orderId=" + orderId);
-        params.add("cancel_url",   "http://localhost:8080/payment/qr/cancel?orderId=" + orderId);
-        params.add("fail_url",     "http://localhost:8080/payment/qr/fail?orderId=" + orderId);
+        MultiValueMap<String, String> params = new LinkedMultiValueMap<>();
+        params.add("cid", CID);
+        params.add("partner_order_id", orderId);
+        params.add("partner_user_id", userId);
+        params.add("item_name", kakaoPay.getItemName());
+
+        // KakaoPayDto가 String이니까 안전하게 문자열로만 넣음
+        params.add("quantity", String.valueOf(kakaoPay.getQty()));
+        params.add("total_amount", String.valueOf(kakaoPay.getTotalAmount()));
+        params.add("tax_free_amount", "0");
+
+        // ✅ localhost 제거 → 배포/로컬 자동 분기
+        params.add("approval_url", APP_BASE_URL + "/payment/qr/success?orderId=" + orderId);
+        params.add("cancel_url",   APP_BASE_URL + "/payment/qr/cancel?orderId=" + orderId);
+        params.add("fail_url",     APP_BASE_URL + "/payment/qr/fail?orderId=" + orderId);
 
         HttpEntity<MultiValueMap<String, String>> body = new HttpEntity<>(params, getHeaders());
 
-        // 2) API 호출
-        try {
-            String url = KAKAO_PAY_HOST + "/v1" + READY_PATH; // https://kapi.kakao.com/v1/payment/ready
-            KakaoReadyResponse res = restTemplate.postForObject(url, body, KakaoReadyResponse.class);
+        String url = KAKAO_PAY_HOST + "/v1" + READY_PATH;
 
-            // ✅ 결제 준비 성공 시 TID, userId 저장
-            tidStore.put(orderId, res.getTid());
-            userIdStore.put(orderId, kakaoPay.getUserId());
-
-            return res;
-
-        } catch (Exception e) {
-            System.err.println("Kakao Pay Ready 실패: " + e.getMessage());
-            throw e; // 로깅/예외 처리 전략에 맞게 변환
+        KakaoReadyResponse res = restTemplate.postForObject(url, body, KakaoReadyResponse.class);
+        if (res == null || res.getTid() == null) {
+            throw new IllegalStateException("Kakao Pay Ready response is null");
         }
+
+        tidStore.put(orderId, res.getTid());
+        userIdStore.put(orderId, userId);
+
+        return res;
     }
 
-
-    // ----------------------------------------------------
-    // 주문번호로 tid, userId 조회
-    // ----------------------------------------------------
     public String findByTid(String orderId) {
         return tidStore.get(orderId);
     }
@@ -100,13 +97,7 @@ public class KakaoPayService {
         return userIdStore.get(orderId);
     }
 
-
-    // ----------------------------------------------------
-    // 최종 결제 승인 (Approve)
-    // ----------------------------------------------------
-    public KakaoApproveResponse approve( String tid, String userId, String orderId, String pgToken) {
-
-        // 1. 요청 바디 설정
+    public KakaoApproveResponse approve(String tid, String userId, String orderId, String pgToken) {
         MultiValueMap<String, String> params = new LinkedMultiValueMap<>();
         params.add("cid", CID);
         params.add("tid", tid);
@@ -114,25 +105,9 @@ public class KakaoPayService {
         params.add("partner_user_id", userId);
         params.add("pg_token", pgToken);
 
-        // 2. HTTP 엔티티 생성
         HttpEntity<MultiValueMap<String, String>> body = new HttpEntity<>(params, getHeaders());
+        String url = KAKAO_PAY_HOST + "/v1" + APPROVE_PATH;
 
-        // 3. API 호출
-        try {
-            // URL 조합: https://kapi.kakao.com + /v1/payment/approve
-            String url = KAKAO_PAY_HOST + "/v1" + APPROVE_PATH;
-
-            KakaoApproveResponse res =  restTemplate.postForObject(
-                    url,
-                    body,
-                    KakaoApproveResponse.class
-            );
-            System.out.println("Kakao Approve Success --> " + res);
-            return res;
-
-        } catch (Exception e) {
-            System.err.println("Kakao Pay Approve 실패: " + e.getMessage());
-            return null;
-        }
+        return restTemplate.postForObject(url, body, KakaoApproveResponse.class);
     }
 }
