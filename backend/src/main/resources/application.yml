@@ -10,13 +10,14 @@
 kakao:
   pay:
     host: https://kapi.kakao.com
-    admin-key: ${KAKAO_ADMIN_KEY:1491d009f98bb0a29734d6af39f55a1a}
+    admin-key: ${KAKAO_ADMIN_KEY}   # ✅ 배포에선 기본값 쓰지 말기
     cid: TC0ONETIME
     ready-path: /payment/ready
     approve-path: /payment/approve
 
 app:
-  base-url: ${APP_BASE_URL:http://localhost:8080}
+  base-url: ${APP_BASE_URL:http://localhost:8080}          # ✅ 백엔드(카카오 콜백)
+  front-base-url: ${FRONT_BASE_URL:http://localhost:3000}  # ✅ 프론트(payConfirm)
 
 #    client_id: 3871609a495b8fba6fef98dd74679876
 #    redirect_uri: http://localhost:8080/callback

@@ -10,7 +10,6 @@ import com.ssf.project.service.OrderService;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpSession;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -38,11 +37,7 @@ public class KakaoPayController {
     private final UserDetailsService userDetailsService;
     private final CouponService couponService;
 
-    // ✅ 프론트 주소 (로컬/배포 분기)
-    @Value("${app.front-base-url:http://localhost:3000}")
-    private String frontBaseUrl;
-
-    // ⚠️ 전역 payInfo는 동시결제 시 꼬일 수 있음(일단 요청대로 유지)
+    // ⚠️ 동시결제 시 꼬일 수 있음(지금 구조 유지)
     private KakaoPayDto payInfo = null;
 
     @Autowired
@@ -57,11 +52,10 @@ public class KakaoPayController {
     }
 
     /**
-     * ✅ 결제 준비 요청 (프론트에서 호출)
+     * ✅ 결제 준비 요청
      */
     @PostMapping("/kakao/ready")
     public KakaoReadyResponse paymentKakao(@RequestBody KakaoPayDto kakaoPay) {
-        // orderId 생성
         payInfo = kakaoPay;
         kakaoPay.setOrderId(UUID.randomUUID().toString());
 
@@ -77,14 +71,14 @@ public class KakaoPayController {
     }
 
     /**
-     * ✅ 결제 성공 콜백
+     * ✅ 결제 성공 콜백 (카카오 → 백엔드)
      */
     @GetMapping("/qr/success")
     public ResponseEntity<Void> success(@RequestParam String orderId,
                                         @RequestParam("pg_token") String pgToken,
                                         HttpServletRequest request) {
 
-        /*********************  카카오 페이 결제 성공 후 세션 복원 시작 ******************/
+        /*********************  세션 복원 시작 ******************/
         Authentication auth = SecurityContextHolder.getContext().getAuthentication();
 
         if (auth == null || !auth.isAuthenticated()
@@ -114,42 +108,39 @@ public class KakaoPayController {
                 );
 
                 auth = newAuth;
-                System.out.println("✅ 카카오 결제 성공 시 Authentication 복원 완료: " + auth.getName());
+                System.out.println("✅ Authentication 복원 완료: " + auth.getName());
             } else {
                 System.out.println("⚠️ userId 조회 실패 - 세션 복원 불가");
             }
         } else {
             System.out.println("✅ 기존 Authentication 유지됨: " + auth.getName());
         }
-        /*********************  카카오 페이 결제 성공 후 세션 복원 종료 ******************/
+        /*********************  세션 복원 종료 ******************/
 
         // 1) tid, userId 조회
         String tid = kakaoPayService.findByTid(orderId);
         String userId = kakaoPayService.findByUserId(orderId);
 
-        // 2) 최종 승인 요청
+        // 2) 카카오 최종 승인
         KakaoApproveResponse approve = kakaoPayService.approve(tid, userId, orderId, pgToken);
         System.out.println("Kakao Approve Success --> " + approve);
 
-        // 2-1) 실제 결제 금액 반영
-        if (approve != null && approve.getAmount() != null && approve.getAmount().getTotal() != null) {
-            int actualPaidAmount = approve.getAmount().getTotal();
-            if (payInfo != null) {
-                payInfo.setTotalAmount(String.valueOf(actualPaidAmount));
-            }
-            System.out.println("실제 결제 금액 반영: " + actualPaidAmount);
-        }
-
-        // payInfo null 방어 (콜백만 들어온 경우 등)
+        // payInfo null이면 프론트로 실패 보내고 종료
         if (payInfo == null) {
-            // 최소한의 안전장치: 프론트로 실패/예외 리다이렉트
-            URI redirect = URI.create(frontBaseUrl + "/payConfirm?orderId=" + orderId + "&status=fail");
+            URI redirectFail = URI.create(kakaoPayService.buildFrontPayConfirmUrl(orderId, "fail"));
             HttpHeaders headers = new HttpHeaders();
-            headers.setLocation(redirect);
+            headers.setLocation(redirectFail);
             return new ResponseEntity<>(headers, HttpStatus.FOUND);
         }
 
-        // 3) 결제 완료 처리 (주문 저장/카트 삭제 등)
+        // 실제 결제금액 반영
+        if (approve != null && approve.getAmount() != null && approve.getAmount().getTotal() != null) {
+            int actualPaidAmount = approve.getAmount().getTotal();
+            payInfo.setTotalAmount(String.valueOf(actualPaidAmount));
+            System.out.println("실제 결제 금액 반영: " + actualPaidAmount);
+        }
+
+        // 3) 주문 저장
         String email = payInfo.getUserId();
         int result = orderService.saveOrder(payInfo, email);
 
@@ -162,18 +153,11 @@ public class KakaoPayController {
 
         System.out.println("kakaopay ::: result========>> " + result);
 
-        // ✅ 핵심: 로컬/배포 모두 대응되는 프론트 주소로 리다이렉트
-        // 혹시 double slash 방지
-        String base = frontBaseUrl != null ? frontBaseUrl.replaceAll("/+$", "") : "http://localhost:3000";
-
-        URI redirect = URI.create(
-                base + "/payConfirm"
-                        + "?orderId=" + orderId
-                        + "&status=success"
-        );
-
+        // 5) 프론트 payConfirm로 이동
+        URI redirect = URI.create(kakaoPayService.buildFrontPayConfirmUrl(orderId, "success"));
         HttpHeaders headers = new HttpHeaders();
         headers.setLocation(redirect);
+
         return new ResponseEntity<>(headers, HttpStatus.FOUND);
     }
 
@@ -181,20 +165,26 @@ public class KakaoPayController {
      * ✅ 결제 취소 콜백
      */
     @GetMapping("/qr/cancel")
-    public ResponseEntity<?> cancel(@RequestParam String orderId) {
-        return ResponseEntity.ok(Map.of("status", "CANCEL", "orderId", orderId));
+    public ResponseEntity<Void> cancel(@RequestParam String orderId) {
+        URI redirect = URI.create(kakaoPayService.buildFrontPayConfirmUrl(orderId, "cancel"));
+        HttpHeaders headers = new HttpHeaders();
+        headers.setLocation(redirect);
+        return new ResponseEntity<>(headers, HttpStatus.FOUND);
     }
 
     /**
      * ✅ 결제 실패 콜백
      */
     @GetMapping("/qr/fail")
-    public ResponseEntity<?> fail(@RequestParam String orderId) {
-        return ResponseEntity.ok(Map.of("status", "FAIL", "orderId", orderId));
+    public ResponseEntity<Void> fail(@RequestParam String orderId) {
+        URI redirect = URI.create(kakaoPayService.buildFrontPayConfirmUrl(orderId, "fail"));
+        HttpHeaders headers = new HttpHeaders();
+        headers.setLocation(redirect);
+        return new ResponseEntity<>(headers, HttpStatus.FOUND);
     }
 
     /**
-     * 결제 후 주문 완료 화면 데이터
+     * ✅ payConfirm에서 주문목록 조회 (orderId 기반)
      */
     @PostMapping("/orderList")
     public List<OrderListResponseDto> findOrderListByEmail(@RequestBody Map<String, String> payload) {

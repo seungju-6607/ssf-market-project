@@ -5,6 +5,7 @@ import jakarta.servlet.http.HttpServletResponse;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.http.HttpMethod;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.AuthenticationProvider;
 import org.springframework.security.authentication.dao.DaoAuthenticationProvider;
@@ -39,7 +40,6 @@ public class SecurityConfig {
     @Bean
     SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
 
-        // ✅ 적용 확인용 (재배포 후 Render Logs에서 확인)
         System.out.println("### SSF SecurityConfig LOADED ###");
 
         http
@@ -52,8 +52,9 @@ public class SecurityConfig {
                 .formLogin(form -> form.disable())
                 .requestCache(rc -> rc.disable())
 
-                // 🔥 발표용: 전부 허용 (403 완전 차단)
+                // ✅ 발표/개발용: 전부 허용 + OPTIONS 프리플라이트도 무조건 허용
                 .authorizeHttpRequests(authorize -> authorize
+                        .requestMatchers(HttpMethod.OPTIONS, "/**").permitAll()
                         .anyRequest().permitAll()
                 );
 
@@ -82,6 +83,7 @@ public class SecurityConfig {
     public UrlBasedCorsConfigurationSource corsConfigurationSource() {
         CorsConfiguration configuration = new CorsConfiguration();
 
+        // ✅ Vercel + 로컬 허용
         configuration.setAllowedOriginPatterns(List.of(
                 "http://localhost:3000",
                 "http://localhost:3030",
@@ -91,6 +93,9 @@ public class SecurityConfig {
         configuration.setAllowedMethods(List.of("GET", "POST", "PUT", "DELETE", "OPTIONS"));
         configuration.setAllowCredentials(true);
         configuration.setAllowedHeaders(List.of("*"));
+
+        // ✅ (선택) 프론트가 리다이렉트 Location 등을 읽는 상황 대비
+        configuration.setExposedHeaders(List.of("Location", "Set-Cookie"));
 
         UrlBasedCorsConfigurationSource source = new UrlBasedCorsConfigurationSource();
         source.registerCorsConfiguration("/**", configuration);

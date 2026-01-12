@@ -11,6 +11,8 @@ import org.springframework.util.MultiValueMap;
 import org.springframework.web.client.RestClientResponseException;
 import org.springframework.web.client.RestTemplate;
 
+import java.net.URLEncoder;
+import java.nio.charset.StandardCharsets;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 
@@ -32,17 +34,17 @@ public class KakaoPayService {
     @Value("${kakao.pay.approve-path}")
     private String APPROVE_PATH;            // /payment/approve
 
-    // ✅ 배포/로컬 base url (Render: https://ssf-market-project.onrender.com)
+    // ✅ 백엔드(카카오 콜백) base url (Render / local)
     @Value("${app.base-url}")
     private String APP_BASE_URL;
 
-    // ✅ 승인 후 프론트로 보낼 base url (Vercel: https://ssf-market-project.vercel.app)
+    // ✅ 프론트(payConfirm) base url (Vercel / local)
     @Value("${app.front-base-url}")
     private String FRONT_BASE_URL;
 
     private final RestTemplate restTemplate = new RestTemplate();
 
-    // ⚠️ Render 재시작/슬립 시 날아갈 수 있음 (임시용)
+    // ⚠️ 임시 저장소 (서버 재시작 시 날아감)
     private final Map<String, String> tidStore = new ConcurrentHashMap<>();
     private final Map<String, String> userIdStore = new ConcurrentHashMap<>();
 
@@ -56,7 +58,11 @@ public class KakaoPayService {
 
     private String trimTrailingSlash(String url) {
         if (url == null) return null;
-        return url.endsWith("/") ? url.substring(0, url.length() - 1) : url;
+        return url.replaceAll("/+$", "");
+    }
+
+    private String enc(String v) {
+        return URLEncoder.encode(String.valueOf(v), StandardCharsets.UTF_8);
     }
 
     // ----------------------------------------------------
@@ -77,16 +83,14 @@ public class KakaoPayService {
         params.add("partner_order_id", orderId);
         params.add("partner_user_id", userId);
         params.add("item_name", kakaoPay.getItemName());
-
-        // KakaoPayDto가 String이면 그대로 문자열로
         params.add("quantity", String.valueOf(kakaoPay.getQty()));
         params.add("total_amount", String.valueOf(kakaoPay.getTotalAmount()));
         params.add("tax_free_amount", "0");
 
-        // ✅ localhost 금지. 무조건 배포 도메인/로컬 도메인 baseUrl 사용
-        params.add("approval_url", baseUrl + "/payment/qr/success?orderId=" + orderId);
-        params.add("cancel_url",   baseUrl + "/payment/qr/cancel?orderId=" + orderId);
-        params.add("fail_url",     baseUrl + "/payment/qr/fail?orderId=" + orderId);
+        // ✅ 카카오가 돌아올 백엔드 콜백 (Render/Local)
+        params.add("approval_url", baseUrl + "/payment/qr/success?orderId=" + enc(orderId));
+        params.add("cancel_url",   baseUrl + "/payment/qr/cancel?orderId=" + enc(orderId));
+        params.add("fail_url",     baseUrl + "/payment/qr/fail?orderId=" + enc(orderId));
 
         HttpEntity<MultiValueMap<String, String>> body = new HttpEntity<>(params, getHeaders());
 
@@ -103,7 +107,6 @@ public class KakaoPayService {
 
             return res;
         } catch (RestClientResponseException e) {
-            // 카카오에서 내려주는 에러 바디가 여기 들어있음(로그에 찍으면 원인 파악 쉬움)
             System.err.println("Kakao Ready error: " + e.getRawStatusCode() + " " + e.getResponseBodyAsString());
             throw e;
         }
@@ -146,20 +149,10 @@ public class KakaoPayService {
     }
 
     // ----------------------------------------------------
-    // 3) 승인 후 프론트로 보낼 URL 만들어주기
+    // 3) 승인 후 프론트(payConfirm) 리다이렉트 URL
     // ----------------------------------------------------
-    public String buildFrontSuccessRedirectUrl(String orderId) {
+    public String buildFrontPayConfirmUrl(String orderId, String status) {
         String front = trimTrailingSlash(FRONT_BASE_URL);
-        return front + "/payment/success?orderId=" + orderId;
-    }
-
-    public String buildFrontFailRedirectUrl(String orderId) {
-        String front = trimTrailingSlash(FRONT_BASE_URL);
-        return front + "/payment/fail?orderId=" + orderId;
-    }
-
-    public String buildFrontCancelRedirectUrl(String orderId) {
-        String front = trimTrailingSlash(FRONT_BASE_URL);
-        return front + "/payment/cancel?orderId=" + orderId;
+        return front + "/payConfirm?orderId=" + enc(orderId) + "&status=" + enc(status);
     }
 }
