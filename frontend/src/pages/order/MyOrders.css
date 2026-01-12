@@ -6,6 +6,12 @@
   padding: 40px 20px;
   background: #fff;
 }
+.my-orders-group-total {
+  margin-left: auto;
+  margin-right: 12px;
+  font-weight: 700;
+}
+
 
 .my-orders-header {
   display: flex;
