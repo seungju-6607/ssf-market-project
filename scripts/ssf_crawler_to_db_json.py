@@ -9,67 +9,57 @@ HEADERS = {
     "User-Agent": "Mozilla/5.0 (compatible; SSFShopBot/1.0; +http://localhost)"
 }
 
-
 def fetch_html(url):
-    """실제 사이트에서 HTML 가져오기"""
     print(f"[INFO] 요청: {url}")
-    r = requests.get(url, headers=HEADERS, timeout=10)
+    r = requests.get(url, headers=HEADERS, timeout=20)
     r.raise_for_status()
     return r.text
 
-
 def parse_list_page(html, category, subcategory):
-    """상품 리스트 HTML을 파싱"""
     soup = BeautifulSoup(html, "html.parser")
     products = []
 
-    # 공통 구조: li.god-item
     for li in soup.select("li.god-item"):
         prdno = li.get("data-prdno") or ""
+
         brand_el = li.select_one("span.brand")
-        name_el = li.select_one("span.name")
+        name_el  = li.select_one("span.name")
         price_el = li.select_one("span.price")
-        img_el = li.select_one("div.god-img img")
+        img_el   = li.select_one("div.god-img img")
 
         brand = brand_el.get_text(strip=True) if brand_el else ""
-        name = name_el.get_text(strip=True) if name_el else ""
-        price_text = price_el.get_text(" ", strip=True) if price_el else ""
+        name  = name_el.get_text(strip=True) if name_el else ""
 
+        price_text = price_el.get_text(" ", strip=True) if price_el else ""
         raw = price_text.replace(",", "")
         nums = re.findall(r"\d{3,}", raw)
-        sale_price = int(nums[-1]) if nums else 0
+        price = int(nums[-1]) if nums else 0
 
         image = img_el["src"] if img_el and img_el.has_attr("src") else ""
 
         if not name:
             continue
 
-        products.append(
-            {
-                "id": prdno or name,
-                "brand": brand,
-                "name": name,
-                "price": sale_price,
-                "image": image,
-                "category": category,       # 프론트 CATEGORY_DATA의 키와 동일
-                "subcategory": subcategory  # CATEGORY_DATA[cat].pages의 키와 동일
-            }
-        )
+        products.append({
+            "id": prdno or name,
+            "brand": brand,
+            "name": name,
+            "price": price,
+            "image": image,
+            "category": category,
+            "subcategory": subcategory,
+        })
 
-    print(f"[INFO] {category}/{subcategory} → {len(products)}개 상품 추출")
+    print(f"[INFO] {category}/{subcategory} → {len(products)}개")
     return products
 
-
 def crawl_category(url, category, subcategory):
-    """한 카테고리 크롤링"""
     html = fetch_html(url)
     return parse_list_page(html, category, subcategory)
 
-
 def main():
-    base_dir = Path(__file__).resolve().parent.parent
-    target_js = base_dir / "frontend" / "src" / "data" / "productData.generated.js"
-    target_js.parent.mkdir(parents=True, exist_ok=True)
+    base_dir = Path(__file__).resolve().parent
+    json_path = base_dir / "ssf_items.json"
 
     categories = [
         # ===== 여성 =====
@@ -99,14 +89,13 @@ def main():
         ("https://www.ssfshop.com/BABY/list?dspCtgryNo=SFMA43A06", "kids", "baby"),
         ("https://www.ssfshop.com/New-In/list?dspCtgryNo=SFMA43A03", "kids", "new"),
 
-        # ===== 럭셔리 ===== (camelCase로 맞춤)
+        # ===== 럭셔리 =====
         ("https://www.ssfshop.com/Women-Apparel/list?dspCtgryNo=SFME34A01", "luxury", "womenapparel"),
         ("https://www.ssfshop.com/Women-Fashion-Accessories/list?dspCtgryNo=SFME34A11", "luxury", "womenacc"),
         ("https://www.ssfshop.com/Mens-Apparel/list?dspCtgryNo=SFME34A02", "luxury", "menapparel"),
         ("https://www.ssfshop.com/Mens-Fashion-Accessories/list?dspCtgryNo=SFME34A13", "luxury", "menacc"),
 
         # ===== 백&슈즈 =====
-        # category는 프론트의 key인 "shoes"로 통일, subcategory는 camelCase
         ("https://www.ssfshop.com/new-in/list?dspCtgryNo=SFMA46A02", "shoes", "new"),
         ("https://www.ssfshop.com/WomenBags/list?dspCtgryNo=SFMA46A09", "shoes", "women-bag"),
         ("https://www.ssfshop.com/WomensWallet/list?dspCtgryNo=SFMA46A10", "shoes", "women-wallet"),
@@ -156,7 +145,7 @@ def main():
         ("https://www.ssfshop.com/Acceptance/list?dspCtgryNo=SFMB84A48", "life", "storage"),
         ("https://www.ssfshop.com/Giftcard/list?dspCtgryNo=SFMB84A45", "life", "giftcard"),
 
-       # ===== 아울렛 =====
+        # ===== 아울렛 =====
         ("https://www.ssfshop.com/WOMEN/list?dspCtgryNo=SFMA44A02", "outlet", "women"),
         ("https://www.ssfshop.com/MEN/list?dspCtgryNo=SFMA44A04", "outlet", "men"),
         ("https://www.ssfshop.com/KIDS/list?dspCtgryNo=SFMA44A05", "outlet", "kids"),
@@ -166,7 +155,6 @@ def main():
         ("https://www.ssfshop.com/GOLF/list?dspCtgryNo=SFMA44A12", "outlet", "golf"),
         ("https://www.ssfshop.com/BEAUTY/list?dspCtgryNo=SFMA44A08", "outlet", "beauty"),
         ("https://www.ssfshop.com/LIFE/list?dspCtgryNo=SFMA44A07", "outlet", "life"),
-
     ]
 
     all_products = []
@@ -176,24 +164,14 @@ def main():
             all_products.extend(items)
             time.sleep(1)
         except Exception as e:
-            print(f"[WARN] {cat}/{sub} 크롤링 실패: {e}")
+            print(f"[WARN] {cat}/{sub} 실패: {e}")
 
-    print(f"\n총 {len(all_products)}개 상품 수집 완료.")
+    print(f"\n총 {len(all_products)}개 상품 수집 완료")
 
-    # JSON 저장 (디버그용)
-    json_path = base_dir / "scripts" / "ssf_items.json"
     with open(json_path, "w", encoding="utf-8") as f:
         json.dump(all_products, f, ensure_ascii=False, indent=2)
-    print(f"[INFO] ssf_items.json 저장 완료 ({json_path})")
 
-    # JS 파일로 저장 (프론트에서 import 해서 씀)
-    with open(target_js, "w", encoding="utf-8") as f:
-        f.write("// ⚠ 자동 생성 파일 (scripts/ssf_crawler_to_js.py로 생성됨)\n")
-        f.write("export const products = ")
-        json.dump(all_products, f, ensure_ascii=False, indent=2)
-        f.write(";\n")
-    print(f"[INFO] productData.generated.js 생성 완료 ({target_js})")
-
+    print(f"[INFO] ssf_items.json 저장 완료 → {json_path}")
 
 if __name__ == "__main__":
     main()
