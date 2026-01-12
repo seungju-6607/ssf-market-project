@@ -67,3 +67,6 @@ lpt[0-9]
 # Large reference files
 **/presentations/
 **/reference/
+scripts/insert_ssf_items_to_db.py
+scripts/ssf_items.json
+scripts/ssf_crawler_to_db_json.py
