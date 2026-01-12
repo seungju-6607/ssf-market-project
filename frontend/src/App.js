@@ -141,6 +141,7 @@ function App() {
         <Route path="/account/recovery" element={<AccountRecovery />} />
         <Route path="/naver-callback" element={<NaverCallback />} />
         <Route path="/kakao-callback" element={<KakaoCallback />} />
+      
 
         {/* 마이페이지 */}
         <Route path="/mypage" element={<PrivateRoute><MyPage /></PrivateRoute>} />
