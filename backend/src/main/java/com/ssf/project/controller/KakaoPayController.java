@@ -57,9 +57,13 @@ public class KakaoPayController {
     @PostMapping("/kakao/ready")
     public KakaoReadyResponse paymentKakao(@RequestBody KakaoPayDto kakaoPay) {
         payInfo = kakaoPay;
-        kakaoPay.setOrderId(UUID.randomUUID().toString());
 
-        System.out.println("[DEBUG] payInfo 객체 생성: " + payInfo);
+        // orderId가 없으면 생성 (있으면 유지)
+        if (kakaoPay.getOrderId() == null || kakaoPay.getOrderId().isBlank()) {
+            kakaoPay.setOrderId(UUID.randomUUID().toString());
+        }
+
+        System.out.println("[DEBUG] ready orderId=" + kakaoPay.getOrderId() + ", userId=" + kakaoPay.getUserId());
 
         KakaoReadyResponse response = kakaoPayService.kakaoPayReady(kakaoPay);
 
@@ -78,16 +82,28 @@ public class KakaoPayController {
                                         @RequestParam("pg_token") String pgToken,
                                         HttpServletRequest request) {
 
+        // 0) orderId 기반으로 tid/userId 먼저 확보 (없으면 더 진행하면 무조건 터짐)
+        String tid = kakaoPayService.findByTid(orderId);
+        String userId = kakaoPayService.findByUserId(orderId);
+
+        if (tid == null || tid.isBlank() || userId == null || userId.isBlank()) {
+            System.out.println("❌ tid/userId 조회 실패. orderId=" + orderId + ", tid=" + tid + ", userId=" + userId);
+            URI redirectFail = URI.create(kakaoPayService.buildFrontPayConfirmUrl(orderId, "fail"));
+            HttpHeaders headers = new HttpHeaders();
+            headers.setLocation(redirectFail);
+            return new ResponseEntity<>(headers, HttpStatus.FOUND);
+        }
+
         /*********************  세션 복원 시작 ******************/
         Authentication auth = SecurityContextHolder.getContext().getAuthentication();
 
-        if (auth == null || !auth.isAuthenticated()
-                || "anonymousUser".equals(String.valueOf(auth.getPrincipal()))) {
+        boolean needRestore = (auth == null || !auth.isAuthenticated()
+                || "anonymousUser".equals(String.valueOf(auth.getPrincipal())));
 
-            String userId = kakaoPayService.findByUserId(orderId);
+        if (needRestore) {
             System.out.println("카카오 결제 성공 시 세션 복원 시작 - userId = " + userId);
 
-            if (userId != null) {
+            try {
                 UserDetails userDetails = userDetailsService.loadUserByUsername(userId);
 
                 UsernamePasswordAuthenticationToken newAuth =
@@ -109,42 +125,56 @@ public class KakaoPayController {
 
                 auth = newAuth;
                 System.out.println("✅ Authentication 복원 완료: " + auth.getName());
-            } else {
-                System.out.println("⚠️ userId 조회 실패 - 세션 복원 불가");
+            } catch (Exception e) {
+                System.out.println("❌ 세션 복원 실패: " + e.getMessage());
+                URI redirectFail = URI.create(kakaoPayService.buildFrontPayConfirmUrl(orderId, "fail"));
+                HttpHeaders headers = new HttpHeaders();
+                headers.setLocation(redirectFail);
+                return new ResponseEntity<>(headers, HttpStatus.FOUND);
             }
         } else {
             System.out.println("✅ 기존 Authentication 유지됨: " + auth.getName());
         }
         /*********************  세션 복원 종료 ******************/
 
-        // 1) tid, userId 조회
-        String tid = kakaoPayService.findByTid(orderId);
-        String userId = kakaoPayService.findByUserId(orderId);
-
-        // 2) 카카오 최종 승인
-        KakaoApproveResponse approve = kakaoPayService.approve(tid, userId, orderId, pgToken);
-        System.out.println("Kakao Approve Success --> " + approve);
-
-        // payInfo null이면 프론트로 실패 보내고 종료
-        if (payInfo == null) {
+        // 1) 카카오 최종 승인
+        KakaoApproveResponse approve;
+        try {
+            approve = kakaoPayService.approve(tid, userId, orderId, pgToken);
+            System.out.println("Kakao Approve Success --> " + approve);
+        } catch (Exception e) {
+            System.out.println("❌ Kakao approve 실패: " + e.getMessage());
             URI redirectFail = URI.create(kakaoPayService.buildFrontPayConfirmUrl(orderId, "fail"));
             HttpHeaders headers = new HttpHeaders();
             headers.setLocation(redirectFail);
             return new ResponseEntity<>(headers, HttpStatus.FOUND);
         }
 
-        // 실제 결제금액 반영
-        if (approve != null && approve.getAmount() != null && approve.getAmount().getTotal() != null) {
-            int actualPaidAmount = approve.getAmount().getTotal();
-            payInfo.setTotalAmount(String.valueOf(actualPaidAmount));
-            System.out.println("실제 결제 금액 반영: " + actualPaidAmount);
+        // 2) payInfo 없으면 주문 저장 불가 → fail로
+        if (payInfo == null) {
+            System.out.println("❌ payInfo is null. (동시결제/서버재시작 등으로 유실 가능)");
+            URI redirectFail = URI.create(kakaoPayService.buildFrontPayConfirmUrl(orderId, "fail"));
+            HttpHeaders headers = new HttpHeaders();
+            headers.setLocation(redirectFail);
+            return new ResponseEntity<>(headers, HttpStatus.FOUND);
         }
 
-        // 3) 주문 저장
-        String email = payInfo.getUserId();
+        // 3) 실제 결제금액 반영
+        try {
+            if (approve != null && approve.getAmount() != null && approve.getAmount().getTotal() != null) {
+                int actualPaidAmount = approve.getAmount().getTotal();
+                payInfo.setTotalAmount(String.valueOf(actualPaidAmount));
+                System.out.println("실제 결제 금액 반영: " + actualPaidAmount);
+            }
+        } catch (Exception ignore) {
+            // amount 구조가 다르면 여기서 터질 수 있음 -> 그냥 무시하고 진행
+        }
+
+        // 4) 주문 저장
+        String email = payInfo.getUserId(); // 여기 구조상 userId를 email로 쓰는 듯
         int result = orderService.saveOrder(payInfo, email);
 
-        // 4) 쿠폰 사용 처리
+        // 5) 쿠폰 사용 처리
         String couponId = payInfo.getCouponId();
         if (couponId != null && !couponId.isBlank()) {
             boolean couponUsed = couponService.consumeCoupon(email, couponId);
@@ -153,11 +183,10 @@ public class KakaoPayController {
 
         System.out.println("kakaopay ::: result========>> " + result);
 
-        // 5) 프론트 payConfirm로 이동
+        // 6) 프론트 payConfirm로 이동
         URI redirect = URI.create(kakaoPayService.buildFrontPayConfirmUrl(orderId, "success"));
         HttpHeaders headers = new HttpHeaders();
         headers.setLocation(redirect);
-
         return new ResponseEntity<>(headers, HttpStatus.FOUND);
     }
 
