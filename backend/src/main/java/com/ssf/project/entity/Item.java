@@ -1,9 +1,3 @@
-package com.ssf.project.entity;
-
-import jakarta.persistence.*;
-import lombok.*;
-import java.time.LocalDateTime;
-
 @Entity
 @Table(name = "ssf_item")
 @Data
@@ -17,8 +11,8 @@ public class Item {
     @Column(name = "item_key")
     private Long itemKey;
 
-    // ❌ category_id 컬럼은 DB에 없으니 제거한다.
-    // private String categoryId;
+    @Column(name = "category_id", length = 5, nullable = false)
+    private String categoryId;
 
     @Column(name = "product_id", length = 100, nullable = false)
     private String productId;
@@ -27,7 +21,7 @@ public class Item {
     private String itemName;
 
     @Column(name = "item_list", columnDefinition = "json", nullable = false)
-    private String itemList; // JSON 문자열로 저장
+    private String itemList;
 
     @Column(name = "item_content", length = 1000)
     private String itemContent;
@@ -37,9 +31,6 @@ public class Item {
 
     @Column(name = "item_sale", nullable = false)
     private Integer itemSale;
-
-    @Column(name = "item_rdate")
-    private LocalDateTime itemRdate;
 
     @Column(name = "item_cnt", nullable = false)
     private Integer itemCnt;
@@ -51,9 +42,9 @@ public class Item {
     @Column(name = "item_brand", length = 100)
     private String itemBrand;
 
-    @Column(name = "item_category", length = 150, nullable = false)
+    @Column(name = "item_category", length = 150)
     private String itemCategory;
 
-    @Column(name = "item_subcategory", length = 150, nullable = false)
+    @Column(name = "item_subcategory", length = 150)
     private String itemSubcategory;
 }
