@@ -70,3 +70,5 @@ lpt[0-9]
 scripts/insert_ssf_items_to_db.py
 scripts/ssf_items.json
 scripts/ssf_crawler_to_db_json.py
+scripts/insert_ssf_items_to_db.py
+scripts/ssf_items.json
