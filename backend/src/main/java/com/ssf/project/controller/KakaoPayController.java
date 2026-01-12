@@ -3,14 +3,14 @@ package com.ssf.project.controller;
 import com.ssf.project.dto.KakaoApproveResponse;
 import com.ssf.project.dto.KakaoReadyResponse;
 import com.ssf.project.dto.OrderListResponseDto;
+import com.ssf.project.dto.KakaoPayDto;
 import com.ssf.project.service.CouponService;
-import com.ssf.project.service.CouponServiceImpl;
 import com.ssf.project.service.KakaoPayService;
 import com.ssf.project.service.OrderService;
-import com.ssf.project.dto.KakaoPayDto;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpSession;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -35,9 +35,15 @@ public class KakaoPayController {
 
     private final KakaoPayService kakaoPayService;
     private final OrderService orderService;
-    private KakaoPayDto payInfo = null; //KaKaoPay DTO 클래스를 전역으로 선언
     private final UserDetailsService userDetailsService;
     private final CouponService couponService;
+
+    // ✅ 프론트 주소 (로컬/배포 분기)
+    @Value("${app.front-base-url:http://localhost:3000}")
+    private String frontBaseUrl;
+
+    // ⚠️ 전역 payInfo는 동시결제 시 꼬일 수 있음(일단 요청대로 유지)
+    private KakaoPayDto payInfo = null;
 
     @Autowired
     public KakaoPayController(KakaoPayService kakaoPayService,
@@ -52,22 +58,18 @@ public class KakaoPayController {
 
     /**
      * ✅ 결제 준비 요청 (프론트에서 호출)
-     *    카카오페이 결제 ready API 호출
      */
     @PostMapping("/kakao/ready")
     public KakaoReadyResponse paymentKakao(@RequestBody KakaoPayDto kakaoPay) {
-        //orderId(주문번호) 생성 : UUID 클래스 사용
-        payInfo = kakaoPay;   //kakaoPay 객체 주소를 payInfo 복사, 전역으로 확대
+        // orderId 생성
+        payInfo = kakaoPay;
         kakaoPay.setOrderId(UUID.randomUUID().toString());
 
         System.out.println("[DEBUG] payInfo 객체 생성: " + payInfo);
 
-        String TEMP_TID = null;
         KakaoReadyResponse response = kakaoPayService.kakaoPayReady(kakaoPay);
 
-        if (response != null) {
-            TEMP_TID = response.getTid(); // 발급받은 TID 저장
-        } else {
+        if (response == null) {
             System.out.println("결제 준비 실패.");
         }
 
@@ -75,30 +77,25 @@ public class KakaoPayController {
     }
 
     /**
-     * ✅ 결제 성공
+     * ✅ 결제 성공 콜백
      */
     @GetMapping("/qr/success")
-    public ResponseEntity<Void> success( @RequestParam String orderId,
-                                         @RequestParam("pg_token") String pgToken,
-                                         HttpServletRequest request) {
+    public ResponseEntity<Void> success(@RequestParam String orderId,
+                                        @RequestParam("pg_token") String pgToken,
+                                        HttpServletRequest request) {
 
         /*********************  카카오 페이 결제 성공 후 세션 복원 시작 ******************/
-        // 0. 현재 SecurityContext에 Authentication이 있는지 확인
         Authentication auth = SecurityContextHolder.getContext().getAuthentication();
 
-        // anonymousUser 이거나 null 이면, 세션이 끊겼다고 보고 수동 복원 시도
         if (auth == null || !auth.isAuthenticated()
                 || "anonymousUser".equals(String.valueOf(auth.getPrincipal()))) {
 
-            // 0-1. orderId 기반으로 결제 요청 시 사용했던 userId 조회
-            String userId = kakaoPayService.findByUserId(orderId);  // 이미 사용 중인 메서드라고 하셨음
+            String userId = kakaoPayService.findByUserId(orderId);
             System.out.println("카카오 결제 성공 시 세션 복원 시작 - userId = " + userId);
 
             if (userId != null) {
-                // 0-2. userId로 UserDetails 조회 (Spring Security 표준)
                 UserDetails userDetails = userDetailsService.loadUserByUsername(userId);
 
-                // 0-3. 새 Authentication 객체 생성
                 UsernamePasswordAuthenticationToken newAuth =
                         new UsernamePasswordAuthenticationToken(
                                 userDetails,
@@ -106,12 +103,10 @@ public class KakaoPayController {
                                 userDetails.getAuthorities()
                         );
 
-                // 0-4. SecurityContext 생성 및 설정
                 SecurityContext context = SecurityContextHolder.createEmptyContext();
                 context.setAuthentication(newAuth);
                 SecurityContextHolder.setContext(context);
 
-                // 0-5. HttpSession에도 SecurityContext 저장 (명시적 세션 바인딩)
                 HttpSession session = request.getSession(true);
                 session.setAttribute(
                         HttpSessionSecurityContextRepository.SPRING_SECURITY_CONTEXT_KEY,
@@ -128,27 +123,37 @@ public class KakaoPayController {
         }
         /*********************  카카오 페이 결제 성공 후 세션 복원 종료 ******************/
 
-        // 1. tid, userId 조회
+        // 1) tid, userId 조회
         String tid = kakaoPayService.findByTid(orderId);
         String userId = kakaoPayService.findByUserId(orderId);
 
-        // 2. 조회된 tid를 Approve 서비스에 넘겨 최종 승인 요청
+        // 2) 최종 승인 요청
         KakaoApproveResponse approve = kakaoPayService.approve(tid, userId, orderId, pgToken);
         System.out.println("Kakao Approve Success --> " + approve);
 
-        // 2-1. 실제 카카오 결제 성공 후 리턴되는 금액을 payInfo에 반영
+        // 2-1) 실제 결제 금액 반영
         if (approve != null && approve.getAmount() != null && approve.getAmount().getTotal() != null) {
             int actualPaidAmount = approve.getAmount().getTotal();
-            payInfo.setTotalAmount(String.valueOf(actualPaidAmount));
+            if (payInfo != null) {
+                payInfo.setTotalAmount(String.valueOf(actualPaidAmount));
+            }
             System.out.println("실제 결제 금액 반영: " + actualPaidAmount);
         }
 
-        // 3. 결제 완료 처리 (DB 상태 업데이트 등)
-        //DB 상태 업데이트 - 주문상품을 order, order_detail 테이블에 저장, cart에서는 삭제
+        // payInfo null 방어 (콜백만 들어온 경우 등)
+        if (payInfo == null) {
+            // 최소한의 안전장치: 프론트로 실패/예외 리다이렉트
+            URI redirect = URI.create(frontBaseUrl + "/payConfirm?orderId=" + orderId + "&status=fail");
+            HttpHeaders headers = new HttpHeaders();
+            headers.setLocation(redirect);
+            return new ResponseEntity<>(headers, HttpStatus.FOUND);
+        }
+
+        // 3) 결제 완료 처리 (주문 저장/카트 삭제 등)
         String email = payInfo.getUserId();
         int result = orderService.saveOrder(payInfo, email);
 
-        //쿠폰 사용 처리
+        // 4) 쿠폰 사용 처리
         String couponId = payInfo.getCouponId();
         if (couponId != null && !couponId.isBlank()) {
             boolean couponUsed = couponService.consumeCoupon(email, couponId);
@@ -157,17 +162,20 @@ public class KakaoPayController {
 
         System.out.println("kakaopay ::: result========>> " + result);
 
+        // ✅ 핵심: 로컬/배포 모두 대응되는 프론트 주소로 리다이렉트
+        // 혹시 double slash 방지
+        String base = frontBaseUrl != null ? frontBaseUrl.replaceAll("/+$", "") : "http://localhost:3000";
+
         URI redirect = URI.create(
-                "http://localhost:3000/payConfirm"
+                base + "/payConfirm"
                         + "?orderId=" + orderId
                         + "&status=success"
         );
+
         HttpHeaders headers = new HttpHeaders();
         headers.setLocation(redirect);
-
         return new ResponseEntity<>(headers, HttpStatus.FOUND);
     }
-
 
     /**
      * ✅ 결제 취소 콜백
@@ -186,12 +194,12 @@ public class KakaoPayController {
     }
 
     /**
-     * 결제 후 주문 완료 화면
+     * 결제 후 주문 완료 화면 데이터
      */
     @PostMapping("/orderList")
     public List<OrderListResponseDto> findOrderListByEmail(@RequestBody Map<String, String> payload) {
         String orderId = payload.get("orderId");
-        if(orderId == null) {
+        if (orderId == null) {
             return Collections.emptyList();
         }
         return orderService.findOrderListByOrderId(orderId);
