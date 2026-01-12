@@ -3,11 +3,16 @@ import React, { useEffect, useMemo, useState, useCallback } from "react";
 import { useNavigate, useLocation } from "react-router-dom";
 import "./Checkout.css";
 import { useDispatch, useSelector } from "react-redux";
-import { fetchDefaultAddress, fetchAddressList, deleteAddress, saveAddress } from "../../feature/order/orderAPI.js";
+import {
+  fetchDefaultAddress,
+  fetchAddressList,
+  deleteAddress,
+  saveAddress,
+} from "../../feature/order/orderAPI.js";
 import { openKakaoPostCode } from "../../utils/postCode.js";
 import CardOptionModal from "../../components/order/CardOptionModal.jsx";
 import { getPayment } from "../../feature/payment/paymentAPI.js";
-import { fetchCouponInfo, consumeCoupon } from "../../feature/coupon/couponAPI.js";
+import { fetchCouponInfo } from "../../feature/coupon/couponAPI.js";
 
 const toNumber = (v) =>
   typeof v === "number" ? v : Number(String(v ?? "").replace(/[^\d]/g, "")) || 0;
@@ -85,9 +90,7 @@ const getCheckoutPayload = (location) => {
   if (orderSource === "direct") {
     const directCheckout = readJSON("directCheckout", null);
     if (Array.isArray(directCheckout) && directCheckout.length > 0) {
-      return directCheckout
-        .map((item) => normalizeOrderItem(item))
-        .filter(Boolean);
+      return directCheckout.map(normalizeOrderItem).filter(Boolean);
     }
   }
 
@@ -130,34 +133,48 @@ const getCheckoutPayload = (location) => {
 const PaymentIcon = ({ method }) => {
   const { key, label, icon } = method;
   const isImg = icon?.startsWith("/");
-  const cls = `pay-icon-img${["toss", "naver", "kakao"].includes(key) ? " pay-icon-large" : ""}`;
+  const cls = `pay-icon-img${
+    ["toss", "naver", "kakao"].includes(key) ? " pay-icon-large" : ""
+  }`;
 
-  return isImg
-    ? <img src={icon} alt={label} className={cls} />
-    : <span className="pay-icon" aria-hidden>{icon}</span>;
+  return isImg ? (
+    <img src={icon} alt={label} className={cls} />
+  ) : (
+    <span className="pay-icon" aria-hidden>
+      {icon}
+    </span>
+  );
 };
-
 
 export default function Checkout() {
   const navigate = useNavigate();
   const location = useLocation();
   const dispatch = useDispatch();
-  const defaultAddress = useSelector(state => state.order.defaultAddress);
-  const addressList = useSelector(state => state.order.addressList);
+
+  const defaultAddress = useSelector((state) => state.order.defaultAddress);
+  const addressList = useSelector((state) => state.order.addressList);
 
   const items = useMemo(() => getCheckoutPayload(location), [location]);
 
-  // 로그인 사용자 정보
+  // ✅ 로그인 사용자 정보: 라우트 이동/재진입 시 갱신되게
   const loginUser = useMemo(() => {
-    return JSON.parse(localStorage.getItem("loginUser") || "{}");
-  }, []);
+    try {
+      return JSON.parse(localStorage.getItem("loginUser") || "{}");
+    } catch {
+      return {};
+    }
+  }, [location.key]);
 
   const [couponInfo, setCouponInfo] = useState(null);
   const [couponLoading, setCouponLoading] = useState(false);
   const [couponId, setCouponId] = useState("");
 
   // 결제 방법 목록
-  const [paymentData, setPaymentData] = useState({ methods: [], cardBrands: [], installments: [] });
+  const [paymentData, setPaymentData] = useState({
+    methods: [],
+    cardBrands: [],
+    installments: [],
+  });
 
   // 배송 정보
   const [name, setName] = useState("");
@@ -178,7 +195,8 @@ export default function Checkout() {
   useEffect(() => {
     fetch("/paymentMethods.json")
       .then((res) => res.json())
-      .then((data) => setPaymentData(data));
+      .then((data) => setPaymentData(data))
+      .catch((e) => console.error("paymentMethods.json load fail:", e));
   }, []);
 
   useEffect(() => {
@@ -187,7 +205,6 @@ export default function Checkout() {
       return;
     }
 
-    // DB에서 회원에 대한 쿠폰 소지 정보를 가져와 setCouponInfo
     let mounted = true;
     const loadCoupon = async () => {
       setCouponLoading(true);
@@ -214,36 +231,37 @@ export default function Checkout() {
   }, [dispatch]);
 
   // 배송지 정보를 폼에 채우는 함수
-  const fillAddressForm = useCallback((address) => {
-    if (!address) return;
-    
-    setName(address.addrName || "");
-    setPhone(address.addrTel || "");
-    setEmail(loginUser.email || "");
-    setPostcode(address.addrZipcode || "");
-    setAddress(address.addrMain || "");
-    setAddressDetail(address.addrDetail || "");
-    setMemo(address.addrReq || "");
-    setSaveAsDefault(address.addrDef === "Y");
-  }, [loginUser.email]);
+  const fillAddressForm = useCallback(
+    (addr) => {
+      if (!addr) return;
+
+      setName(addr.addrName || "");
+      setPhone(addr.addrTel || "");
+      setEmail(loginUser.email || "");
+      setPostcode(addr.addrZipcode || "");
+      setAddress(addr.addrMain || "");
+      setAddressDetail(addr.addrDetail || "");
+      setMemo(addr.addrReq || "");
+      setSaveAsDefault(addr.addrDef === "Y");
+    },
+    [loginUser.email]
+  );
 
   // 기본 배송지 데이터를 폼에 채우기
   useEffect(() => {
-    if (defaultAddress) {
-      fillAddressForm(defaultAddress);
-    }
+    if (defaultAddress) fillAddressForm(defaultAddress);
   }, [defaultAddress, fillAddressForm]);
 
   const { methods: paymentMethods, cardBrands, installments } = paymentData;
+
   const kakaoMethod = useMemo(
     () => paymentMethods.find((m) => m.key === "kakao"),
     [paymentMethods]
   );
+
   const paymentCards = useMemo(() => {
     const cards = [];
-    if (kakaoMethod) {
-      cards.push(kakaoMethod);
-    }
+    if (kakaoMethod) cards.push(kakaoMethod);
     cards.push({
       key: "comingsoon",
       label: "준비 중입니다",
@@ -257,7 +275,7 @@ export default function Checkout() {
 
   // 주소찾기 팝업 상태
   const [isPostcodeOpen, setIsPostcodeOpen] = useState(false);
-  
+
   // 배송지 선택 모달 상태
   const [isAddressModalOpen, setIsAddressModalOpen] = useState(false);
   const [selectedAddressIndex, setSelectedAddressIndex] = useState(null);
@@ -267,15 +285,15 @@ export default function Checkout() {
 
   // 새로입력 버튼 클릭시 기존 정보 초기화
   const handleNewAddress = () => {
-      setName("");
-      setPhone("");
-      setEmail("");
-      setPostcode("");
-      setAddress("");
-      setAddressDetail("");
-      setMemo("");
-      setSaveAsDefault(false);
-  }
+    setName("");
+    setPhone("");
+    setEmail(loginUser?.email || "");
+    setPostcode("");
+    setAddress("");
+    setAddressDetail("");
+    setMemo("");
+    setSaveAsDefault(false);
+  };
 
   // 배송지 선택 버튼 클릭
   const handleSelectAddress = async () => {
@@ -284,11 +302,10 @@ export default function Checkout() {
   };
 
   // 배송지 선택
-  const handleAddressClick = (address, index) => {
+  const handleAddressClick = (addr, index) => {
     setSelectedAddressIndex(index);
-    fillAddressForm(address);
-    
-    // 배송지 선택 모달창 닫음
+    fillAddressForm(addr);
+
     setTimeout(() => {
       setIsAddressModalOpen(false);
       setSelectedAddressIndex(null);
@@ -297,13 +314,10 @@ export default function Checkout() {
 
   // 배송지 삭제
   const handleDeleteAddress = async (addrKey) => {
-    if (!window.confirm("정말 이 배송지를 삭제하시겠습니까?")) {
-      return;
-    }
+    if (!window.confirm("정말 이 배송지를 삭제하시겠습니까?")) return;
 
     try {
       await dispatch(deleteAddress(addrKey));
-      // 삭제 후 목록 새로고침
       await dispatch(fetchAddressList());
     } catch (error) {
       console.error("배송지 삭제 실패:", error);
@@ -329,7 +343,8 @@ export default function Checkout() {
 
   const availableCoupon = useMemo(() => {
     if (!couponInfo) return null;
-    if (couponInfo.couponYn && couponInfo.couponYn.toUpperCase() !== "Y") return null;
+    if (couponInfo.couponYn && couponInfo.couponYn.toUpperCase() !== "Y")
+      return null;
     if (couponInfo.couponEnd) {
       const t = new Date(couponInfo.couponEnd).getTime();
       if (!isNaN(t) && t < Date.now()) return null;
@@ -339,7 +354,9 @@ export default function Checkout() {
 
   const selectedCoupon = useMemo(() => {
     if (!availableCoupon) return null;
-    return String(availableCoupon.couponId) === String(couponId) ? availableCoupon : null;
+    return String(availableCoupon.couponId) === String(couponId)
+      ? availableCoupon
+      : null;
   }, [availableCoupon, couponId]);
 
   const normalizedCoupon = useMemo(() => {
@@ -356,35 +373,48 @@ export default function Checkout() {
     [subtotal, normalizedCoupon]
   );
 
-  //배송비 2500원으로 고정 - 추후에 지역별 배송비 적용시 수정 필요
+  // 배송비 2500원 고정
   const shipping = 2500;
   const total = Math.max(0, subtotal - discount + shipping);
 
-  useEffect(() => {
-//     console.log("[DEBUG] items:", items);
-  }, [items]);
+  // ✅ totals 변경될 때 paymentInfo도 갱신되도록
+  const paymentInfo = useMemo(
+    () => ({
+      shippingFee: shipping,
+      discountAmount: discount,
+      totalAmount: total,
+    }),
+    [shipping, discount, total]
+  );
 
+  const handlePayment = async () => {
+    const userEmail = loginUser?.email;
 
-  //결제 정보 저장
-  const [paymentInfo, setPaymentInfo] = useState({
-    "shippingFee": shipping,
-    "discountAmount": discount,
-    "totalAmount": total
-  });
+    // ✅ 로그인 체크: anonymousUser 방지
+    if (!userEmail) {
+      alert("로그인 후 결제할 수 있어요.");
+      navigate("/login");
+      return;
+    }
 
-  const handlePayment = async() => {
+    // ✅ 필수 입력 체크
+    if (!name || !phone || !postcode || !address) {
+      alert("배송지 정보를 모두 입력해 주세요.");
+      return;
+    }
 
-       //결제 로직 시작
-       const receiver = {
-         name: name,
-         phone: phone,
-         zipcode: postcode,
-         address1: address,
-         address2: addressDetail,
-         memo: memo
-       };
+    const receiver = {
+      name,
+      phone,
+      zipcode: postcode,
+      address1: address,
+      address2: addressDetail,
+      memo,
+    };
 
-       await dispatch(saveAddress({
+    // ✅ 주소 저장 (실패해도 결제 진행은 하게 하고 싶으면 try/catch로 감싸도 됨)
+    await dispatch(
+      saveAddress({
         addrName: name,
         addrTel: phone,
         addrZipcode: postcode,
@@ -392,22 +422,33 @@ export default function Checkout() {
         addrDetail: addressDetail,
         addrReq: memo,
         addrDef: saveAsDefault ? "Y" : "N",
-       }));
+      })
+    );
 
-       const orderSource = localStorage.getItem("orderSource") || "cart";
-       const result = await getPayment(receiver, paymentInfo, items, total, orderSource, selectedCoupon?.couponId);
-  }
+    const orderSource = localStorage.getItem("orderSource") || "cart";
+
+    // ✅ 핵심: getPayment에 userEmail을 추가로 넘겨서 payload userId를 고정
+    await getPayment(
+      receiver,
+      paymentInfo,
+      items,
+      total,
+      orderSource,
+      selectedCoupon?.couponId,
+      userEmail
+    );
+  };
 
   if (!items || items.length === 0) {
     return (
       <div className="checkout-page">
         <h2 className="title">주문/결제</h2>
-        <p className="empty-info">선택된 상품이 없습니다. 장바구니로 이동해 주세요.</p>
+        <p className="empty-info">
+          선택된 상품이 없습니다. 장바구니로 이동해 주세요.
+        </p>
       </div>
     );
   }
-
-
 
   return (
     <div className="checkout-page">
@@ -459,7 +500,14 @@ export default function Checkout() {
             >
               <option value="">선택 안 함</option>
               <option value={String(availableCoupon.couponId)}>
-                {availableCoupon.couponName} - {formatKRW(toNumber(availableCoupon.couponCost || availableCoupon.amount || availableCoupon.discount))}
+                {availableCoupon.couponName} -{" "}
+                {formatKRW(
+                  toNumber(
+                    availableCoupon.couponCost ||
+                      availableCoupon.amount ||
+                      availableCoupon.discount
+                  )
+                )}
               </option>
             </select>
             <p className="coupon-hint">
@@ -474,14 +522,20 @@ export default function Checkout() {
         <div className="section-header">
           <h3 className="section-title">배송지 정보</h3>
           <div className="btn-group">
-            <button className="btn-select" onClick={handleSelectAddress}>배송지 선택</button>
-            <button className="btn-reset" onClick={handleNewAddress}>새로입력</button>
+            <button className="btn-select" onClick={handleSelectAddress}>
+              배송지 선택
+            </button>
+            <button className="btn-reset" onClick={handleNewAddress}>
+              새로입력
+            </button>
           </div>
         </div>
 
         <div className="shipping-form">
           <div className="form-row">
-            <label>이름 <span className="required">*</span></label>
+            <label>
+              이름 <span className="required">*</span>
+            </label>
             <input
               type="text"
               className="input"
@@ -492,7 +546,9 @@ export default function Checkout() {
           </div>
 
           <div className="form-row">
-            <label>휴대폰 <span className="required">*</span></label>
+            <label>
+              휴대폰 <span className="required">*</span>
+            </label>
             <input
               type="text"
               className="input"
@@ -503,7 +559,9 @@ export default function Checkout() {
           </div>
 
           <div className="form-row">
-            <label>이메일 주소 <span className="required">*</span></label>
+            <label>
+              이메일 주소 <span className="required">*</span>
+            </label>
             <input
               type="email"
               className="input"
@@ -514,7 +572,9 @@ export default function Checkout() {
           </div>
 
           <div className="form-row">
-            <label>배송주소 <span className="required">*</span></label>
+            <label>
+              배송주소 <span className="required">*</span>
+            </label>
             <div className="address-input">
               <input
                 type="text"
@@ -523,7 +583,12 @@ export default function Checkout() {
                 onChange={(e) => setPostcode(e.target.value)}
                 placeholder="우편번호"
               />
-              <button className="btn-address" onClick={() => openKakaoPostCode(handleOpenPostcode)}>주소찾기</button>
+              <button
+                className="btn-address"
+                onClick={() => openKakaoPostCode(handleOpenPostcode)}
+              >
+                주소찾기
+              </button>
             </div>
             <input
               type="text"
@@ -533,8 +598,9 @@ export default function Checkout() {
               placeholder="기본 주소"
             />
           </div>
+
           <div className="form-row">
-            <label></label> {/* 빈 라벨로 정렬 유지 */}
+            <label></label>
             <input
               type="text"
               className="input"
@@ -554,6 +620,7 @@ export default function Checkout() {
               placeholder="배송 메시지를 입력해주세요"
             />
           </div>
+
           <div className="form-row checkbox-row">
             <label></label>
             <label className="checkbox-default">
@@ -567,17 +634,23 @@ export default function Checkout() {
           </div>
         </div>
       </section>
-      
 
       {/* 결제 방법 */}
       <section className="section payment-section">
         <div className="payment-header">
           <h3 className="section-title payment-title-center">결제수단</h3>
-          <button className="card-benefit-btn" type="button" onClick={() => setIsCardOptionModalOpen(true)}>
+          <button
+            className="card-benefit-btn"
+            type="button"
+            onClick={() => setIsCardOptionModalOpen(true)}
+          >
             카드혜택 <span className="question-mark">?</span>
           </button>
           {isCardOptionModalOpen && (
-            <CardOptionModal open={isCardOptionModalOpen} onClose={() => setIsCardOptionModalOpen(false)} />
+            <CardOptionModal
+              open={isCardOptionModalOpen}
+              onClose={() => setIsCardOptionModalOpen(false)}
+            />
           )}
         </div>
 
@@ -631,16 +704,20 @@ export default function Checkout() {
                 onChange={(e) => setInstallment(e.target.value)}
               >
                 {installments.map((m) => (
-                  <option key={m} value={m}>{m}</option>
+                  <option key={m} value={m}>
+                    {m}
+                  </option>
                 ))}
               </select>
             </div>
 
-            <p className="pay-help">* 무이자/부분무이자 여부는 결제 단계에서 카드사 정책에 따라 안내됩니다.</p>
+            <p className="pay-help">
+              * 무이자/부분무이자 여부는 결제 단계에서 카드사 정책에 따라
+              안내됩니다.
+            </p>
           </div>
         )}
       </section>
-
 
       {/* 합계 */}
       <section className="section">
@@ -664,59 +741,83 @@ export default function Checkout() {
         <button className="pay-btn" onClick={handlePayment}>
           결제하기
         </button>
-
-        
       </section>
 
       {/* 배송지 선택 모달 */}
       {isAddressModalOpen && (
-        <div className="modal-overlay" onClick={() => setIsAddressModalOpen(false)}>
-          <div className="modal-content address-modal" onClick={(e) => e.stopPropagation()}>
+        <div
+          className="modal-overlay"
+          onClick={() => setIsAddressModalOpen(false)}
+        >
+          <div
+            className="modal-content address-modal"
+            onClick={(e) => e.stopPropagation()}
+          >
             <div className="modal-header">
               <h3 className="modal-title">배송지 선택</h3>
-              <button className="modal-close" onClick={() => setIsAddressModalOpen(false)}>×</button>
+              <button
+                className="modal-close"
+                onClick={() => setIsAddressModalOpen(false)}
+              >
+                ×
+              </button>
             </div>
+
             <div className="address-list">
               {addressList.length === 0 ? (
                 <p className="empty-address">저장된 배송지가 없습니다.</p>
               ) : (
-                addressList.map((address, index) => (
+                addressList.map((addr, index) => (
                   <div
-                    key={address.addrKey || index}
-                    className={`address-card ${selectedAddressIndex === index ? 'is-active' : ''}`}
+                    key={addr.addrKey || index}
+                    className={`address-card ${
+                      selectedAddressIndex === index ? "is-active" : ""
+                    }`}
                   >
-                    <button 
+                    <button
                       className="address-delete-btn"
                       onClick={(e) => {
                         e.stopPropagation();
-                        handleDeleteAddress(address.addrKey);
+                        handleDeleteAddress(addr.addrKey);
                       }}
                     >
                       삭제
                     </button>
-                    <div className="address-card-content" onClick={() => handleAddressClick(address, index)}>
+
+                    <div
+                      className="address-card-content"
+                      onClick={() => handleAddressClick(addr, index)}
+                    >
                       <div className="address-card-header">
                         <div className="address-name-wrapper">
                           <input
                             type="radio"
                             name="address-select"
                             checked={selectedAddressIndex === index}
-                            onChange={() => handleAddressClick(address, index)}
+                            onChange={() => handleAddressClick(addr, index)}
                             className="address-radio"
                           />
-                          <span className="address-name">{address.addrName || "이름 없음"}</span>
+                          <span className="address-name">
+                            {addr.addrName || "이름 없음"}
+                          </span>
                         </div>
-                        {address.addrDef === 'Y' && (
-                          <span className="address-default-badge">기본배송지</span>
+                        {addr.addrDef === "Y" && (
+                          <span className="address-default-badge">
+                            기본배송지
+                          </span>
                         )}
                       </div>
+
                       <div className="address-card-body">
-                        <p className="address-phone">{address.addrTel || ""}</p>
+                        <p className="address-phone">{addr.addrTel || ""}</p>
                         <p className="address-full">
-                          ({address.addrZipcode || ""}) {address.addrMain || ""} {address.addrDetail || ""}
+                          ({addr.addrZipcode || ""}) {addr.addrMain || ""}{" "}
+                          {addr.addrDetail || ""}
                         </p>
-                        {address.addrReq && (
-                          <p className="address-memo">배송 메시지: {address.addrReq}</p>
+                        {addr.addrReq && (
+                          <p className="address-memo">
+                            배송 메시지: {addr.addrReq}
+                          </p>
                         )}
                       </div>
                     </div>

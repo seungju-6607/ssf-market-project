@@ -32,12 +32,13 @@ export default function PayConfirm() {
   }, [firstOrder]);
 
   useEffect(() => {
-    // 결제 성공일 때만 주문조회
-    if (orderId && status === "success") {
+    // ✅ orderId 없으면 잘못된 접근이니 홈으로
+    if (!orderId) return;
+
+    if (status === "success") {
       dispatch(showOrderList(orderId));
     }
 
-    // 결제 완료 후 임시 저장소 정리
     localStorage.removeItem("cartCheckout");
     localStorage.removeItem("directCheckout");
     localStorage.removeItem("orderSource");
@@ -45,10 +46,8 @@ export default function PayConfirm() {
 
   const totalPrice = firstOrder?.totalPrice
     ? toNumber(firstOrder.totalPrice)
-    : (orderList?.reduce(
-        (sum, i) => sum + toNumber(i.itemPrice) * i.itemQty,
-        0
-      ) || 0);
+    : (orderList?.reduce((sum, i) => sum + toNumber(i.itemPrice) * i.itemQty, 0) ||
+        0);
 
   const extractThumb = (itemList) => {
     if (!itemList) return "";
@@ -68,11 +67,28 @@ export default function PayConfirm() {
 
   const goHome = () => navigate("/");
 
-  // ✅ status 안내
   const statusLabel =
     status === "success" ? "결제완료" : status === "cancel" ? "결제취소" : "결제실패";
 
-  // cancel/fail이면 주문내역 조회하지 않으니 간단 안내만
+  // ✅ orderId 없을 때 안내
+  if (!orderId) {
+    return (
+      <div className="pc-wrap">
+        <div className="pc-card">
+          <section className="pc-items-block">
+            <div className="pc-empty">잘못된 접근입니다.</div>
+          </section>
+          <footer className="pc-footer">
+            <button type="button" className="pc-home-btn" onClick={goHome}>
+              홈으로 가기
+            </button>
+          </footer>
+        </div>
+      </div>
+    );
+  }
+
+  // cancel/fail
   if (status !== "success") {
     return (
       <div className="pc-wrap">
@@ -85,7 +101,7 @@ export default function PayConfirm() {
               </p>
             </div>
             <div className="pc-order-links">
-              <span className="pc-order-id">주문번호 : {orderId || "-"}</span>
+              <span className="pc-order-id">주문번호 : {orderId}</span>
             </div>
           </header>
 
@@ -163,7 +179,8 @@ export default function PayConfirm() {
               <div>
                 <dt>주소</dt>
                 <dd>
-                  ({firstOrder.addrZipCode}) {firstOrder.addrMain} {firstOrder.addrDetail}
+                  ({firstOrder.addrZipCode}) {firstOrder.addrMain}{" "}
+                  {firstOrder.addrDetail}
                 </dd>
               </div>
               <div>
