@@ -2,60 +2,61 @@ package com.ssf.project.security;
 
 import io.jsonwebtoken.*;
 import io.jsonwebtoken.security.Keys;
+import jakarta.annotation.PostConstruct;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 
+import javax.crypto.SecretKey;
 import java.nio.charset.StandardCharsets;
-import java.security.Key;
 import java.util.Date;
 
 @Component
 public class JwtTokenProvider {
 
-    private final Key key;
-    private final long expirationMs;
+    @Value("${jwt.secret}")
+    private String secret;
 
-    public JwtTokenProvider(
-            @Value("${jwt.secret}") String secret,
-            @Value("${jwt.expiration-ms:3600000}") long expirationMs
-    ) {
-        // ✅ secret은 최소 32자 이상 권장 (HS256)
+    @Value("${jwt.expiration-ms}")
+    private long expirationMs;
+
+    private SecretKey key;
+
+    @PostConstruct
+    public void init() {
+        if (secret == null || secret.length() < 32) {
+            throw new IllegalStateException("JWT_SECRET is null or too short");
+        }
+
         this.key = Keys.hmacShaKeyFor(secret.getBytes(StandardCharsets.UTF_8));
-        this.expirationMs = expirationMs;
     }
 
-    public String createToken(String subjectEmail, String role) {
+    public String createToken(String email, String role) {
         Date now = new Date();
-        Date exp = new Date(now.getTime() + expirationMs);
+        Date expiry = new Date(now.getTime() + expirationMs);
 
         return Jwts.builder()
-                .setSubject(subjectEmail)
+                .setSubject(email)
                 .claim("role", role)
                 .setIssuedAt(now)
-                .setExpiration(exp)
+                .setExpiration(expiry)
                 .signWith(key, SignatureAlgorithm.HS256)
                 .compact();
     }
 
-    public boolean validate(String token) {
+    public Claims getClaims(String token) {
+        return Jwts.parserBuilder()
+                .setSigningKey(key)
+                .build()
+                .parseClaimsJws(token)
+                .getBody();
+    }
+
+    public boolean validateToken(String token) {
         try {
-            parser().parseClaimsJws(token);
+            getClaims(token);
             return true;
         } catch (JwtException | IllegalArgumentException e) {
             return false;
         }
-    }
-
-    public String getSubject(String token) {
-        return parser().parseClaimsJws(token).getBody().getSubject();
-    }
-
-    public String getRole(String token) {
-        Object v = parser().parseClaimsJws(token).getBody().get("role");
-        return v == null ? "user" : v.toString();
-    }
-
-    private JwtParser parser() {
-        return Jwts.parserBuilder().setSigningKey(key).build();
     }
 }
