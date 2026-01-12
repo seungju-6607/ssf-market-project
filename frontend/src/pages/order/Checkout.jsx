@@ -146,10 +146,6 @@ const PaymentIcon = ({ method }) => {
   );
 };
 
-// ✅ orderId 생성 (프론트에서 한번 만들어서 백엔드에 넘김)
-const generateOrderId = () =>
-  `ORD-${Date.now()}-${Math.random().toString(36).slice(2, 8)}`;
-
 export default function Checkout() {
   const navigate = useNavigate();
   const location = useLocation();
@@ -195,10 +191,10 @@ export default function Checkout() {
   const [cardBrand, setCardBrand] = useState("");
   const [installment, setInstallment] = useState("일시불");
 
-  // ✅ 결제 중 중복 클릭 방지
+  // 버튼 중복클릭 방지
   const [isPaying, setIsPaying] = useState(false);
 
-  // paymentMethods.json 파일에서 결제 방법 목록 로드
+  // paymentMethods.json 로드
   useEffect(() => {
     fetch("/paymentMethods.json")
       .then((res) => res.json())
@@ -206,6 +202,7 @@ export default function Checkout() {
       .catch((e) => console.error("paymentMethods.json load fail:", e));
   }, []);
 
+  // 쿠폰 로드
   useEffect(() => {
     if (!loginUser?.email) {
       setCouponInfo(null);
@@ -237,7 +234,7 @@ export default function Checkout() {
     dispatch(fetchDefaultAddress());
   }, [dispatch]);
 
-  // 배송지 정보를 폼에 채우는 함수
+  // 배송지 폼 채우기
   const fillAddressForm = useCallback(
     (addr) => {
       if (!addr) return;
@@ -254,7 +251,6 @@ export default function Checkout() {
     [loginUser.email]
   );
 
-  // 기본 배송지 데이터를 폼에 채우기
   useEffect(() => {
     if (defaultAddress) fillAddressForm(defaultAddress);
   }, [defaultAddress, fillAddressForm]);
@@ -280,9 +276,6 @@ export default function Checkout() {
     return cards;
   }, [kakaoMethod]);
 
-  // 주소찾기 팝업 상태 (현재 UI에서 따로 쓰진 않지만 기존 유지)
-  const [isPostcodeOpen, setIsPostcodeOpen] = useState(false);
-
   // 배송지 선택 모달 상태
   const [isAddressModalOpen, setIsAddressModalOpen] = useState(false);
   const [selectedAddressIndex, setSelectedAddressIndex] = useState(null);
@@ -290,7 +283,6 @@ export default function Checkout() {
   // 카드 옵션 모달 상태
   const [isCardOptionModalOpen, setIsCardOptionModalOpen] = useState(false);
 
-  // 새로입력 버튼 클릭시 기존 정보 초기화
   const handleNewAddress = () => {
     setName("");
     setPhone("");
@@ -302,13 +294,11 @@ export default function Checkout() {
     setSaveAsDefault(false);
   };
 
-  // 배송지 선택 버튼 클릭
   const handleSelectAddress = async () => {
     await dispatch(fetchAddressList());
     setIsAddressModalOpen(true);
   };
 
-  // 배송지 선택
   const handleAddressClick = (addr, index) => {
     setSelectedAddressIndex(index);
     fillAddressForm(addr);
@@ -319,7 +309,6 @@ export default function Checkout() {
     }, 200);
   };
 
-  // 배송지 삭제
   const handleDeleteAddress = async (addrKey) => {
     if (!window.confirm("정말 이 배송지를 삭제하시겠습니까?")) return;
 
@@ -331,11 +320,9 @@ export default function Checkout() {
     }
   };
 
-  // 주소찾기 버튼 클릭 시 (카카오 우편번호 API 연동)
   const handleOpenPostcode = (data) => {
     setPostcode(data.zonecode);
     setAddress(data.jibunAddress);
-    setIsPostcodeOpen(true);
   };
 
   // 합계
@@ -380,11 +367,9 @@ export default function Checkout() {
     [subtotal, normalizedCoupon]
   );
 
-  // 배송비 2500원 고정
   const shipping = 2500;
   const total = Math.max(0, subtotal - discount + shipping);
 
-  // ✅ totals 변경될 때 paymentInfo도 갱신되도록
   const paymentInfo = useMemo(
     () => ({
       shippingFee: shipping,
@@ -399,21 +384,15 @@ export default function Checkout() {
 
     const userEmail = loginUser?.email;
 
-    // ✅ 로그인 체크: anonymousUser 방지
+    // ✅ 여기서 막아야 anonymousUser 안감
     if (!userEmail) {
       alert("로그인 후 결제할 수 있어요.");
       navigate("/login");
       return;
     }
 
-    // ✅ 필수 입력 체크
     if (!name || !phone || !postcode || !address) {
       alert("배송지 정보를 모두 입력해 주세요.");
-      return;
-    }
-
-    if (payMethod !== "kakao") {
-      alert("현재는 카카오페이만 지원합니다.");
       return;
     }
 
@@ -429,7 +408,6 @@ export default function Checkout() {
         memo,
       };
 
-      // ✅ 주소 저장 (실패해도 결제 진행은 하게 하려면 try/catch로 분리 가능)
       await dispatch(
         saveAddress({
           addrName: name,
@@ -443,9 +421,8 @@ export default function Checkout() {
       );
 
       const orderSource = localStorage.getItem("orderSource") || "cart";
-      const orderId = generateOrderId(); // ✅ 핵심: orderId 프론트 생성
 
-      // ✅ 핵심: getPayment에 orderId + userEmail 넘김(anonymousUser/빈 orderId 방지)
+      // ✅ 핵심: userEmail을 getPayment로 넘김
       await getPayment(
         receiver,
         paymentInfo,
@@ -453,12 +430,9 @@ export default function Checkout() {
         total,
         orderSource,
         selectedCoupon?.couponId,
-        orderId,   // ✅ 추가
-        userEmail  // ✅ 추가
+        userEmail
       );
-    } catch (e) {
-      console.error("결제 준비 실패:", e);
-      alert("결제 준비 중 오류가 발생했습니다. 잠시 후 다시 시도해 주세요.");
+    } finally {
       setIsPaying(false);
     }
   };
