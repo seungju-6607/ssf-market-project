@@ -62,33 +62,52 @@ export default function CartPage() {
   };
 
   const unitPrice = (item) => {
-  if (!item) return 0;
+    if (!item) return 0;
 
-  const sale =
-    typeof item.itemSale === "number"
-      ? item.itemSale
-      : Number(String(item.itemSale ?? "").replace(/[^\d]/g, "")) || 0;
+    const sale =
+      typeof item.itemSale === "number"
+        ? item.itemSale
+        : Number(String(item.itemSale ?? "").replace(/[^\d]/g, "")) || 0;
 
-  const price =
-    typeof item.itemPrice === "number"
-      ? item.itemPrice
-      : Number(String(item.itemPrice ?? "").replace(/[^\d]/g, "")) || 0;
+    const price =
+      typeof item.itemPrice === "number"
+        ? item.itemPrice
+        : Number(String(item.itemPrice ?? "").replace(/[^\d]/g, "")) || 0;
 
-  return sale > 0 ? sale : price;
-};
-
+    return sale > 0 ? sale : price;
+  };
 
   const linePrice = (item) => {
     if (!item) return 0;
-    if (typeof item.lineTotalSale === "number") return item.lineTotalSale;
-    if (typeof item.lineTotalPrice === "number") return item.lineTotalPrice;
-    return unitPrice(item) * (item.cartQty || 0);
+
+    const qty = Number(item.cartQty || 0);
+
+    const lineSale =
+      typeof item.lineTotalSale === "number"
+        ? item.lineTotalSale
+        : Number(String(item.lineTotalSale ?? "").replace(/[^\d]/g, "")) || 0;
+
+    const lineP =
+      typeof item.lineTotalPrice === "number"
+        ? item.lineTotalPrice
+        : Number(String(item.lineTotalPrice ?? "").replace(/[^\d]/g, "")) || 0;
+
+    if (lineSale > 0) return lineSale;
+    if (lineP > 0) return lineP;
+
+    return unitPrice(item) * qty;
   };
 
   /* 장바구니 아이템 선택 */
   const selectedItems = useMemo(
     () => cartList.filter((item) => selected[item.cartKey]),
     [cartList, selected]
+  );
+
+  // ✅ 추가: 선택된 상품 합계(프론트에서 정확히 계산)
+  const selectedTotal = useMemo(
+    () => selectedItems.reduce((sum, item) => sum + linePrice(item), 0),
+    [selectedItems]
   );
 
   const proceed = () => {
@@ -106,7 +125,6 @@ export default function CartPage() {
       size: item.cartSize || "",
     }));
 
-
     localStorage.setItem("cartCheckout", JSON.stringify(payload));
     localStorage.setItem("orderSource", "cart");
     localStorage.removeItem("directCheckout");
@@ -115,13 +133,13 @@ export default function CartPage() {
 
   /* 장바구니 선택 삭제 */
   const deleteSelectedItems = async () => {
-    if(selectedItems.length === 0) {
-        alert("삭제할 상품을 선택해주세요.");
-        return;
+    if (selectedItems.length === 0) {
+      alert("삭제할 상품을 선택해주세요.");
+      return;
     }
-    const cartKeys = selectedItems.map(item => item.cartKey);
+    const cartKeys = selectedItems.map((item) => item.cartKey);
     await dispatch(removeCart(cartKeys));
-  }
+  };
 
   return (
     <div className="cart-wrap">
@@ -138,17 +156,15 @@ export default function CartPage() {
         <div className="cart-layout">
           <div className="cart-head">
             <label className="chk">
-              <input
-                type="checkbox"
-                checked={allChecked}
-                onChange={toggleAll}
-              />
+              <input type="checkbox" checked={allChecked} onChange={toggleAll} />
               <span>전체선택</span>
             </label>
             <div className="cart-head-actions">
-              <button className="btn"
-                      onClick={deleteSelectedItems}
-                      disabled={selectedItems.length === 0}>
+              <button
+                className="btn"
+                onClick={deleteSelectedItems}
+                disabled={selectedItems.length === 0}
+              >
                 선택삭제
               </button>
             </div>
@@ -170,35 +186,42 @@ export default function CartPage() {
                     />
                   </label>
 
-                  <img
-                    className="cart-img"
-                    src={imgSrc}
-                    alt={item.itemName}
-                  />
+                  <img className="cart-img" src={imgSrc} alt={item.itemName} />
 
                   <div className="cart-info">
                     <div className="cart-name">{item.itemName}</div>
                     <div className="cart-meta">사이즈: {item.cartSize}</div>
-                    <div className="cart-meta">
-                      단가: ₩{unit.toLocaleString()}
-                    </div>
+                    <div className="cart-meta">단가: ₩{unit.toLocaleString()}</div>
                   </div>
 
                   <div className="cart-qty">
-                    <button type="button" onClick={() => {item.cartQty > 1 && dispatch(updateCartQty(item.cartKey, "-"))}}>
+                    <button
+                      type="button"
+                      onClick={() => {
+                        item.cartQty > 1 && dispatch(updateCartQty(item.cartKey, "-"));
+                      }}
+                    >
                       -
                     </button>
                     <input type="text" value={item.cartQty} readOnly />
-                    <button type="button" onClick={() => { dispatch(updateCartQty(item.cartKey, "+"))}}>
+                    <button
+                      type="button"
+                      onClick={() => {
+                        dispatch(updateCartQty(item.cartKey, "+"));
+                      }}
+                    >
                       +
                     </button>
                   </div>
 
-                  <div className="cart-sub">
-                    ₩{sub.toLocaleString()}
-                  </div>
+                  <div className="cart-sub">₩{sub.toLocaleString()}</div>
 
-                  <button className="btn-danger" onClick={() => { dispatch(removeCart(item.cartKey))}}>
+                  <button
+                    className="btn-danger"
+                    onClick={() => {
+                      dispatch(removeCart(item.cartKey));
+                    }}
+                  >
                     삭제
                   </button>
                 </div>
@@ -209,7 +232,11 @@ export default function CartPage() {
           <div className="cart-summary">
             <div className="cart-sum-row">
               <span>선택 상품 금액</span>
-              <b>₩{totalSaleAmount.toLocaleString()}</b>
+              {/* ✅ 기존 totalSaleAmount 대신 selectedTotal로 표시 */}
+              <b>₩{selectedTotal.toLocaleString()}</b>
+              {/* 참고: totalSaleAmount(리덕스)는 이제 안 써도 됨
+                  <b>₩{totalSaleAmount.toLocaleString()}</b>
+              */}
             </div>
             <div className="cart-actions">
               <Link to="/" className="btn">
