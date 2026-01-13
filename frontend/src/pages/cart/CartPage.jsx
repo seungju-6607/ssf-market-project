@@ -62,13 +62,21 @@ export default function CartPage() {
   };
 
   const unitPrice = (item) => {
-    if (!item) return 0;
-    if (typeof item.itemSale === "number") return item.itemSale;
-    if (typeof item.itemPrice === "number") return item.itemPrice;
-    const price = item.itemSale ?? item.itemPrice;
-    if (!price) return 0;
-    return Number(String(price).replace(/[^\d]/g, "")) || 0;
-  };
+  if (!item) return 0;
+
+  const sale =
+    typeof item.itemSale === "number"
+      ? item.itemSale
+      : Number(String(item.itemSale ?? "").replace(/[^\d]/g, "")) || 0;
+
+  const price =
+    typeof item.itemPrice === "number"
+      ? item.itemPrice
+      : Number(String(item.itemPrice ?? "").replace(/[^\d]/g, "")) || 0;
+
+  return sale > 0 ? sale : price;
+};
+
 
   const linePrice = (item) => {
     if (!item) return 0;
@@ -93,10 +101,11 @@ export default function CartPage() {
       id: item.cartKey,
       name: item.itemName,
       image: parseImage(item.itemList),
-      price: unitPrice(item),
-      qty: item.cartQty,
-      size: item.cartSize,
+      price: Number(unitPrice(item)) || 0,
+      qty: Number(item.cartQty) || 1,
+      size: item.cartSize || "",
     }));
+
 
     localStorage.setItem("cartCheckout", JSON.stringify(payload));
     localStorage.setItem("orderSource", "cart");
