@@ -1,59 +1,68 @@
 // src/pages/Search.jsx
-import React, { useMemo } from "react";
+import React, { useEffect, useMemo, useState } from "react";
 import { useParams } from "react-router-dom";
+import axiosJWT from "../api/axiosJWT.js";
 import ProductThumb from "../components/ProductThumb";
-import { PRODUCT_DATA } from "../data/productData";   // 실제 경로에 맞춰 수정
 import { srcOf } from "../utils/srcOf";
 
-// PRODUCT_DATA를 1차원 배열로 평탄화
-function flattenProducts(data) {
-  const out = [];
-  Object.entries(data).forEach(([cat, sections]) => {
-    Object.entries(sections).forEach(([sub, arr]) => {
-      if (Array.isArray(arr)) {
-        arr.forEach((p) =>
-          out.push({
-            ...p,
-            category: cat,
-            subcategory: sub,
-          })
-        );
-      }
-    });
-  });
-  return out;
-}
+const toNumber = (v) =>
+  typeof v === "number" ? v : Number(String(v ?? "").replace(/[^\d]/g, "")) || 0;
 
 export default function Search() {
-  const { keyword = "" } = useParams();        // /search/:keyword
+  const { keyword = "" } = useParams();
   const q = decodeURIComponent(keyword).trim();
-  const all = useMemo(() => flattenProducts(PRODUCT_DATA), []);
 
-  // ‘자켓’ 검색 → name/desc 에 포함된 상품만
-  const results = useMemo(() => {
-    if (!q) return [];
-    const needle = q.toLowerCase();
-    return all.filter((p) => {
-      const name = (p.name || "").toLowerCase();
-      const desc = (p.desc || "").toLowerCase();
-      return name.includes(needle) || desc.includes(needle);
+  const [items, setItems] = useState([]);
+
+  useEffect(() => {
+    let mounted = true;
+
+    const run = async () => {
+      if (!q) {
+        if (mounted) setItems([]);
+        return;
+      }
+      try {
+        const res = await axiosJWT.get(
+          `/api/items/search?q=${encodeURIComponent(q)}`
+        );
+        if (mounted) setItems(Array.isArray(res.data) ? res.data : []);
+      } catch (e) {
+        console.error("search error:", e);
+        if (mounted) setItems([]);
+      }
+    };
+
+    run();
+    return () => {
+      mounted = false;
+    };
+  }, [q]);
+
+  const normalized = useMemo(() => {
+    return items.map((it) => {
+      let firstImg = "";
+      try {
+        const arr = JSON.parse(it.itemList || "[]");
+        firstImg = arr?.[0] || "";
+      } catch {}
+
+      return {
+        id: it.itemKey,
+        name: it.itemName,
+        desc: it.itemContent,
+        price: toNumber(it.itemPrice),
+        img: srcOf(firstImg),
+      };
     });
-  }, [all, q]);
-
-  const normalized = useMemo(
-    () =>
-      results.map((p) => ({
-        ...p,
-        image: srcOf(p.image || p.img || p.src),
-      })),
-    [results]
-  );
+  }, [items]);
 
   return (
     <div className="page">
       <div className="container">
         <h2 className="page-title" style={{ marginBottom: 18 }}>
-          ‘{q}’ 검색 결과 <span className="count">{normalized.length}개 상품</span>
+          ‘{q}’ 검색 결과{" "}
+          <span className="count">{normalized.length}개 상품</span>
         </h2>
 
         <div className="product-grid">
@@ -62,7 +71,7 @@ export default function Search() {
               <ProductThumb product={p} />
               <h4>{p.name}</h4>
               <p className="desc">{p.desc}</p>
-              <p className="price">{p.price}</p>
+              <p className="price">₩{p.price.toLocaleString()}</p>
             </div>
           ))}
         </div>

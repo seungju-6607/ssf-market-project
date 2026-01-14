@@ -31,21 +31,21 @@ public class ItemController {
     @GetMapping("/{itemKey}")
     public ResponseEntity<Item> getItemDetail(@PathVariable Long itemKey) {
         Item item = service.getItemDetail(itemKey);
-        if (item != null) {
-            return ResponseEntity.ok(item);
-        } else {
-            return ResponseEntity.notFound().build();
-        }
+        if (item != null) return ResponseEntity.ok(item);
+        return ResponseEntity.notFound().build();
     }
 
     // 단일 상품 조회 by productId
     @GetMapping("/product/{productId}")
     public ResponseEntity<Item> getItemByProductId(@PathVariable String productId) {
         Item item = service.getItemByProductId(productId);
-        if (item != null) {
-            return ResponseEntity.ok(item);
-        } else {
-            return ResponseEntity.notFound().build();
-        }
+        if (item != null) return ResponseEntity.ok(item);
+        return ResponseEntity.notFound().build();
+    }
+
+    // ✅ 검색
+    @GetMapping("/search")
+    public ResponseEntity<List<Item>> search(@RequestParam("q") String q) {
+        return ResponseEntity.ok(service.searchItems(q));
     }
 }

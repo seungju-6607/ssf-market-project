@@ -1,3 +1,4 @@
+// backend/src/main/java/com/ssf/project/service/ItemService.java
 package com.ssf.project.service;
 
 import com.ssf.project.entity.Item;
@@ -6,6 +7,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
 
+import java.util.Collections;
 import java.util.List;
 
 @Service
@@ -18,7 +20,6 @@ public class ItemService {
         this.repo = repo;
     }
 
-    // 카테고리 + 서브카테고리 상품 조회
     public List<Item> getItemsByCategory(String category, String subcategory) {
         List<Item> items;
 
@@ -30,13 +31,10 @@ public class ItemService {
             logger.info("getItemsByCategory({},{}) -> {} items found", category, subcategory, items.size());
         }
 
-        // 중간 데이터 확인
         items.forEach(item -> logger.debug("Item: {} - {} - {}", item.getItemKey(), item.getItemName(), item.getItemPrice()));
-
         return items;
     }
 
-    // 단일 상품 조회
     public Item getItemDetail(Long itemKey) {
         Item item = repo.findByItemKeyAndItemDeleted(itemKey, "N");
         if (item != null) {
@@ -48,7 +46,6 @@ public class ItemService {
         return item;
     }
 
-    // 단일 상품 조회 by productId
     public Item getItemByProductId(String productId) {
         Item item = repo.findByProductIdAndItemDeleted(productId, "N");
         if (item != null) {
@@ -58,5 +55,13 @@ public class ItemService {
             logger.warn("getItemByProductId({}) -> Item not found", productId);
         }
         return item;
+    }
+
+    // ✅ 추가: 검색
+    public List<Item> searchItems(String q) {
+        if (q == null) return Collections.emptyList();
+        String keyword = q.trim();
+        if (keyword.isEmpty()) return Collections.emptyList();
+        return repo.search(keyword);
     }
 }
